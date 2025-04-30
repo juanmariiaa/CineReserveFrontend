@@ -49,10 +49,32 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  isLoggedIn(): boolean {
-    return !!this.getToken();
+  private tokenExpired(token: string): boolean {
+    if (!token) return true;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expiryTime = payload.exp * 1000; // Convert to milliseconds
+      return Date.now() >= expiryTime;
+    } catch (e) {
+      return true; // Si hay error al decodificar, consideramos que ha expirado
+    }
   }
-
+  
+  // Modifica el método isLoggedIn para verificar la expiración
+  isLoggedIn(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+    
+    const isExpired = this.tokenExpired(token);
+    if (isExpired) {
+      this.logout(); // Limpiar si está expirado
+      return false;
+    }
+    
+    return true;
+  }
+  
   isAdmin(): boolean {
     const user = this.currentUserSubject.value;
     return user?.roles?.includes('ROLE_ADMIN');

@@ -7,11 +7,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
     MatCardModule,
     MatFormFieldModule,
@@ -90,11 +92,20 @@ export class LoginComponent {
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {
-          this.snackBar.open('Error al iniciar sesión: ' + (error.message || 'Credenciales incorrectas'), 'Cerrar', {
+          let errorMsg = 'Credenciales incorrectas';
+          
+          if (error.error && error.error.message) {
+            errorMsg = error.error.message;
+          } else if (error.status === 0) {
+            errorMsg = 'No se pudo conectar con el servidor. Verifica tu conexión o si el servidor está activo.';
+          } else if (error.status === 401) {
+            errorMsg = 'Usuario o contraseña incorrectos';
+          }
+          
+          this.snackBar.open('Error al iniciar sesión: ' + errorMsg, 'Cerrar', {
             duration: 5000
           });
         }
       });
     }
-  }
-}
+  }}

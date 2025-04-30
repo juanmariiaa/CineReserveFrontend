@@ -25,12 +25,16 @@ export class AuthInterceptor implements HttpInterceptor {
         }
       });
     }
-
+  
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
+          console.log('No autorizado: Sesión expirada o token inválido');
           this.authService.logout();
           this.router.navigate(['/login']);
+        } else if (error.status === 403) {
+          console.log('Acceso prohibido: No tienes permiso para esta acción');
+          // Puedes redirigir a una página de error o mostrar un mensaje
         }
         return throwError(() => error);
       })
