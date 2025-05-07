@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { ADMIN_ROUTES } from './features/admin/admin.routes';
 
 export const routes: Routes = [
   {
@@ -30,5 +31,6 @@ export const routes: Routes = [
     path: 'movies/:id',
     loadComponent: () => import('./features/movies/movie-detail/movie-detail.component').then(c => c.MovieDetailComponent),
     canActivate: [authGuard]
-  }
+  },
+  ...ADMIN_ROUTES
 ];

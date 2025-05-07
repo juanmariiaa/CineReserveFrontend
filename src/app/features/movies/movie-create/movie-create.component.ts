@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MovieService } from '../../../core/services/movie.service';
 import { MovieSearchResult } from '../../../core/models/movie.model';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -30,12 +30,18 @@ import { Subject, of } from 'rxjs';
     MatIconModule,
     MatChipsModule,
     MatDividerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    RouterLink
   ],
   template: `
     <div class="movie-create-container">
-      <h1>Añadir película</h1>
-      
+      <div class="page-header">
+        <h1>Añadir película</h1>
+        <button mat-raised-button color="accent" routerLink="/movies">
+          <mat-icon>arrow_back</mat-icon> Back to Movies
+        </button>
+      </div>
+
       <mat-card>
         <mat-card-content>
           <form [formGroup]="searchForm" class="search-form">
@@ -45,42 +51,42 @@ import { Subject, of } from 'rxjs';
               <mat-icon matSuffix>search</mat-icon>
             </mat-form-field>
           </form>
-          
+
           <div *ngIf="searching" class="loading-spinner">
             <mat-spinner diameter="40"></mat-spinner>
           </div>
-          
+
           <div *ngIf="searchResults.length > 0" class="search-results-grid">
             <mat-card *ngFor="let movie of searchResults" class="movie-card">
               <div class="poster-container" *ngIf="movie.posterPath">
-                <img *ngIf="movie.posterPath" [src]="movie.posterPath" 
+                <img *ngIf="movie.posterPath" [src]="movie.posterPath"
                      [alt]="movie.title" class="movie-poster">
                 <div *ngIf="!movie.posterPath" class="no-poster">
 
                   <mat-icon>movie</mat-icon>
                 </div>
               </div>
-              
+
               <mat-card-content class="movie-card-content">
                 <h3 class="movie-title">{{ movie.title }}</h3>
-                
+
                 <div class="movie-metadata">
                   <span *ngIf="movie.releaseDate" class="release-date">
                     <mat-icon class="meta-icon">calendar_today</mat-icon>
                     {{ movie.releaseDate | date:'yyyy' }}
                   </span>
-                  
+
                   <span *ngIf="movie.voteAverage" class="vote-average">
                     <mat-icon class="meta-icon star-icon">star</mat-icon>
                     {{ movie.voteAverage }} / 10
                   </span>
                 </div>
-                
+
                 <p *ngIf="movie.overview" class="movie-overview">{{ movie.overview }}</p>
-                
+
 
               </mat-card-content>
-              
+
               <mat-card-actions align="end">
                 <button mat-raised-button color="primary" (click)="importMovie(movie.id)">
                   <mat-icon>add</mat-icon> Importar
@@ -88,12 +94,12 @@ import { Subject, of } from 'rxjs';
               </mat-card-actions>
             </mat-card>
           </div>
-          
+
           <div *ngIf="!searching && searchResults.length === 0 && searchForm.get('searchTerm')?.value" class="no-results">
             <mat-icon>search_off</mat-icon>
             <p>No se encontraron resultados</p>
           </div>
-          
+
           <div *ngIf="importing" class="importing-spinner">
             <mat-spinner></mat-spinner>
             <p>Importando película...</p>
@@ -106,29 +112,36 @@ import { Subject, of } from 'rxjs';
     .movie-create-container {
       padding: 20px;
     }
-    
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
     .search-form {
       margin-bottom: 20px;
     }
-    
+
     .search-field {
       width: 100%;
     }
-    
+
     .loading-spinner, .importing-spinner {
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 20px 0;
     }
-    
+
     .search-results-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
       margin-top: 20px;
     }
-    
+
     .movie-card {
       display: flex;
       flex-direction: column;
@@ -136,12 +149,12 @@ import { Subject, of } from 'rxjs';
       transition: all 0.3s ease;
       overflow: hidden;
     }
-    
+
     .movie-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 6px 10px rgba(0,0,0,0.15);
     }
-    
+
     .poster-container {
       height: 300px;
       overflow: hidden;
@@ -150,13 +163,13 @@ import { Subject, of } from 'rxjs';
       justify-content: center;
       align-items: center;
     }
-    
+
     .movie-poster {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
+
     .no-poster {
       display: flex;
       justify-content: center;
@@ -165,19 +178,19 @@ import { Subject, of } from 'rxjs';
       height: 100%;
       background-color: #e0e0e0;
     }
-    
+
     .no-poster mat-icon {
       font-size: 64px;
       width: 64px;
       height: 64px;
       color: #888;
     }
-    
+
     .movie-card-content {
       flex-grow: 1;
       padding: 16px;
     }
-    
+
     .movie-title {
       margin: 0 0 8px;
       font-size: 18px;
@@ -187,7 +200,7 @@ import { Subject, of } from 'rxjs';
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    
+
     .movie-metadata {
       display: flex;
       align-items: center;
@@ -196,7 +209,7 @@ import { Subject, of } from 'rxjs';
       color: #666;
       font-size: 14px;
     }
-    
+
     .meta-icon {
       font-size: 16px;
       width: 16px;
@@ -204,11 +217,11 @@ import { Subject, of } from 'rxjs';
       vertical-align: middle;
       margin-right: 4px;
     }
-    
+
     .star-icon {
       color: gold;
     }
-    
+
     .movie-overview {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -221,19 +234,19 @@ import { Subject, of } from 'rxjs';
       margin-bottom: 12px;
       height: 63px; /* Approximately 3 lines */
     }
-    
+
     .genre-chips {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
       margin-top: 10px;
     }
-    
+
     .genre-chips .mat-mdc-chip {
       font-size: 12px;
       min-height: 24px;
     }
-    
+
     .no-results {
       display: flex;
       flex-direction: column;
@@ -241,7 +254,7 @@ import { Subject, of } from 'rxjs';
       padding: 30px;
       color: #888;
     }
-    
+
     .no-results mat-icon {
       font-size: 48px;
       width: 48px;
@@ -255,7 +268,7 @@ export class MovieCreateComponent implements OnInit {
   searchResults: MovieSearchResult[] = [];
   searching = false;
   importing = false;
-  
+
   // Simple genre mapping - you might want to fetch these from an API
   genres: Record<number, string> = {
     28: 'Acción',

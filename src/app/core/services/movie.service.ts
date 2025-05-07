@@ -28,4 +28,8 @@ export class MovieService {
     // Asumimos que hay un endpoint para obtener todas las películas
     return this.http.get<Movie[]>(`${environment.apiUrl}/movies`);
   }
+
+  deleteMovie(id: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/movies/${id}`);
+  }
 }

@@ -89,7 +89,7 @@ export class LoginComponent {
       const { username, password } = this.loginForm.value;
       this.authService.login({ username, password }).subscribe({
         next: () => {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/admin/dashboard']);
         },
         error: (error) => {
           let errorMsg = 'Credenciales incorrectas';

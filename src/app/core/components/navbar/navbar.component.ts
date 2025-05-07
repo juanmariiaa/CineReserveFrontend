@@ -13,20 +13,23 @@ import { MatIconModule } from '@angular/material/icon';
     <mat-toolbar color="primary">
       <span>Cine Admin</span>
       <div class="spacer"></div>
-      <a mat-button routerLink="/dashboard">
+      <a mat-button routerLink="/admin/dashboard">
         <mat-icon>dashboard</mat-icon> Dashboard
       </a>
-      <a mat-button routerLink="/movies">
-        <mat-icon>movie</mat-icon> Películas
+      <a mat-button routerLink="/admin/movies">
+        <mat-icon>movie</mat-icon> Movies
       </a>
-      <a mat-button routerLink="/screenings">
-        <mat-icon>event</mat-icon> Funciones
+      <a mat-button routerLink="/admin/screenings">
+        <mat-icon>event</mat-icon> Screenings
       </a>
-      <a mat-button routerLink="/reservations">
-        <mat-icon>book</mat-icon> Reservas
+      <a mat-button routerLink="/admin/reservations">
+        <mat-icon>book</mat-icon> Reservations
+      </a>
+      <a mat-button routerLink="/admin/users">
+        <mat-icon>people</mat-icon> Users
       </a>
       <button mat-button (click)="logout()">
-        <mat-icon>exit_to_app</mat-icon> Salir
+        <mat-icon>exit_to_app</mat-icon> Exit
       </button>
     </mat-toolbar>
   `,
@@ -34,7 +37,7 @@ import { MatIconModule } from '@angular/material/icon';
     .spacer {
       flex: 1 1 auto;
     }
-    
+
     a {
       margin: 0 8px;
     }

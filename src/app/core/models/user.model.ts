@@ -6,4 +6,5 @@ export interface User {
     lastName: string;
     phoneNumber?: string;
     roles: string[];
+    isActive?: boolean;
   }
