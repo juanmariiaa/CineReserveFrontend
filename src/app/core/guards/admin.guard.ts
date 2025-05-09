@@ -11,9 +11,9 @@ export const adminGuard: CanActivateFn = () => {
     return true;
   }
 
-  // Redirigir al dashboard si el usuario está autenticado pero no es admin
+  // Redirect to not-allowed page if the user is authenticated but not admin
   if (authService.isLoggedIn()) {
-    return router.createUrlTree(['/admin/dashboard']);
+    return router.createUrlTree(['/not-allowed']);
   }
 
   return router.createUrlTree(['/login']);

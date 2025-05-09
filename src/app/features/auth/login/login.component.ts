@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,31 +19,35 @@ import { CommonModule } from '@angular/common';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    RouterLink
   ],
   template: `
     <div class="login-container">
       <mat-card>
         <mat-card-header>
-          <mat-card-title>Iniciar sesión</mat-card-title>
+          <mat-card-title>Login</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Usuario</mat-label>
-              <input matInput formControlName="username" placeholder="Usuario">
-              <mat-error *ngIf="loginForm.get('username')?.invalid">Usuario requerido</mat-error>
+              <mat-label>Username</mat-label>
+              <input matInput formControlName="username" placeholder="Username">
+              <mat-error *ngIf="loginForm.get('username')?.invalid">Username is required</mat-error>
             </mat-form-field>
             
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Contraseña</mat-label>
-              <input matInput type="password" formControlName="password" placeholder="Contraseña">
-              <mat-error *ngIf="loginForm.get('password')?.invalid">Contraseña requerida</mat-error>
+              <mat-label>Password</mat-label>
+              <input matInput type="password" formControlName="password" placeholder="Password">
+              <mat-error *ngIf="loginForm.get('password')?.invalid">Password is required</mat-error>
             </mat-form-field>
             
-            <button type="submit" mat-raised-button color="primary" class="full-width" [disabled]="loginForm.invalid">
-              Iniciar sesión
-            </button>
+            <div class="form-actions">
+              <button type="button" mat-button routerLink="/register">Don't have an account? Register</button>
+              <button type="submit" mat-raised-button color="primary" [disabled]="loginForm.invalid">
+                Login
+              </button>
+            </div>
           </form>
         </mat-card-content>
       </mat-card>
@@ -67,6 +71,13 @@ import { CommonModule } from '@angular/common';
       width: 100%;
       margin-bottom: 15px;
     }
+    
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
   `]
 })
 export class LoginComponent {
@@ -89,23 +100,29 @@ export class LoginComponent {
       const { username, password } = this.loginForm.value;
       this.authService.login({ username, password }).subscribe({
         next: () => {
-          this.router.navigate(['/admin/dashboard']);
+          // Redirect based on user role
+          if (this.authService.isAdmin()) {
+            this.router.navigate(['/admin/dashboard']);
+          } else {
+            this.router.navigate(['/']);
+          }
         },
         error: (error) => {
-          let errorMsg = 'Credenciales incorrectas';
+          let errorMsg = 'Invalid credentials';
           
           if (error.error && error.error.message) {
             errorMsg = error.error.message;
           } else if (error.status === 0) {
-            errorMsg = 'No se pudo conectar con el servidor. Verifica tu conexión o si el servidor está activo.';
+            errorMsg = 'Could not connect to server. Please check your connection or if the server is active.';
           } else if (error.status === 401) {
-            errorMsg = 'Usuario o contraseña incorrectos';
+            errorMsg = 'Invalid username or password';
           }
           
-          this.snackBar.open('Error al iniciar sesión: ' + errorMsg, 'Cerrar', {
+          this.snackBar.open('Login error: ' + errorMsg, 'Close', {
             duration: 5000
           });
         }
       });
     }
-  }}
+  }
+}
