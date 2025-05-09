@@ -49,6 +49,11 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
+  getCurrentUser(): any {
+    const userJson = localStorage.getItem(this.USER_KEY);
+    return userJson ? JSON.parse(userJson) : null;
+  }
+
   private tokenExpired(token: string): boolean {
     if (!token) return true;
     
