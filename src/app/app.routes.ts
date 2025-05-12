@@ -6,53 +6,69 @@ import { ADMIN_ROUTES } from './features/admin/admin.routes';
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./features/home/home.component').then(c => c.HomeComponent)
+    loadComponent: () =>
+      import('./features/home/home.component').then((c) => c.HomeComponent),
   },
   {
     path: 'login',
-    loadComponent: () => import('./features/auth/login/login.component').then(c => c.LoginComponent)
+    loadComponent: () =>
+      import('./features/auth/login/login.component').then(
+        (c) => c.LoginComponent
+      ),
   },
   {
     path: 'register',
-    loadComponent: () => import('./features/auth/register/register.component').then(c => c.RegisterComponent)
+    loadComponent: () =>
+      import('./features/auth/register/register.component').then(
+        (c) => c.RegisterComponent
+      ),
   },
   {
     path: 'not-allowed',
-    loadComponent: () => import('./features/shared/not-allowed/not-allowed.component').then(c => c.NotAllowedComponent)
+    loadComponent: () =>
+      import('./features/shared/not-allowed/not-allowed.component').then(
+        (c) => c.NotAllowedComponent
+      ),
   },
   {
     path: 'reserve/:id',
-    loadComponent: () => import('./features/reservation/reservation.component').then(c => c.ReservationComponent),
-    canActivate: [authGuard]
+    loadComponent: () =>
+      import('./features/reservation/reservation.component').then(
+        (c) => c.ReservationComponent
+      ),
+    canActivate: [authGuard],
   },
   {
     path: 'dashboard',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(c => c.DashboardComponent),
-    canActivate: [authGuard, adminGuard]
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component').then(
+        (c) => c.DashboardComponent
+      ),
+    canActivate: [authGuard, adminGuard],
   },
+  // Rutas públicas de películas
   {
-    path: 'movies/add',
-    loadComponent: () => import('./features/movies/movie-create/movie-create.component').then(c => c.MovieCreateComponent),
-    canActivate: [authGuard, adminGuard]
+    path: 'movies',
+    loadComponent: () =>
+      import('./features/public/movie-list/movie-list.component').then(
+        (c) => c.PublicMovieListComponent
+      ),
   },
+  // Detalle de película (público, sin autenticación)
   {
     path: 'movies/:id',
-    loadComponent: () => import('./features/movies/movie-detail/movie-detail.component').then(c => c.MovieDetailComponent),
-    canActivate: [authGuard]
-  },
-  // Public movie routes - accessible without authentication
-  {
-    path: 'public/movies',
-    loadComponent: () => import('./features/public/movie-list/movie-list.component').then(c => c.PublicMovieListComponent)
-  },
-  {
-    path: 'public/movies/:id',
-    loadComponent: () => import('./features/public/movie-detail/movie-detail.component').then(c => c.PublicMovieDetailComponent)
+    loadComponent: () =>
+      import('./features/public/movie-detail/movie-detail.component').then(
+        (c) => c.PublicMovieDetailComponent
+      ),
   },
   {
     path: 'my-reservations',
-    loadComponent: () => import('./features/user/reservations/user-reservations.component').then(c => c.UserReservationsComponent),
-    canActivate: [authGuard]
+    loadComponent: () =>
+      import('./features/user/reservations/user-reservations.component').then(
+        (c) => c.UserReservationsComponent
+      ),
+    canActivate: [authGuard],
   },
-  ...ADMIN_ROUTES
+  ...ADMIN_ROUTES,
 ];

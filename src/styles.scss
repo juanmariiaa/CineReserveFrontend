@@ -1,24 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { 
-  height: 100%; 
+html,
+body {
+  height: 100%;
 }
 
-body { 
-  margin: 0; 
-  font-family: Roboto, "Helvetica Neue", sans-serif; 
-  background-color: #181818; 
-  color: #FFFFFF;
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #181818;
+  color: #ffffff;
 }
 
 /* Override Angular Material Default Styles */
 .mat-mdc-card {
   background-color: #202020 !important;
-  color: #FFFFFF !important;
+  color: #ffffff !important;
 }
 
 .mat-mdc-card-title {
-  color: #FFFFFF !important;
+  color: #ffffff !important;
 }
 
 .mat-mdc-card-subtitle {
@@ -27,23 +28,35 @@ body {
 
 .mat-toolbar.mat-primary {
   background-color: #121212 !important;
-  color: #FFFFFF !important;
+  color: #ffffff !important;
 }
 
 .mat-mdc-raised-button.mat-primary {
   background-color: #121212 !important;
+  color: #ffffff !important;
 }
 
 .mat-mdc-raised-button.mat-accent,
 .mat-mdc-button.mat-accent,
 .mat-mdc-outlined-button.mat-accent {
-  background-color: #00B020 !important;
-  color: #FFFFFF !important;
+  background-color: #00b020 !important;
+  color: #ffffff !important;
 }
 
-.mat-mdc-button, 
-.mat-mdc-outlined-button {
-  color: #FFFFFF !important;
+.mat-mdc-button,
+.mat-mdc-outlined-button,
+.mat-mdc-raised-button {
+  color: #ffffff !important;
+}
+
+.mat-mdc-button .mat-icon,
+.mat-mdc-raised-button .mat-icon,
+.mat-mdc-outlined-button .mat-icon {
+  color: #ffffff !important;
+}
+
+.mat-mdc-raised-button.mat-warn {
+  color: #ffffff !important;
 }
 
 .mat-mdc-menu-panel {
@@ -51,7 +64,7 @@ body {
 }
 
 .mat-mdc-menu-item {
-  color: #FFFFFF !important;
+  color: #ffffff !important;
 }
 
 .mat-mdc-menu-item:hover:not([disabled]) {
@@ -63,7 +76,33 @@ body {
 }
 
 .mat-mdc-input-element {
-  color: #FFFFFF !important;
+  color: #ffffff !important;
+}
+
+.mat-mdc-form-field-hint {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.mat-mdc-form-field-error {
+  color: #f44336 !important;
+}
+
+.mat-mdc-select-value,
+.mat-mdc-select-arrow {
+  color: #ffffff !important;
+}
+
+.mat-mdc-option {
+  color: #ffffff !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled)
+  .mdc-list-item__primary-text {
+  color: #ffffff !important;
+}
+
+.mat-mdc-select-panel {
+  background-color: #202020 !important;
 }
 
 .mat-mdc-tab-group {
@@ -79,11 +118,11 @@ body {
 }
 
 .mat-mdc-tab.mat-mdc-tab-active {
-  color: #00B020 !important;
+  color: #00b020 !important;
 }
 
 .mat-mdc-tab-body-content {
-  color: #FFFFFF !important;
+  color: #ffffff !important;
 }
 
 .mat-mdc-divider {
@@ -92,16 +131,21 @@ body {
 
 .mat-mdc-table {
   background-color: #202020 !important;
-  color: #FFFFFF !important;
+  color: #ffffff !important;
 }
 
 .mat-mdc-paginator {
   background-color: #202020 !important;
-  color: #FFFFFF !important;
+  color: #ffffff !important;
+}
+
+.mat-mdc-cell,
+.mat-mdc-header-cell {
+  color: #ffffff !important;
 }
 
 a {
-  color: #00B020;
+  color: #00b020;
   text-decoration: none;
 }
 
@@ -110,7 +154,22 @@ a:hover {
 }
 
 .mat-primary .mat-mdc-pseudo-checkbox-checked {
-  background-color: #00B020 !important;
+  background-color: #00b020 !important;
+}
+
+/* Asegurar que los textos en componentes de formulario sean blancos */
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-floating-label,
+.mdc-floating-label--float-above {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.mdc-text-field--outlined:not(.mdc-text-field--disabled)
+  .mdc-notched-outline__leading,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled)
+  .mdc-notched-outline__notch,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled)
+  .mdc-notched-outline__trailing {
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 /* Make sure scrollbars match the theme */

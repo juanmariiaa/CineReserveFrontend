@@ -37,17 +37,25 @@ import { MatChipsModule } from '@angular/material/chips';
     MatDialogModule,
     FormsModule,
     MatTooltipModule,
-    MatChipsModule
+    MatChipsModule,
   ],
   template: `
     <div class="screening-management-container">
       <div class="page-header">
         <h1>Screening Management</h1>
         <div class="header-actions">
-          <button mat-raised-button color="primary" routerLink="/admin/screenings/create">
+          <button
+            mat-raised-button
+            color="primary"
+            routerLink="/admin/screenings/create"
+          >
             <mat-icon>add</mat-icon> Schedule Screening
           </button>
-          <button mat-raised-button color="accent" routerLink="/admin/dashboard">
+          <button
+            mat-raised-button
+            color="accent"
+            routerLink="/admin/dashboard"
+          >
             <mat-icon>arrow_back</mat-icon> Back to Dashboard
           </button>
         </div>
@@ -62,25 +70,46 @@ import { MatChipsModule } from '@angular/material/chips';
           <div *ngIf="!loading">
             <mat-form-field appearance="outline" class="filter-field">
               <mat-label>Filter Screenings</mat-label>
-              <input matInput (keyup)="applyFilter($event)" placeholder="Movie, room, date..." #input>
+              <input
+                matInput
+                (keyup)="applyFilter($event)"
+                placeholder="Movie, room, date..."
+                #input
+              />
               <mat-icon matSuffix>search</mat-icon>
             </mat-form-field>
 
             <div class="table-container">
-              <table mat-table [dataSource]="dataSource" matSort class="screening-table">
+              <table
+                mat-table
+                [dataSource]="dataSource"
+                matSort
+                class="screening-table"
+              >
                 <!-- ID Column -->
                 <ng-container matColumnDef="id">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
-                  <td mat-cell *matCellDef="let screening"> {{screening.id}} </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+                  <td mat-cell *matCellDef="let screening">
+                    {{ screening.id }}
+                  </td>
                 </ng-container>
 
                 <!-- Movie Column -->
                 <ng-container matColumnDef="movie">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Movie </th>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Movie
+                  </th>
                   <td mat-cell *matCellDef="let screening">
                     <div class="movie-info">
-                      <img *ngIf="screening.movie?.posterUrl" [src]="screening.movie?.posterUrl" class="movie-poster">
-                      <div *ngIf="!screening.movie?.posterUrl" class="no-poster">
+                      <img
+                        *ngIf="screening.movie?.posterUrl"
+                        [src]="screening.movie?.posterUrl"
+                        class="movie-poster"
+                      />
+                      <div
+                        *ngIf="!screening.movie?.posterUrl"
+                        class="no-poster"
+                      >
                         <mat-icon>movie</mat-icon>
                       </div>
                       <span>{{ screening.movie?.title || 'Unknown' }}</span>
@@ -90,7 +119,9 @@ import { MatChipsModule } from '@angular/material/chips';
 
                 <!-- Room Column -->
                 <ng-container matColumnDef="room">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Room </th>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Room
+                  </th>
                   <td mat-cell *matCellDef="let screening">
                     {{ screening.room?.number || 'Unknown' }}
                   </td>
@@ -98,204 +129,211 @@ import { MatChipsModule } from '@angular/material/chips';
 
                 <!-- Date Column -->
                 <ng-container matColumnDef="date">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Date
+                  </th>
                   <td mat-cell *matCellDef="let screening">
-                    {{ screening.startTime | date:'dd/MM/yyyy' }}
+                    {{ screening.startTime | date : 'dd/MM/yyyy' }}
                   </td>
                 </ng-container>
 
                 <!-- Time Column -->
                 <ng-container matColumnDef="time">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Time </th>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Time
+                  </th>
                   <td mat-cell *matCellDef="let screening">
-                    {{ screening.startTime | date:'HH:mm' }}
+                    {{ screening.startTime | date : 'HH:mm' }}
                   </td>
                 </ng-container>
 
                 <!-- Price Column -->
                 <ng-container matColumnDef="price">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Price </th>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Price
+                  </th>
                   <td mat-cell *matCellDef="let screening">
-                    {{ screening.ticketPrice | currency:'EUR':'symbol':'1.2-2' }}
+                    {{
+                      screening.ticketPrice
+                        | currency : 'EUR' : 'symbol' : '1.2-2'
+                    }}
                   </td>
                 </ng-container>
 
                 <!-- Actions Column -->
                 <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef> Actions </th>
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
                   <td mat-cell *matCellDef="let screening">
-                    <button mat-icon-button color="accent" [routerLink]="['/admin/screenings/edit', screening.id]" matTooltip="Edit">
+                    <button
+                      mat-icon-button
+                      color="accent"
+                      [routerLink]="['/admin/screenings/edit', screening.id]"
+                      matTooltip="Edit"
+                    >
                       <mat-icon>edit</mat-icon>
                     </button>
-                    <button mat-icon-button color="warn" (click)="confirmDelete(screening)" matTooltip="Delete">
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      (click)="confirmDelete(screening)"
+                      matTooltip="Delete"
+                    >
                       <mat-icon>delete</mat-icon>
                     </button>
                   </td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumns"
+                ></tr>
 
                 <!-- Row shown when there is no matching data. -->
                 <tr class="mat-row" *matNoDataRow>
-                  <td class="mat-cell" colspan="7">No screenings found matching "{{input.value}}"</td>
+                  <td class="mat-cell" colspan="7">
+                    No screenings found matching "{{ input.value }}"
+                  </td>
                 </tr>
               </table>
 
-              <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of screenings"></mat-paginator>
+              <mat-paginator
+                [pageSizeOptions]="[5, 10, 25, 100]"
+                aria-label="Select page of screenings"
+              ></mat-paginator>
             </div>
           </div>
         </mat-card-content>
       </mat-card>
     </div>
   `,
-  styles: [`
-    .screening-management-container {
-      padding: 20px;
-      color: #FFFFFF;
-    }
+  styles: [
+    `
+      .screening-management-container {
+        padding: 20px;
+        color: #ffffff;
+        background-color: #181818;
+        min-height: 100vh;
+      }
 
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
 
-    h1 {
-      color: #FFFFFF;
-      margin: 0;
-    }
+      h1 {
+        color: #ffffff;
+        margin: 0;
+      }
 
-    .header-actions {
-      display: flex;
-      gap: 10px;
-    }
+      .header-actions {
+        display: flex;
+        gap: 10px;
+      }
 
-    .loading-spinner {
-      display: flex;
-      justify-content: center;
-      padding: 50px 0;
-    }
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        padding: 30px;
+      }
 
-    .filter-field {
-      width: 100%;
-      margin-bottom: 20px;
-    }
+      .filter-field {
+        width: 100%;
+        margin-bottom: 16px;
+      }
 
-    ::ng-deep .mat-form-field-label {
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
+      .table-container {
+        overflow-x: auto;
+      }
 
-    ::ng-deep .mat-form-field-outline {
-      color: rgba(255, 255, 255, 0.3) !important;
-    }
+      .screening-table {
+        width: 100%;
+      }
 
-    ::ng-deep .mat-form-field-infix input {
-      color: #FFFFFF !important;
-    }
+      .movie-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
-    ::ng-deep .mat-icon {
-      color: rgba(255, 255, 255, 0.7);
-    }
+      .movie-info span {
+        color: #ffffff;
+      }
 
-    ::ng-deep .mat-card {
-      background-color: #222222;
-      color: #FFFFFF;
-      border: 1px solid #3a3a3a;
-    }
+      .movie-poster {
+        width: 40px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
 
-    .table-container {
-      overflow-x: auto;
-    }
+      .no-poster {
+        width: 40px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #333333;
+        border-radius: 4px;
+      }
 
-    .screening-table {
-      width: 100%;
-      background-color: transparent;
-    }
+      /* Ensure Angular Material components have proper text color */
+      ::ng-deep .mat-mdc-card {
+        background-color: #222222 !important;
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-table {
-      background-color: transparent !important;
-    }
+      ::ng-deep .mat-mdc-form-field-label {
+        color: rgba(255, 255, 255, 0.6) !important;
+      }
 
-    ::ng-deep .mat-header-cell {
-      color: rgba(255, 255, 255, 0.9) !important;
-      font-weight: 500;
-      background-color: #1a1a1a;
-    }
+      ::ng-deep .mat-mdc-input-element {
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-cell {
-      color: rgba(255, 255, 255, 0.7) !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
+      ::ng-deep .mat-mdc-card-content {
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-row:hover {
-      background-color: rgba(255, 255, 255, 0.05);
-    }
+      ::ng-deep .mat-sort-header-content {
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-paginator {
-      background-color: transparent;
-      color: #FFFFFF;
-    }
+      ::ng-deep .mat-mdc-paginator-range-label,
+      ::ng-deep .mat-mdc-paginator-page-size-label {
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-paginator-page-size-label, 
-    ::ng-deep .mat-paginator-range-label {
-      color: rgba(255, 255, 255, 0.7);
-    }
+      ::ng-deep .mat-mdc-select-value,
+      ::ng-deep .mat-mdc-select-arrow {
+        color: #ffffff !important;
+      }
 
-    .movie-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+      ::ng-deep .mat-mdc-table .mat-mdc-header-cell {
+        color: rgba(255, 255, 255, 0.87) !important;
+        background-color: #202020 !important;
+      }
 
-    .movie-info span {
-      color: #FFFFFF;
-    }
-
-    .movie-poster {
-      width: 40px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 4px;
-    }
-
-    .no-poster {
-      width: 40px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #333333;
-      border-radius: 4px;
-    }
-
-    ::ng-deep .mat-raised-button.mat-primary {
-      background-color: #00B020;
-    }
-
-    ::ng-deep .mat-raised-button.mat-accent {
-      background-color: #2c2c2c;
-      color: #FFFFFF;
-    }
-
-    ::ng-deep .mat-icon-button {
-      color: #FFFFFF;
-    }
-
-    ::ng-deep .mat-icon-button.mat-accent {
-      color: #00B020;
-    }
-
-    ::ng-deep .mat-icon-button.mat-warn {
-      color: #f44336;
-    }
-  `]
+      ::ng-deep .mat-mdc-table .mat-mdc-cell {
+        color: #ffffff !important;
+      }
+    `,
+  ],
 })
 export class ScreeningManagementComponent implements OnInit {
   screenings: Screening[] = [];
   loading = true;
-  displayedColumns: string[] = ['id', 'movie', 'room', 'date', 'time', 'price', 'actions'];
+  displayedColumns: string[] = [
+    'id',
+    'movie',
+    'room',
+    'date',
+    'time',
+    'price',
+    'actions',
+  ];
   dataSource: any;
 
   constructor(
@@ -317,11 +355,15 @@ export class ScreeningManagementComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.snackBar.open('Error loading screenings: ' + error.message, 'Close', {
-          duration: 5000
-        });
+        this.snackBar.open(
+          'Error loading screenings: ' + error.message,
+          'Close',
+          {
+            duration: 5000,
+          }
+        );
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -340,15 +382,19 @@ export class ScreeningManagementComponent implements OnInit {
     this.screeningService.deleteScreening(id).subscribe({
       next: () => {
         this.snackBar.open('Screening deleted successfully', 'Close', {
-          duration: 3000
+          duration: 3000,
         });
         this.loadScreenings();
       },
       error: (error) => {
-        this.snackBar.open('Error deleting screening: ' + error.message, 'Close', {
-          duration: 5000
-        });
-      }
+        this.snackBar.open(
+          'Error deleting screening: ' + error.message,
+          'Close',
+          {
+            duration: 5000,
+          }
+        );
+      },
     });
   }
 }

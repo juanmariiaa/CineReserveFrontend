@@ -1,7 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { RoomService } from '../../../../core/services/room.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -30,7 +35,7 @@ import { MatDividerModule } from '@angular/material/divider';
     MatFormFieldModule,
     MatSelectModule,
     MatSliderModule,
-    MatDividerModule
+    MatDividerModule,
   ],
   template: `
     <div class="room-create-container">
@@ -54,7 +59,7 @@ import { MatDividerModule } from '@angular/material/divider';
                   min="1"
                   max="50"
                   (input)="updateCapacity()"
-                >
+                />
                 <mat-hint>Number of rows (1-50)</mat-hint>
                 <mat-error *ngIf="roomForm.get('rows')?.hasError('required')">
                   Number of rows is required
@@ -76,9 +81,11 @@ import { MatDividerModule } from '@angular/material/divider';
                   min="1"
                   max="50"
                   (input)="updateCapacity()"
-                >
+                />
                 <mat-hint>Number of columns (1-50)</mat-hint>
-                <mat-error *ngIf="roomForm.get('columns')?.hasError('required')">
+                <mat-error
+                  *ngIf="roomForm.get('columns')?.hasError('required')"
+                >
                   Number of columns is required
                 </mat-error>
                 <mat-error *ngIf="roomForm.get('columns')?.hasError('min')">
@@ -97,7 +104,10 @@ import { MatDividerModule } from '@angular/material/divider';
             <div class="room-preview">
               <h3>Room Preview</h3>
               <div class="screen">SCREEN</div>
-              <div class="seats-grid" [style.grid-template-columns]="gridTemplateColumns">
+              <div
+                class="seats-grid"
+                [style.grid-template-columns]="gridTemplateColumns"
+              >
                 <div
                   *ngFor="let seat of previewSeats"
                   class="seat"
@@ -110,13 +120,18 @@ import { MatDividerModule } from '@angular/material/divider';
             </div>
 
             <div class="form-actions">
-              <button type="button" mat-button color="warn" (click)="resetForm()">
+              <button
+                type="button"
+                mat-button
+                color="warn"
+                (click)="resetForm()"
+              >
                 Reset
               </button>
               <button
                 type="submit"
                 mat-raised-button
-                color="primary"
+                class="create-room-btn"
                 [disabled]="roomForm.invalid || saving"
               >
                 <mat-icon>save</mat-icon> Create Room
@@ -127,146 +142,228 @@ import { MatDividerModule } from '@angular/material/divider';
       </mat-card>
     </div>
   `,
-  styles: [`
-    .room-create-container {
-      padding: 20px;
-      color: #FFFFFF;
-      background-color: #181818;
-    }
+  styles: [
+    `
+      .room-create-container {
+        padding: 20px;
+        color: #ffffff;
+        background-color: #181818;
+        min-height: 100vh;
+      }
 
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
 
-    h1, h2, h3, p {
-      color: #FFFFFF;
-    }
+      h1,
+      h2,
+      h3,
+      p {
+        color: #ffffff;
+      }
 
-    .form-row {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 16px;
-    }
+      .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 16px;
+      }
 
-    .form-field {
-      flex: 1;
-    }
+      .form-field {
+        flex: 1;
+      }
 
-    .capacity-display {
-      margin: 20px 0;
-      padding: 15px;
-      background-color: #222222;
-      border-radius: 4px;
-      text-align: center;
-      border: 1px solid #3a3a3a;
-    }
+      .capacity-display {
+        margin: 20px 0;
+        padding: 15px;
+        background-color: #222222;
+        border-radius: 4px;
+        text-align: center;
+        border: 1px solid #3a3a3a;
+      }
 
-    .capacity-display h3 {
-      margin: 0;
-      color: #00B020;
-    }
+      .capacity-display h3 {
+        margin: 0;
+        color: #00b020;
+      }
 
-    .room-preview {
-      margin: 20px 0;
-      padding: 20px;
-      background-color: #222222;
-      border-radius: 4px;
-      border: 1px solid #3a3a3a;
-    }
+      .room-preview {
+        margin: 20px 0;
+        padding: 20px;
+        background-color: #222222;
+        border-radius: 4px;
+        border: 1px solid #3a3a3a;
+      }
 
-    .room-preview h3 {
-      margin-top: 0;
-      text-align: center;
-      color: #FFFFFF;
-    }
+      .room-preview h3 {
+        margin-top: 0;
+        text-align: center;
+        color: #ffffff;
+      }
 
-    .screen {
-      background-color: #333333;
-      padding: 10px;
-      text-align: center;
-      margin-bottom: 20px;
-      border-radius: 4px;
-      font-weight: bold;
-      color: #FFFFFF;
-    }
+      .screen {
+        background-color: #333333;
+        padding: 10px;
+        text-align: center;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        font-weight: bold;
+        color: #ffffff;
+      }
 
-    .seats-grid {
-      display: grid;
-      gap: 5px;
-      justify-content: center;
-    }
+      .seats-grid {
+        display: grid;
+        gap: 5px;
+        justify-content: center;
+      }
 
-    .seat {
-      width: 30px;
-      height: 30px;
-      background-color: #2c2c2c;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      font-size: 12px;
-      color: #FFFFFF;
-      border: 1px solid #3a3a3a;
-    }
+      .seat {
+        width: 30px;
+        height: 30px;
+        background-color: #2c2c2c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #ffffff;
+        border: 1px solid #3a3a3a;
+      }
 
-    .seat.aisle-right {
-      margin-right: 15px;
-    }
+      .seat.aisle-right {
+        margin-right: 15px;
+      }
 
-    .seat.aisle-left {
-      margin-left: 15px;
-    }
+      .seat.aisle-left {
+        margin-left: 15px;
+      }
 
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-    }
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
 
-    ::ng-deep .mat-card {
-      background-color: #222222;
-      color: #FFFFFF;
-      border: 1px solid #3a3a3a;
-    }
+      /* Botón de crear sala */
+      .create-room-btn {
+        background-color: #00b020 !important;
+        color: #ffffff !important;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        padding: 8px 16px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease;
+      }
 
-    ::ng-deep .mat-form-field-label {
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
+      .create-room-btn:hover {
+        background-color: #00c02a !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        transform: translateY(-2px);
+      }
 
-    ::ng-deep .mat-form-field-outline {
-      color: rgba(255, 255, 255, 0.3) !important;
-    }
+      .create-room-btn:disabled {
+        background-color: rgba(0, 176, 32, 0.5) !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+        box-shadow: none;
+        transform: none;
+      }
 
-    ::ng-deep .mat-form-field-infix input, 
-    ::ng-deep .mat-form-field-infix textarea {
-      color: #FFFFFF !important;
-    }
+      .create-room-btn .mat-icon {
+        color: #ffffff !important;
+        margin-right: 8px;
+      }
 
-    ::ng-deep .mat-form-field-hint-wrapper {
-      color: rgba(255, 255, 255, 0.5) !important;
-    }
+      /* Angular Material overrides for consistent styling */
+      ::ng-deep .mat-mdc-card {
+        background-color: #222222 !important;
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-icon {
-      color: rgba(255, 255, 255, 0.7);
-    }
+      ::ng-deep .mat-mdc-form-field-label {
+        color: rgba(255, 255, 255, 0.6) !important;
+      }
 
-    ::ng-deep .mat-raised-button.mat-primary {
-      background-color: #00B020;
-    }
+      ::ng-deep .mat-mdc-input-element {
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-raised-button.mat-accent {
-      background-color: #2c2c2c;
-      color: #FFFFFF;
-    }
+      ::ng-deep .mat-mdc-select-value,
+      ::ng-deep .mat-mdc-select-arrow {
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-button.mat-warn {
-      color: #f44336;
-    }
-  `]
+      ::ng-deep .mat-mdc-card-content {
+        color: #ffffff !important;
+      }
+
+      ::ng-deep .mat-mdc-form-field-hint {
+        color: rgba(255, 255, 255, 0.6) !important;
+      }
+
+      ::ng-deep .mat-mdc-form-field-error {
+        color: #f44336 !important;
+      }
+
+      /* Asegurarse de que los botones tengan texto blanco */
+      ::ng-deep .mat-mdc-button,
+      ::ng-deep .mat-mdc-raised-button,
+      ::ng-deep .mat-mdc-outlined-button {
+        color: #ffffff !important;
+      }
+
+      ::ng-deep .mat-mdc-button .mat-icon,
+      ::ng-deep .mat-mdc-raised-button .mat-icon,
+      ::ng-deep .mat-mdc-outlined-button .mat-icon {
+        color: #ffffff !important;
+      }
+
+      /* Corregir colores de fondo y bordes de los campos de formulario */
+      ::ng-deep .mat-mdc-text-field-wrapper {
+        background-color: #222222 !important;
+      }
+
+      ::ng-deep .mat-mdc-form-field-focus-overlay {
+        background-color: #303030 !important;
+      }
+
+      ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+        background-color: #222222 !important;
+      }
+
+      ::ng-deep
+        .mdc-text-field--outlined:not(.mdc-text-field--disabled)
+        .mdc-notched-outline__leading,
+      ::ng-deep
+        .mdc-text-field--outlined:not(.mdc-text-field--disabled)
+        .mdc-notched-outline__notch,
+      ::ng-deep
+        .mdc-text-field--outlined:not(.mdc-text-field--disabled)
+        .mdc-notched-outline__trailing {
+        border-color: rgba(255, 255, 255, 0.3) !important;
+      }
+
+      ::ng-deep
+        .mdc-text-field--outlined:not(
+          .mdc-text-field--disabled
+        ).mdc-text-field--focused
+        .mdc-notched-outline__leading,
+      ::ng-deep
+        .mdc-text-field--outlined:not(
+          .mdc-text-field--disabled
+        ).mdc-text-field--focused
+        .mdc-notched-outline__notch,
+      ::ng-deep
+        .mdc-text-field--outlined:not(
+          .mdc-text-field--disabled
+        ).mdc-text-field--focused
+        .mdc-notched-outline__trailing {
+        border-color: #00b020 !important;
+      }
+    `,
+  ],
 })
 export class RoomCreateComponent {
   roomForm: FormGroup;
@@ -288,7 +385,10 @@ export class RoomCreateComponent {
   createForm(): FormGroup {
     return this.fb.group({
       rows: [10, [Validators.required, Validators.min(1), Validators.max(50)]],
-      columns: [10, [Validators.required, Validators.min(1), Validators.max(50)]]
+      columns: [
+        10,
+        [Validators.required, Validators.min(1), Validators.max(50)],
+      ],
     });
   }
 
@@ -318,7 +418,7 @@ export class RoomCreateComponent {
         this.previewSeats.push({
           label: `${rowLabel}${seatNumber}`,
           isAisleRight,
-          isAisleLeft
+          isAisleLeft,
         });
       }
     }
@@ -327,7 +427,7 @@ export class RoomCreateComponent {
   resetForm(): void {
     this.roomForm.reset({
       rows: 10,
-      columns: 10
+      columns: 10,
     });
     this.updateCapacity();
   }
@@ -343,16 +443,16 @@ export class RoomCreateComponent {
     this.roomService.createRoom(roomData).subscribe({
       next: () => {
         this.snackBar.open('Room created successfully', 'Close', {
-          duration: 3000
+          duration: 3000,
         });
         this.router.navigate(['/admin/rooms']);
       },
       error: (error) => {
         this.snackBar.open('Error creating room: ' + error.message, 'Close', {
-          duration: 5000
+          duration: 5000,
         });
         this.saving = false;
-      }
+      },
     });
   }
 }

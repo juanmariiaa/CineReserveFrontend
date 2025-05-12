@@ -31,17 +31,25 @@ import { FormsModule } from '@angular/forms';
     MatPaginatorModule,
     MatInputModule,
     MatFormFieldModule,
-    FormsModule
+    FormsModule,
   ],
   template: `
     <div class="movie-management-container">
       <div class="page-header">
         <h1>Movie Management</h1>
         <div class="header-actions">
-          <button mat-raised-button color="primary" routerLink="/movies/add">
+          <button
+            mat-raised-button
+            color="primary"
+            routerLink="/admin/movies/add"
+          >
             <mat-icon>add</mat-icon> Add Movie
           </button>
-          <button mat-raised-button color="accent" routerLink="/admin/dashboard">
+          <button
+            mat-raised-button
+            color="accent"
+            routerLink="/admin/dashboard"
+          >
             <mat-icon>arrow_back</mat-icon> Back to Dashboard
           </button>
         </div>
@@ -56,23 +64,38 @@ import { FormsModule } from '@angular/forms';
           <div *ngIf="!loading">
             <mat-form-field appearance="outline" class="filter-field">
               <mat-label>Filter Movies</mat-label>
-              <input matInput (keyup)="applyFilter($event)" placeholder="Title, genre, etc." #input>
+              <input
+                matInput
+                (keyup)="applyFilter($event)"
+                placeholder="Title, genre, etc."
+                #input
+              />
               <mat-icon matSuffix>search</mat-icon>
             </mat-form-field>
 
             <div class="table-container">
-              <table mat-table [dataSource]="dataSource" matSort class="movie-table">
+              <table
+                mat-table
+                [dataSource]="dataSource"
+                matSort
+                class="movie-table"
+              >
                 <!-- ID Column -->
                 <ng-container matColumnDef="id">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
-                  <td mat-cell *matCellDef="let movie"> {{movie.id}} </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+                  <td mat-cell *matCellDef="let movie">{{ movie.id }}</td>
                 </ng-container>
 
                 <!-- Poster Column -->
                 <ng-container matColumnDef="poster">
-                  <th mat-header-cell *matHeaderCellDef> Poster </th>
+                  <th mat-header-cell *matHeaderCellDef>Poster</th>
                   <td mat-cell *matCellDef="let movie">
-                    <img *ngIf="movie.posterUrl" [src]="movie.posterUrl" alt="Poster" class="movie-poster">
+                    <img
+                      *ngIf="movie.posterUrl"
+                      [src]="movie.posterUrl"
+                      alt="Poster"
+                      class="movie-poster"
+                    />
                     <div *ngIf="!movie.posterUrl" class="no-poster">
                       <mat-icon>image_not_supported</mat-icon>
                     </div>
@@ -81,28 +104,41 @@ import { FormsModule } from '@angular/forms';
 
                 <!-- Title Column -->
                 <ng-container matColumnDef="title">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
-                  <td mat-cell *matCellDef="let movie"> {{movie.title}} </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Title
+                  </th>
+                  <td mat-cell *matCellDef="let movie">{{ movie.title }}</td>
                 </ng-container>
 
                 <!-- Release Date Column -->
                 <ng-container matColumnDef="releaseDate">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Release Date </th>
-                  <td mat-cell *matCellDef="let movie"> {{movie.releaseDate | date}} </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Release Date
+                  </th>
+                  <td mat-cell *matCellDef="let movie">
+                    {{ movie.releaseDate | date }}
+                  </td>
                 </ng-container>
 
                 <!-- Duration Column -->
                 <ng-container matColumnDef="duration">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Duration </th>
-                  <td mat-cell *matCellDef="let movie"> {{movie.durationMinutes}} min </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Duration
+                  </th>
+                  <td mat-cell *matCellDef="let movie">
+                    {{ movie.durationMinutes }} min
+                  </td>
                 </ng-container>
 
                 <!-- Rating Column -->
                 <ng-container matColumnDef="rating">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Rating </th>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Rating
+                  </th>
                   <td mat-cell *matCellDef="let movie">
                     <span *ngIf="movie.voteAverage" class="rating">
-                      <mat-icon class="star-icon">star</mat-icon> {{movie.voteAverage}}
+                      <mat-icon class="star-icon">star</mat-icon>
+                      {{ movie.voteAverage }}
                     </span>
                     <span *ngIf="!movie.voteAverage">-</span>
                   </td>
@@ -110,188 +146,183 @@ import { FormsModule } from '@angular/forms';
 
                 <!-- Actions Column -->
                 <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef> Actions </th>
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
                   <td mat-cell *matCellDef="let movie">
-                    <button mat-icon-button color="primary" [routerLink]="['/movies', movie.id]" matTooltip="View Details">
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      [routerLink]="['/movies', movie.id]"
+                      matTooltip="View Details"
+                    >
                       <mat-icon>visibility</mat-icon>
                     </button>
-                    <button mat-icon-button color="accent" [routerLink]="['/admin/movies/edit', movie.id]" matTooltip="Edit">
+                    <button
+                      mat-icon-button
+                      color="accent"
+                      [routerLink]="['/admin/movies/edit', movie.id]"
+                      matTooltip="Edit"
+                    >
                       <mat-icon>edit</mat-icon>
                     </button>
-                    <button mat-icon-button color="warn" (click)="confirmDelete(movie)" matTooltip="Delete">
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      (click)="confirmDelete(movie)"
+                      matTooltip="Delete"
+                    >
                       <mat-icon>delete</mat-icon>
                     </button>
                   </td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumns"
+                ></tr>
 
                 <!-- Row shown when there is no matching data. -->
                 <tr class="mat-row" *matNoDataRow>
-                  <td class="mat-cell" colspan="7">No movies found matching "{{input.value}}"</td>
+                  <td class="mat-cell" colspan="7">
+                    No movies found matching "{{ input.value }}"
+                  </td>
                 </tr>
               </table>
 
-              <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of movies"></mat-paginator>
+              <mat-paginator
+                [pageSizeOptions]="[5, 10, 25, 100]"
+                aria-label="Select page of movies"
+              ></mat-paginator>
             </div>
           </div>
         </mat-card-content>
       </mat-card>
     </div>
   `,
-  styles: [`
-    .movie-management-container {
-      padding: 20px;
-      color: #FFFFFF;
-    }
+  styles: [
+    `
+      .movie-management-container {
+        padding: 20px;
+        color: #ffffff;
+        background-color: #181818;
+        min-height: 100vh;
+      }
 
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
 
-    h1 {
-      color: #FFFFFF;
-      margin: 0;
-    }
+      h1 {
+        color: #ffffff;
+        margin: 0;
+      }
 
-    .header-actions {
-      display: flex;
-      gap: 10px;
-    }
+      .header-actions {
+        display: flex;
+        gap: 10px;
+      }
 
-    .loading-spinner {
-      display: flex;
-      justify-content: center;
-      padding: 50px 0;
-    }
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        padding: 30px;
+      }
 
-    .filter-field {
-      width: 100%;
-      margin-bottom: 20px;
-    }
+      .filter-field {
+        width: 100%;
+        margin-bottom: 16px;
+      }
 
-    ::ng-deep .mat-form-field-label {
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
+      .table-container {
+        overflow-x: auto;
+      }
 
-    ::ng-deep .mat-form-field-outline {
-      color: rgba(255, 255, 255, 0.3) !important;
-    }
+      .movie-table {
+        width: 100%;
+      }
 
-    ::ng-deep .mat-form-field-infix input {
-      color: #FFFFFF !important;
-    }
+      .movie-poster {
+        width: 50px;
+        height: 75px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
 
-    ::ng-deep .mat-icon {
-      color: rgba(255, 255, 255, 0.7);
-    }
+      .no-poster {
+        width: 50px;
+        height: 75px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #333333;
+        border-radius: 4px;
+      }
 
-    ::ng-deep .mat-card {
-      background-color: #222222;
-      color: #FFFFFF;
-      border: 1px solid #3a3a3a;
-    }
+      .star-icon {
+        color: #00b020 !important;
+        font-size: 18px;
+        height: 18px;
+        width: 18px;
+      }
 
-    .table-container {
-      overflow-x: auto;
-    }
+      /* Ensure Angular Material components have proper text color */
+      ::ng-deep .mat-mdc-card {
+        background-color: #222222 !important;
+        color: #ffffff !important;
+      }
 
-    .movie-table {
-      width: 100%;
-      background-color: transparent;
-    }
+      ::ng-deep .mat-mdc-form-field-label {
+        color: rgba(255, 255, 255, 0.6) !important;
+      }
 
-    ::ng-deep .mat-table {
-      background-color: transparent !important;
-    }
+      ::ng-deep .mat-mdc-input-element {
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-header-cell {
-      color: rgba(255, 255, 255, 0.9) !important;
-      font-weight: 500;
-      background-color: #1a1a1a;
-    }
+      ::ng-deep .mat-mdc-card-content {
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-cell {
-      color: rgba(255, 255, 255, 0.7) !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
+      ::ng-deep .mat-sort-header-content {
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-row:hover {
-      background-color: rgba(255, 255, 255, 0.05);
-    }
+      ::ng-deep .mat-mdc-paginator-range-label,
+      ::ng-deep .mat-mdc-paginator-page-size-label {
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-paginator {
-      background-color: transparent;
-      color: #FFFFFF;
-    }
+      ::ng-deep .mat-mdc-select-value,
+      ::ng-deep .mat-mdc-select-arrow {
+        color: #ffffff !important;
+      }
 
-    ::ng-deep .mat-paginator-page-size-label, 
-    ::ng-deep .mat-paginator-range-label {
-      color: rgba(255, 255, 255, 0.7);
-    }
+      ::ng-deep .mat-mdc-table .mat-mdc-header-cell {
+        color: rgba(255, 255, 255, 0.87) !important;
+        background-color: #202020 !important;
+      }
 
-    ::ng-deep .mat-button-color-accent {
-      color: #00B020 !important;
-    }
-
-    .movie-poster {
-      width: 50px;
-      height: 75px;
-      object-fit: cover;
-      border-radius: 4px;
-    }
-
-    .no-poster {
-      width: 50px;
-      height: 75px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #333333;
-      border-radius: 4px;
-    }
-
-    .star-icon {
-      color: #00B020 !important;
-      font-size: 18px;
-      height: 18px;
-      width: 18px;
-    }
-
-    ::ng-deep .mat-raised-button.mat-primary {
-      background-color: #00B020;
-    }
-
-    ::ng-deep .mat-raised-button.mat-accent {
-      background-color: #2c2c2c;
-      color: #FFFFFF;
-    }
-
-    ::ng-deep .mat-icon-button {
-      color: #FFFFFF;
-    }
-
-    ::ng-deep .mat-icon-button.mat-primary {
-      color: #00B020;
-    }
-
-    ::ng-deep .mat-icon-button.mat-accent {
-      color: #00B020;
-    }
-
-    ::ng-deep .mat-icon-button.mat-warn {
-      color: #f44336;
-    }
-  `]
+      ::ng-deep .mat-mdc-table .mat-mdc-cell {
+        color: #ffffff !important;
+      }
+    `,
+  ],
 })
 export class MovieManagementComponent implements OnInit {
   movies: Movie[] = [];
   loading = true;
-  displayedColumns: string[] = ['id', 'poster', 'title', 'releaseDate', 'duration', 'rating', 'actions'];
+  displayedColumns: string[] = [
+    'id',
+    'poster',
+    'title',
+    'releaseDate',
+    'duration',
+    'rating',
+    'actions',
+  ];
   dataSource: any;
 
   constructor(
@@ -313,10 +344,10 @@ export class MovieManagementComponent implements OnInit {
       },
       error: (error) => {
         this.snackBar.open('Error loading movies: ' + error.message, 'Close', {
-          duration: 5000
+          duration: 5000,
         });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -326,7 +357,9 @@ export class MovieManagementComponent implements OnInit {
   }
 
   confirmDelete(movie: Movie): void {
-    if (confirm(`Are you sure you want to delete the movie "${movie.title}"?`)) {
+    if (
+      confirm(`Are you sure you want to delete the movie "${movie.title}"?`)
+    ) {
       this.deleteMovie(movie.id!);
     }
   }
@@ -335,15 +368,15 @@ export class MovieManagementComponent implements OnInit {
     this.movieService.deleteMovie(id).subscribe({
       next: () => {
         this.snackBar.open('Movie deleted successfully', 'Close', {
-          duration: 3000
+          duration: 3000,
         });
         this.loadMovies();
       },
       error: (error) => {
         this.snackBar.open('Error deleting movie: ' + error.message, 'Close', {
-          duration: 5000
+          duration: 5000,
         });
-      }
+      },
     });
   }
 }

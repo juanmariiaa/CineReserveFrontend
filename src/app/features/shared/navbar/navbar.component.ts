@@ -28,18 +28,18 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     FormsModule,
     ReactiveFormsModule,
     MatSnackBarModule,
-    MatDividerModule
+    MatDividerModule,
   ],
   template: `
     <mat-toolbar color="primary" class="header-toolbar">
       <span routerLink="/" style="cursor: pointer;">CineReserve</span>
       <span class="spacer"></span>
-      
+
       <!-- Browse movies button - visible to all users -->
-      <button mat-button routerLink="/public/movies">
+      <button mat-button routerLink="/movies">
         <mat-icon>movie</mat-icon> Browse Movies
       </button>
-      
+
       <!-- Not logged in: show login dropdown -->
       <div *ngIf="!isLoggedIn">
         <button mat-button [matMenuTriggerFor]="loginMenu">
@@ -50,36 +50,55 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
             <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
               <mat-form-field appearance="outline">
                 <mat-label>Username</mat-label>
-                <input matInput formControlName="username">
-                <mat-error *ngIf="loginForm.get('username')?.hasError('required')">Required</mat-error>
+                <input matInput formControlName="username" />
+                <mat-error
+                  *ngIf="loginForm.get('username')?.hasError('required')"
+                  >Required</mat-error
+                >
               </mat-form-field>
-              
+
               <mat-form-field appearance="outline">
                 <mat-label>Password</mat-label>
-                <input matInput type="password" formControlName="password">
-                <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Required</mat-error>
+                <input matInput type="password" formControlName="password" />
+                <mat-error
+                  *ngIf="loginForm.get('password')?.hasError('required')"
+                  >Required</mat-error
+                >
               </mat-form-field>
-              
+
               <div class="login-actions">
-                <button mat-raised-button color="accent" type="submit" [disabled]="loginForm.invalid">
+                <button
+                  mat-raised-button
+                  color="accent"
+                  type="submit"
+                  [disabled]="loginForm.invalid"
+                >
                   Login
                 </button>
               </div>
             </form>
             <div class="register-link">
-              <a mat-button routerLink="/register">Don't have an account? Register</a>
+              <a mat-button routerLink="/register"
+                >Don't have an account? Register</a
+              >
             </div>
           </div>
         </mat-menu>
-        <button mat-raised-button color="accent" routerLink="/register">Register</button>
+        <button mat-raised-button color="accent" routerLink="/register">
+          Register
+        </button>
       </div>
-      
+
       <!-- Logged in: show username with dropdown -->
       <div *ngIf="isLoggedIn">
-        <button mat-button *ngIf="isAdmin" routerLink="/admin/dashboard">Admin Dashboard</button>
-        <button mat-button *ngIf="!isAdmin" routerLink="/movies">My Account</button>
+        <button mat-button *ngIf="isAdmin" routerLink="/admin/dashboard">
+          Admin Dashboard
+        </button>
+        <button mat-button *ngIf="!isAdmin" routerLink="/movies">
+          My Account
+        </button>
         <button mat-button [matMenuTriggerFor]="userMenu">
-          <mat-icon>account_circle</mat-icon> 
+          <mat-icon>account_circle</mat-icon>
           {{ username }} <mat-icon>arrow_drop_down</mat-icon>
         </button>
         <mat-menu #userMenu="matMenu">
@@ -94,74 +113,76 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
       </div>
     </mat-toolbar>
   `,
-  styles: [`
-    .header-toolbar {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background-color: #121212;
-      color: #FFFFFF;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    }
-    
-    .spacer {
-      flex: 1 1 auto;
-    }
-    
-    .login-form-container {
-      padding: 16px;
-      min-width: 300px;
-      background-color: #202020;
-      color: #FFFFFF;
-    }
-    
-    .login-form-container mat-form-field {
-      width: 100%;
-      margin-bottom: 10px;
-      color: #FFFFFF;
-    }
-    
-    .login-actions {
-      display: flex;
-      justify-content: center;
-      margin-top: 10px;
-    }
-    
-    .register-link {
-      margin-top: 10px;
-      text-align: center;
-    }
-    
-    .register-link a {
-      color: #00B020;
-    }
-    
-    ::ng-deep .mat-mdc-menu-panel.login-menu {
-      max-width: none !important;
-      background-color: #202020;
-    }
-    
-    ::ng-deep .mat-mdc-menu-panel {
-      background-color: #202020 !important;
-    }
-    
-    ::ng-deep .mat-mdc-menu-item {
-      color: #FFFFFF !important;
-    }
-    
-    ::ng-deep .mat-mdc-menu-item mat-icon {
-      color: rgba(0, 176, 32, 0.9) !important;
-    }
-    
-    ::ng-deep .mat-mdc-menu-item:hover:not([disabled]) {
-      background-color: rgba(0, 176, 32, 0.1) !important;
-    }
-    
-    /* Movie button styling */
-    button[routerlink="/public/movies"] mat-icon {
-      color: #00B020;
-    }
-  `]
+  styles: [
+    `
+      .header-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background-color: #121212;
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      }
+
+      .spacer {
+        flex: 1 1 auto;
+      }
+
+      .login-form-container {
+        padding: 16px;
+        min-width: 300px;
+        background-color: #202020;
+        color: #ffffff;
+      }
+
+      .login-form-container mat-form-field {
+        width: 100%;
+        margin-bottom: 10px;
+        color: #ffffff;
+      }
+
+      .login-actions {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+      }
+
+      .register-link {
+        margin-top: 10px;
+        text-align: center;
+      }
+
+      .register-link a {
+        color: #00b020;
+      }
+
+      ::ng-deep .mat-mdc-menu-panel.login-menu {
+        max-width: none !important;
+        background-color: #202020;
+      }
+
+      ::ng-deep .mat-mdc-menu-panel {
+        background-color: #202020 !important;
+      }
+
+      ::ng-deep .mat-mdc-menu-item {
+        color: #ffffff !important;
+      }
+
+      ::ng-deep .mat-mdc-menu-item mat-icon {
+        color: rgba(0, 176, 32, 0.9) !important;
+      }
+
+      ::ng-deep .mat-mdc-menu-item:hover:not([disabled]) {
+        background-color: rgba(0, 176, 32, 0.1) !important;
+      }
+
+      /* Movie button styling */
+      button[routerlink='/movies'] mat-icon {
+        color: #00b020;
+      }
+    `,
+  ],
 })
 export class NavbarComponent implements OnInit {
   isLoggedIn = false;
@@ -177,15 +198,15 @@ export class NavbarComponent implements OnInit {
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
-      password: ['', Validators.required]
+      password: ['', Validators.required],
     });
   }
 
   ngOnInit(): void {
     this.updateAuthStatus();
-    
+
     // Subscribe to auth changes
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.subscribe((user) => {
       this.updateAuthStatus();
     });
   }
@@ -194,7 +215,7 @@ export class NavbarComponent implements OnInit {
     const previousStatus = this.isLoggedIn;
     this.isLoggedIn = this.authService.isLoggedIn();
     this.isAdmin = this.authService.isAdmin();
-    
+
     // Get username from stored user data
     const userData = this.authService.getUserData();
     this.username = userData?.username || '';
@@ -202,11 +223,11 @@ export class NavbarComponent implements OnInit {
     // If the login status has changed, dispatch a custom event
     if (previousStatus !== this.isLoggedIn) {
       const event = new CustomEvent('loginStatusChange', {
-        detail: { 
+        detail: {
           isLoggedIn: this.isLoggedIn,
-          isAdmin: this.isAdmin
+          isAdmin: this.isAdmin,
         },
-        bubbles: true
+        bubbles: true,
       });
       document.dispatchEvent(event);
     }
@@ -226,19 +247,20 @@ export class NavbarComponent implements OnInit {
         },
         error: (error) => {
           let errorMsg = 'Invalid credentials';
-          
+
           if (error.error && error.error.message) {
             errorMsg = error.error.message;
           } else if (error.status === 0) {
-            errorMsg = 'Could not connect to server. Please check your connection or if the server is active.';
+            errorMsg =
+              'Could not connect to server. Please check your connection or if the server is active.';
           } else if (error.status === 401) {
             errorMsg = 'Invalid username or password';
           }
-          
+
           this.snackBar.open('Login error: ' + errorMsg, 'Close', {
-            duration: 5000
+            duration: 5000,
           });
-        }
+        },
       });
     }
   }
@@ -250,4 +272,4 @@ export class NavbarComponent implements OnInit {
     this.username = '';
     this.router.navigate(['/']);
   }
-} 
+}
