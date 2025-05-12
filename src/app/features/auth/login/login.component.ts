@@ -46,7 +46,7 @@ import { CommonModule } from '@angular/common';
               <button type="button" mat-button routerLink="/register">Don't have an account? Register</button>
               <button type="submit" mat-raised-button color="primary" [disabled]="loginForm.invalid">
                 Login
-              </button>
+            </button>
             </div>
           </form>
         </mat-card-content>
@@ -102,7 +102,7 @@ export class LoginComponent {
         next: () => {
           // Redirect based on user role
           if (this.authService.isAdmin()) {
-            this.router.navigate(['/admin/dashboard']);
+          this.router.navigate(['/admin/dashboard']);
           } else {
             this.router.navigate(['/']);
           }

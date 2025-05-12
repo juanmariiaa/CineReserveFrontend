@@ -1,105 +1,147 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
-import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDividerModule } from '@angular/material/divider';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
+import { ScreeningService } from '../../core/services/screening.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Screening } from '../../core/models/screening.model';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     MatButtonModule,
     MatToolbarModule,
     MatCardModule,
     MatMenuModule,
     MatIconModule,
-    MatInputModule,
+    RouterLink,
     MatFormFieldModule,
-    MatDividerModule,
+    MatInputModule,
+    FormsModule,
+    ReactiveFormsModule,
     MatSnackBarModule,
-    RouterLink
+    MatProgressSpinnerModule
   ],
   template: `
+    <div class="home-container">
       <mat-toolbar color="primary" class="header-toolbar">
         <span>CineReserve</span>
         <span class="spacer"></span>
         
-        <!-- Not logged in: Show login dropdown -->
+        <!-- Not logged in: show login dropdown -->
         <div *ngIf="!isLoggedIn">
-          <button mat-button [matMenuTriggerFor]="loginMenu" #loginMenuTrigger="matMenuTrigger">
+          <button mat-button [matMenuTriggerFor]="loginMenu">
             Login <mat-icon>arrow_drop_down</mat-icon>
           </button>
           <mat-menu #loginMenu="matMenu" class="login-menu">
             <div class="login-form-container" (click)="$event.stopPropagation()">
-              <h2>Login to your account</h2>
               <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-                <mat-form-field appearance="outline" class="full-width">
+                <mat-form-field appearance="outline">
                   <mat-label>Username</mat-label>
-                  <input matInput formControlName="username" placeholder="Username">
-                  <mat-error *ngIf="loginForm.get('username')?.hasError('required')">Username is required</mat-error>
+                  <input matInput formControlName="username">
+                  <mat-error *ngIf="loginForm.get('username')?.hasError('required')">Required</mat-error>
                 </mat-form-field>
                 
-                <mat-form-field appearance="outline" class="full-width">
+                <mat-form-field appearance="outline">
                   <mat-label>Password</mat-label>
-                  <input matInput type="password" formControlName="password" placeholder="Password">
-                  <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
+                  <input matInput type="password" formControlName="password">
+                  <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Required</mat-error>
                 </mat-form-field>
                 
-                <button type="submit" mat-raised-button color="primary" class="full-width" [disabled]="loginForm.invalid">
-                  Login
-                </button>
+                <div class="login-actions">
+                  <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
+                    Login
+                  </button>
+                </div>
               </form>
-              <mat-divider class="divider"></mat-divider>
               <div class="register-link">
-                <span>Don't have an account?</span>
-                <a routerLink="/register" mat-button color="accent" (click)="closeLoginMenu()">Register</a>
+                <a mat-button routerLink="/register">Don't have an account? Register</a>
               </div>
             </div>
           </mat-menu>
-          
           <button mat-raised-button color="accent" routerLink="/register">Register</button>
         </div>
         
-        <!-- Logged in: Show user dropdown -->
+        <!-- Logged in: show username with dropdown -->
         <div *ngIf="isLoggedIn">
           <button mat-button *ngIf="isAdmin" routerLink="/admin/dashboard">Admin Dashboard</button>
           <button mat-button *ngIf="!isAdmin" routerLink="/movies">View Movies</button>
-          
           <button mat-button [matMenuTriggerFor]="userMenu">
-            <mat-icon>account_circle</mat-icon> {{ username }} <mat-icon>arrow_drop_down</mat-icon>
+            <mat-icon>account_circle</mat-icon> 
+            {{ username }} <mat-icon>arrow_drop_down</mat-icon>
           </button>
           <mat-menu #userMenu="matMenu">
-            <button mat-menu-item routerLink="/profile">
-              <mat-icon>person</mat-icon>
-              <span>My Profile</span>
-            </button>
-            <button mat-menu-item routerLink="/my-reservations">
-              <mat-icon>book</mat-icon>
-              <span>My Reservations</span>
-            </button>
-            <mat-divider></mat-divider>
             <button mat-menu-item (click)="logout()">
-              <mat-icon>exit_to_app</mat-icon>
-              <span>Sign Out</span>
+              <mat-icon>exit_to_app</mat-icon> Sign Out
             </button>
           </mat-menu>
         </div>
       </mat-toolbar>
 
-
-
+      <!-- Main content section -->
+      <div class="content">
+        <h1 class="section-title">Now Showing</h1>
         
+        <!-- Loading spinner -->
+        <div *ngIf="loading" class="loading-spinner">
+          <mat-spinner></mat-spinner>
+        </div>
+        
+        <!-- No screenings message -->
+        <div *ngIf="!loading && screenings.length === 0" class="no-screenings">
+          <p>No screenings available at the moment.</p>
+        </div>
+        
+        <!-- Screenings grid -->
+        <div class="screenings-grid">
+          <mat-card *ngFor="let screening of screenings" class="screening-card">
+            <div *ngIf="screening.movie?.posterUrl" class="movie-poster">
+              <img [src]="screening.movie?.posterUrl" alt="{{ screening.movie?.title }} poster">
+            </div>
+            <div class="card-content">
+              <mat-card-header>
+                <mat-card-title>{{ screening.movie?.title }}</mat-card-title>
+                <mat-card-subtitle>
+                  Room {{ screening.room?.number }} | {{ screening.format }}
+                  <span *ngIf="screening.is3D"> | 3D</span>
+                </mat-card-subtitle>
+              </mat-card-header>
+              
+              <mat-card-content>
+                <p><strong>Date:</strong> {{ screening.startTime | date:'medium' }}</p>
+                <p><strong>Price:</strong> {{ screening.ticketPrice | currency:'EUR' }}</p>
+                <p *ngIf="screening.language"><strong>Language:</strong> {{ screening.language }}</p>
+                <p *ngIf="screening.hasSubtitles"><mat-icon class="small-icon">subtitles</mat-icon> With subtitles</p>
+              </mat-card-content>
+              
+              <mat-card-actions>
+                <button 
+                  mat-raised-button 
+                  color="primary" 
+                  [routerLink]="['/reserve', screening.id]"
+                  [disabled]="!isLoggedIn"
+                >
+                  <mat-icon>event_seat</mat-icon> Reserve
+                </button>
+                <span *ngIf="!isLoggedIn" class="login-required-text">Login to reserve</span>
+              </mat-card-actions>
+            </div>
+          </mat-card>
+        </div>
+      </div>
+    </div>
   `,
   styles: [`
     .home-container {
@@ -125,62 +167,98 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
       gap: 30px;
     }
     
-    .welcome-card {
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: center;
-      padding: 20px;
-    }
-    
-    .featured-movies {
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-    }
-    
-    .movie-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-    }
-    
-    .movie-image-placeholder {
-      height: 150px;
-      background-color: #e0e0e0;
-      margin-bottom: 10px;
-    }
-    
-    /* Login dropdown styles */
     .login-form-container {
       padding: 16px;
       min-width: 300px;
     }
     
-    .login-form-container h2 {
-      margin-top: 0;
-      margin-bottom: 16px;
-      font-size: 18px;
-      font-weight: 500;
-    }
-    
-    .full-width {
+    .login-form-container mat-form-field {
       width: 100%;
+      margin-bottom: 10px;
     }
     
-    .divider {
-      margin: 16px 0;
+    .login-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
     }
     
     .register-link {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
+      margin-top: 10px;
+      text-align: center;
     }
     
-    ::ng-deep .mat-mdc-menu-panel.mat-mdc-menu-panel.login-menu {
-      max-width: none;
-      overflow: visible;
+    ::ng-deep .mat-mdc-menu-panel.login-menu {
+      max-width: none !important;
+    }
+
+    .section-title {
+      margin-top: 30px;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    .screenings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .screening-card {
+      display: flex;
+      flex-direction: row;
+      overflow: hidden;
+    }
+
+    .movie-poster {
+      width: 120px;
+      flex-shrink: 0;
+      height: auto;
+    }
+
+    .movie-poster img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+
+    .card-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .small-icon {
+      font-size: 18px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      padding: 50px 0;
+    }
+
+    .no-screenings {
+      text-align: center;
+      padding: 30px;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+    }
+
+    .login-required-text {
+      margin-left: 8px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    mat-card-actions {
+      display: flex;
+      align-items: center;
     }
   `]
 })
@@ -189,11 +267,12 @@ export class HomeComponent implements OnInit {
   isAdmin = false;
   username = '';
   loginForm: FormGroup;
-  
-  @ViewChild('loginMenuTrigger') loginMenuTrigger!: MatMenuTrigger;
+  screenings: Screening[] = [];
+  loading = true;
 
   constructor(
     private authService: AuthService,
+    private screeningService: ScreeningService,
     private router: Router,
     private fb: FormBuilder,
     private snackBar: MatSnackBar
@@ -205,23 +284,41 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isLoggedIn = this.authService.isLoggedIn();
-    this.isAdmin = this.authService.isAdmin();
-    
-    // Get current user info if logged in
-    if (this.isLoggedIn) {
-      const currentUser = this.authService.getCurrentUser();
-      if (currentUser) {
-        this.username = currentUser.username;
-      }
-    }
+    this.updateAuthStatus();
     
     // Subscribe to auth changes
     this.authService.currentUser$.subscribe(user => {
-      this.isLoggedIn = !!user;
-      this.isAdmin = this.authService.isAdmin();
-      this.username = user?.username || '';
+      this.updateAuthStatus();
     });
+
+    // Load screenings
+    this.loadScreenings();
+  }
+
+  loadScreenings(): void {
+    this.loading = true;
+    this.screeningService.getAllScreenings().subscribe({
+      next: (data) => {
+        this.screenings = data;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading screenings:', error);
+        this.snackBar.open('Could not load screenings. Please try again later.', 'Close', {
+          duration: 5000
+        });
+        this.loading = false;
+      }
+    });
+  }
+
+  private updateAuthStatus(): void {
+    this.isLoggedIn = this.authService.isLoggedIn();
+    this.isAdmin = this.authService.isAdmin();
+    
+    // Get username from stored user data
+    const userData = this.authService.getUserData();
+    this.username = userData?.username || '';
   }
 
   onLogin(): void {
@@ -229,17 +326,12 @@ export class HomeComponent implements OnInit {
       const { username, password } = this.loginForm.value;
       this.authService.login({ username, password }).subscribe({
         next: () => {
-          // Successfully logged in
-          this.username = username;
-          
-          // Reset form and close menu
-          this.loginForm.reset();
-          this.closeLoginMenu();
-          
-          // Show success message
-          this.snackBar.open('Successfully logged in', 'Close', {
-            duration: 3000
-          });
+          this.updateAuthStatus();
+          // Redirect based on user role
+          if (this.isAdmin) {
+            this.router.navigate(['/admin/dashboard']);
+          }
+          // For regular users, stay on the home page with updated UI
         },
         error: (error) => {
           let errorMsg = 'Invalid credentials';
@@ -260,17 +352,11 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  closeLoginMenu(): void {
-    if (this.loginMenuTrigger) {
-      this.loginMenuTrigger.closeMenu();
-    }
-  }
-
   logout(): void {
     this.authService.logout();
+    this.isLoggedIn = false;
+    this.isAdmin = false;
+    this.username = '';
     this.router.navigate(['/']);
-    this.snackBar.open('Successfully logged out', 'Close', {
-      duration: 3000
-    });
   }
 } 

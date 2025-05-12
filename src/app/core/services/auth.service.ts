@@ -49,9 +49,16 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  getCurrentUser(): any {
-    const userJson = localStorage.getItem(this.USER_KEY);
-    return userJson ? JSON.parse(userJson) : null;
+  getUserData(): JwtResponse | null {
+    const userStr = localStorage.getItem(this.USER_KEY);
+    if (userStr) {
+      try {
+        return JSON.parse(userStr);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   }
 
   private tokenExpired(token: string): boolean {
@@ -62,18 +69,17 @@ export class AuthService {
       const expiryTime = payload.exp * 1000; // Convert to milliseconds
       return Date.now() >= expiryTime;
     } catch (e) {
-      return true; // Si hay error al decodificar, consideramos que ha expirado
+      return true; // If there's an error decoding, we consider it expired
     }
   }
   
-  // Modifica el método isLoggedIn para verificar la expiración
   isLoggedIn(): boolean {
     const token = this.getToken();
     if (!token) return false;
     
     const isExpired = this.tokenExpired(token);
     if (isExpired) {
-      this.logout(); // Limpiar si está expirado
+      this.logout(); // Clean up if expired
       return false;
     }
     

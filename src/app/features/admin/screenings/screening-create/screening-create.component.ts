@@ -377,7 +377,10 @@ export class ScreeningCreateComponent implements OnInit {
     const movie = this.movies.find(m => m.id === screening.movieId);
 
     // Parse the date and time from the startTime
+    // Convert the string date to a Date object properly
     const startDate = new Date(screening.startTime);
+
+    // Extract hours and minutes directly from the Date object
     const hours = startDate.getHours().toString().padStart(2, '0');
     const minutes = startDate.getMinutes().toString().padStart(2, '0');
     const timeString = `${hours}:${minutes}`;
@@ -441,8 +444,20 @@ export class ScreeningCreateComponent implements OnInit {
     const time = formValue.time;
     const [hours, minutes] = time.split(':');
 
+    // Create the date using the local date and time values
     const startTime = new Date(date);
     startTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
+    
+    // Format date as ISO string but preserve the local time by manually constructing the string
+    // This prevents time zone conversion issues
+    const year = startTime.getFullYear();
+    const month = String(startTime.getMonth() + 1).padStart(2, '0');
+    const day = String(startTime.getDate()).padStart(2, '0');
+    const formattedHours = String(startTime.getHours()).padStart(2, '0');
+    const formattedMinutes = String(startTime.getMinutes()).padStart(2, '0');
+    
+    // Format: "YYYY-MM-DDTHH:MM:00" (no timezone)
+    const localISOString = `${year}-${month}-${day}T${formattedHours}:${formattedMinutes}:00`;
 
     // Get movie ID from selected movie
     const movieId = typeof formValue.movieTitle === 'object' ? formValue.movieTitle.id : null;
@@ -458,7 +473,7 @@ export class ScreeningCreateComponent implements OnInit {
     const screeningData = {
       movieId,
       roomId: formValue.roomId,
-      startTime: startTime.toISOString(),
+      startTime: localISOString,
       ticketPrice: formValue.ticketPrice,
       is3D: formValue.is3D,
       hasSubtitles: formValue.hasSubtitles,

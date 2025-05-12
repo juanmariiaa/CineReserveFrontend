@@ -21,6 +21,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/shared/not-allowed/not-allowed.component').then(c => c.NotAllowedComponent)
   },
   {
+    path: 'reserve/:id',
+    loadComponent: () => import('./features/reservation/reservation.component').then(c => c.ReservationComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'dashboard',
     loadComponent: () => import('./features/dashboard/dashboard.component').then(c => c.DashboardComponent),
     canActivate: [authGuard, adminGuard]
