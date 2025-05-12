@@ -182,6 +182,7 @@ import { MatBadgeModule } from '@angular/material/badge';
   styles: [`
     .reservation-management-container {
       padding: 20px;
+      color: #FFFFFF;
     }
 
     .page-header {
@@ -189,6 +190,11 @@ import { MatBadgeModule } from '@angular/material/badge';
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #FFFFFF;
+      margin: 0;
     }
 
     .loading-spinner {
@@ -202,8 +208,44 @@ import { MatBadgeModule } from '@angular/material/badge';
       margin-bottom: 20px;
     }
 
+    ::ng-deep .mat-form-field-label {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    ::ng-deep .mat-form-field-outline {
+      color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    ::ng-deep .mat-form-field-infix input {
+      color: #FFFFFF !important;
+    }
+
+    ::ng-deep .mat-icon {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    ::ng-deep .mat-card {
+      background-color: #222222;
+      color: #FFFFFF;
+      border: 1px solid #3a3a3a;
+    }
+
     .status-filters {
       margin-bottom: 20px;
+    }
+
+    ::ng-deep .mat-chip-listbox {
+      background-color: transparent;
+    }
+
+    ::ng-deep .mat-chip-option {
+      background-color: #333333 !important;
+      color: #FFFFFF !important;
+    }
+
+    ::ng-deep .mat-chip-option.mat-chip-selected {
+      background-color: rgba(0, 176, 32, 0.3) !important;
+      color: #FFFFFF !important;
     }
 
     .table-container {
@@ -212,11 +254,36 @@ import { MatBadgeModule } from '@angular/material/badge';
 
     .reservation-table {
       width: 100%;
+      background-color: transparent;
     }
 
-    .seats-count {
-      display: inline-flex;
-      align-items: center;
+    ::ng-deep .mat-table {
+      background-color: transparent !important;
+    }
+
+    ::ng-deep .mat-header-cell {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-weight: 500;
+      background-color: #1a1a1a;
+    }
+
+    ::ng-deep .mat-cell {
+      color: rgba(255, 255, 255, 0.7) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    ::ng-deep .mat-row:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    ::ng-deep .mat-paginator {
+      background-color: transparent;
+      color: #FFFFFF;
+    }
+
+    ::ng-deep .mat-paginator-page-size-label, 
+    ::ng-deep .mat-paginator-range-label {
+      color: rgba(255, 255, 255, 0.7);
     }
 
     .status-chip {
@@ -226,24 +293,60 @@ import { MatBadgeModule } from '@angular/material/badge';
       font-weight: 500;
     }
 
-    .status-pending {
-      background-color: #FFF9C4;
-      color: #F57F17;
+    .status-confirmed {
+      background-color: rgba(0, 176, 32, 0.2);
+      color: #00B020;
+      border: 1px solid rgba(0, 176, 32, 0.4);
     }
 
-    .status-confirmed {
-      background-color: #C8E6C9;
-      color: #2E7D32;
+    .status-pending {
+      background-color: rgba(255, 152, 0, 0.2);
+      color: #FF9800;
+      border: 1px solid rgba(255, 152, 0, 0.4);
     }
 
     .status-cancelled {
-      background-color: #FFCDD2;
-      color: #C62828;
+      background-color: rgba(244, 67, 54, 0.2);
+      color: #F44336;
+      border: 1px solid rgba(244, 67, 54, 0.4);
     }
 
     .status-completed {
-      background-color: #BBDEFB;
-      color: #1565C0;
+      background-color: rgba(103, 58, 183, 0.2);
+      color: #673AB7;
+      border: 1px solid rgba(103, 58, 183, 0.4);
+    }
+
+    .seats-count {
+      padding: 2px 8px;
+      background-color: #333333;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    ::ng-deep .mat-raised-button.mat-primary {
+      background-color: #00B020;
+    }
+
+    ::ng-deep .mat-raised-button.mat-accent {
+      background-color: #2c2c2c;
+      color: #FFFFFF;
+    }
+
+    ::ng-deep .mat-icon-button {
+      color: #FFFFFF;
+    }
+
+    ::ng-deep .mat-icon-button.mat-primary {
+      color: #00B020;
+    }
+
+    ::ng-deep .mat-icon-button.mat-accent {
+      color: #00B020;
+    }
+
+    ::ng-deep .mat-icon-button.mat-warn {
+      color: #f44336;
     }
   `]
 })

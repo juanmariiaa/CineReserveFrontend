@@ -104,6 +104,18 @@ import { AuthService } from '../../../../core/services/auth.service';
       margin-right: 8px;
       color: #FFFFFF;
     }
+
+    .menu-icon {
+      color: #FFFFFF;
+    }
+    
+    .logout-btn {
+      color: #FFFFFF;
+    }
+    
+    .logout-btn mat-icon {
+      color: #FFFFFF;
+    }
     
     .sidenav-container {
       position: fixed;
@@ -156,6 +168,10 @@ import { AuthService } from '../../../../core/services/auth.service';
     
     .return-link mat-icon {
       color: #00B020 !important;
+    }
+
+    ::ng-deep .mat-toolbar {
+      color: #FFFFFF;
     }
   `]
 })

@@ -156,6 +156,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
   styles: [`
     .user-management-container {
       padding: 20px;
+      color: #FFFFFF;
     }
 
     .page-header {
@@ -163,6 +164,11 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #FFFFFF;
+      margin: 0;
     }
 
     .loading-spinner {
@@ -176,12 +182,64 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
       margin-bottom: 20px;
     }
 
+    ::ng-deep .mat-form-field-label {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    ::ng-deep .mat-form-field-outline {
+      color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    ::ng-deep .mat-form-field-infix input {
+      color: #FFFFFF !important;
+    }
+
+    ::ng-deep .mat-icon {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    ::ng-deep .mat-card {
+      background-color: #222222;
+      color: #FFFFFF;
+      border: 1px solid #3a3a3a;
+    }
+
     .table-container {
       overflow-x: auto;
     }
 
     .user-table {
       width: 100%;
+      background-color: transparent;
+    }
+
+    ::ng-deep .mat-table {
+      background-color: transparent !important;
+    }
+
+    ::ng-deep .mat-header-cell {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-weight: 500;
+      background-color: #1a1a1a;
+    }
+
+    ::ng-deep .mat-cell {
+      color: rgba(255, 255, 255, 0.7) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    ::ng-deep .mat-row:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    ::ng-deep .mat-paginator {
+      background-color: transparent;
+      color: #FFFFFF;
+    }
+
+    ::ng-deep .mat-paginator-page-size-label, 
+    ::ng-deep .mat-paginator-range-label {
+      color: rgba(255, 255, 255, 0.7);
     }
 
     .role-chips {
@@ -197,13 +255,48 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     }
 
     .admin-role {
-      background-color: #E1F5FE;
-      color: #0288D1;
+      background-color: rgba(0, 176, 32, 0.2);
+      color: #00B020;
+      border: 1px solid rgba(0, 176, 32, 0.4);
     }
 
     .user-role {
-      background-color: #F1F8E9;
-      color: #689F38;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+      background-color: rgba(0, 176, 32, 0.3);
+    }
+
+    ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+      background-color: #00B020;
+    }
+
+    ::ng-deep .mat-raised-button.mat-primary {
+      background-color: #00B020;
+    }
+
+    ::ng-deep .mat-raised-button.mat-accent {
+      background-color: #2c2c2c;
+      color: #FFFFFF;
+    }
+
+    ::ng-deep .mat-icon-button {
+      color: #FFFFFF;
+    }
+
+    ::ng-deep .mat-icon-button.mat-primary {
+      color: #00B020;
+    }
+
+    ::ng-deep .mat-icon-button.mat-accent {
+      color: #00B020;
+    }
+
+    ::ng-deep .mat-icon-button.mat-warn {
+      color: #f44336;
     }
   `]
 })

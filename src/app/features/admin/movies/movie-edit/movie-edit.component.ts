@@ -154,6 +154,8 @@ import { MatNativeDateModule } from '@angular/material/core';
   styles: [`
     .movie-edit-container {
       padding: 20px;
+      color: #FFFFFF;
+      background-color: #181818;
     }
 
     .page-header {
@@ -161,6 +163,10 @@ import { MatNativeDateModule } from '@angular/material/core';
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+    }
+
+    h1, h2, h3, p {
+      color: #FFFFFF;
     }
 
     .loading-spinner {
@@ -213,20 +219,56 @@ import { MatNativeDateModule } from '@angular/material/core';
     }
 
     .not-found {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 50px 0;
       text-align: center;
+      padding: 50px 0;
     }
 
     .not-found mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
+      font-size: 48px;
+      height: 48px;
+      width: 48px;
       margin-bottom: 16px;
-      color: #888;
+      color: #FFFFFF;
+    }
+
+    ::ng-deep .mat-card {
+      background-color: #222222;
+      color: #FFFFFF;
+      border: 1px solid #3a3a3a;
+    }
+
+    ::ng-deep .mat-form-field-label {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    ::ng-deep .mat-form-field-outline {
+      color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    ::ng-deep .mat-form-field-infix input, 
+    ::ng-deep .mat-form-field-infix textarea {
+      color: #FFFFFF !important;
+    }
+
+    ::ng-deep .mat-icon {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    ::ng-deep .mat-raised-button.mat-primary {
+      background-color: #00B020;
+    }
+
+    ::ng-deep .mat-raised-button.mat-accent {
+      background-color: #2c2c2c;
+      color: #FFFFFF;
+    }
+
+    ::ng-deep .mat-button.mat-warn {
+      color: #f44336;
+    }
+
+    ::ng-deep .mat-datepicker-toggle {
+      color: rgba(255, 255, 255, 0.7) !important;
     }
   `]
 })

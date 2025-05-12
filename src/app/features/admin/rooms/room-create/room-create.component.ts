@@ -130,6 +130,8 @@ import { MatDividerModule } from '@angular/material/divider';
   styles: [`
     .room-create-container {
       padding: 20px;
+      color: #FFFFFF;
+      background-color: #181818;
     }
 
     .page-header {
@@ -137,6 +139,10 @@ import { MatDividerModule } from '@angular/material/divider';
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+    }
+
+    h1, h2, h3, p {
+      color: #FFFFFF;
     }
 
     .form-row {
@@ -152,35 +158,39 @@ import { MatDividerModule } from '@angular/material/divider';
     .capacity-display {
       margin: 20px 0;
       padding: 15px;
-      background-color: #f5f5f5;
+      background-color: #222222;
       border-radius: 4px;
       text-align: center;
+      border: 1px solid #3a3a3a;
     }
 
     .capacity-display h3 {
       margin: 0;
-      color: #3f51b5;
+      color: #00B020;
     }
 
     .room-preview {
       margin: 20px 0;
       padding: 20px;
-      background-color: #f9f9f9;
+      background-color: #222222;
       border-radius: 4px;
+      border: 1px solid #3a3a3a;
     }
 
     .room-preview h3 {
       margin-top: 0;
       text-align: center;
+      color: #FFFFFF;
     }
 
     .screen {
-      background-color: #e0e0e0;
+      background-color: #333333;
       padding: 10px;
       text-align: center;
       margin-bottom: 20px;
       border-radius: 4px;
       font-weight: bold;
+      color: #FFFFFF;
     }
 
     .seats-grid {
@@ -192,20 +202,21 @@ import { MatDividerModule } from '@angular/material/divider';
     .seat {
       width: 30px;
       height: 30px;
-      background-color: #bbdefb;
+      background-color: #2c2c2c;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 4px;
       font-size: 12px;
-      cursor: default;
+      color: #FFFFFF;
+      border: 1px solid #3a3a3a;
     }
 
-    .aisle-right {
+    .seat.aisle-right {
       margin-right: 15px;
     }
 
-    .aisle-left {
+    .seat.aisle-left {
       margin-left: 15px;
     }
 
@@ -214,6 +225,46 @@ import { MatDividerModule } from '@angular/material/divider';
       justify-content: flex-end;
       gap: 10px;
       margin-top: 20px;
+    }
+
+    ::ng-deep .mat-card {
+      background-color: #222222;
+      color: #FFFFFF;
+      border: 1px solid #3a3a3a;
+    }
+
+    ::ng-deep .mat-form-field-label {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    ::ng-deep .mat-form-field-outline {
+      color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    ::ng-deep .mat-form-field-infix input, 
+    ::ng-deep .mat-form-field-infix textarea {
+      color: #FFFFFF !important;
+    }
+
+    ::ng-deep .mat-form-field-hint-wrapper {
+      color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    ::ng-deep .mat-icon {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    ::ng-deep .mat-raised-button.mat-primary {
+      background-color: #00B020;
+    }
+
+    ::ng-deep .mat-raised-button.mat-accent {
+      background-color: #2c2c2c;
+      color: #FFFFFF;
+    }
+
+    ::ng-deep .mat-button.mat-warn {
+      color: #f44336;
     }
   `]
 })

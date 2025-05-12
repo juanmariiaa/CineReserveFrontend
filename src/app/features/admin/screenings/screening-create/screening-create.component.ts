@@ -195,6 +195,8 @@ import { Observable, map, startWith } from 'rxjs';
   styles: [`
     .screening-create-container {
       padding: 20px;
+      color: #FFFFFF;
+      background-color: #181818;
     }
 
     .page-header {
@@ -202,6 +204,10 @@ import { Observable, map, startWith } from 'rxjs';
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+    }
+
+    h1, h2, h3, p {
+      color: #FFFFFF;
     }
 
     .loading-spinner {
@@ -226,13 +232,14 @@ import { Observable, map, startWith } from 'rxjs';
     }
 
     .divider {
-      margin: 24px 0 16px;
+      margin: 24px 0;
+      border-color: #3a3a3a;
     }
 
     .checkbox-row {
       display: flex;
       gap: 20px;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
     .form-actions {
@@ -252,7 +259,7 @@ import { Observable, map, startWith } from 'rxjs';
       width: 30px;
       height: 45px;
       object-fit: cover;
-      border-radius: 4px;
+      border-radius: 2px;
     }
 
     .no-poster {
@@ -261,8 +268,88 @@ import { Observable, map, startWith } from 'rxjs';
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #f0f0f0;
-      border-radius: 4px;
+      background-color: #333333;
+      border-radius: 2px;
+      color: #FFFFFF;
+    }
+
+    ::ng-deep .mat-card {
+      background-color: #222222;
+      color: #FFFFFF;
+      border: 1px solid #3a3a3a;
+    }
+
+    ::ng-deep .mat-form-field-label {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    ::ng-deep .mat-form-field-outline {
+      color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    ::ng-deep .mat-form-field-infix input, 
+    ::ng-deep .mat-form-field-infix textarea {
+      color: #FFFFFF !important;
+    }
+
+    ::ng-deep .mat-select-value {
+      color: #FFFFFF !important;
+    }
+
+    ::ng-deep .mat-option {
+      color: #FFFFFF !important;
+      background-color: #222222 !important;
+    }
+
+    ::ng-deep .mat-option:hover:not(.mat-option-disabled) {
+      background-color: #2a2a2a !important;
+    }
+
+    ::ng-deep .mat-autocomplete-panel {
+      background-color: #222222 !important;
+      border: 1px solid #3a3a3a !important;
+    }
+
+    ::ng-deep .mat-checkbox-label {
+      color: #FFFFFF !important;
+    }
+
+    ::ng-deep .mat-checkbox-checked .mat-checkbox-background {
+      background-color: #00B020 !important;
+    }
+
+    ::ng-deep .mat-datepicker-toggle {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    ::ng-deep .mat-calendar {
+      background-color: #222222 !important;
+      color: #FFFFFF !important;
+    }
+
+    ::ng-deep .mat-calendar-body-selected {
+      background-color: #00B020 !important;
+    }
+
+    ::ng-deep .mat-calendar-body-cell-content {
+      color: #FFFFFF !important;
+    }
+
+    ::ng-deep .mat-icon {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    ::ng-deep .mat-raised-button.mat-primary {
+      background-color: #00B020;
+    }
+
+    ::ng-deep .mat-raised-button.mat-accent {
+      background-color: #2c2c2c;
+      color: #FFFFFF;
+    }
+
+    ::ng-deep .mat-button.mat-warn {
+      color: #f44336;
     }
   `]
 })
