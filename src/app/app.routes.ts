@@ -31,11 +31,6 @@ export const routes: Routes = [
     canActivate: [authGuard, adminGuard]
   },
   {
-    path: 'movies',
-    loadComponent: () => import('./features/movies/movie-list/movie-list.component').then(c => c.MovieListComponent),
-    canActivate: [authGuard]
-  },
-  {
     path: 'movies/add',
     loadComponent: () => import('./features/movies/movie-create/movie-create.component').then(c => c.MovieCreateComponent),
     canActivate: [authGuard, adminGuard]
@@ -44,6 +39,15 @@ export const routes: Routes = [
     path: 'movies/:id',
     loadComponent: () => import('./features/movies/movie-detail/movie-detail.component').then(c => c.MovieDetailComponent),
     canActivate: [authGuard]
+  },
+  // Public movie routes - accessible without authentication
+  {
+    path: 'public/movies',
+    loadComponent: () => import('./features/public/movie-list/movie-list.component').then(c => c.PublicMovieListComponent)
+  },
+  {
+    path: 'public/movies/:id',
+    loadComponent: () => import('./features/public/movie-detail/movie-detail.component').then(c => c.PublicMovieDetailComponent)
   },
   ...ADMIN_ROUTES
 ];
