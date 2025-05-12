@@ -323,21 +323,33 @@ import { MatFormFieldModule } from '@angular/material/form-field';
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 80%;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transform: perspective(200px) rotateX(-5deg);
     }
 
     .screen-label {
       color: #555;
       font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
     }
 
     .seats-container {
       margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .seat-row {
       display: flex;
       align-items: center;
       margin-bottom: 10px;
+      justify-content: center;
     }
 
     .row-label {
@@ -350,6 +362,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      justify-content: center;
     }
 
     .seat {

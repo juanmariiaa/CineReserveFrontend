@@ -1,9 +1,11 @@
 import { Routes } from '@angular/router';
 import { adminGuard } from '../../core/guards/admin.guard';
+import { AdminLayoutComponent } from './layouts/admin-layout.component';
 
 export const ADMIN_ROUTES: Routes = [
   {
     path: 'admin',
+    component: AdminLayoutComponent,
     children: [
       {
         path: '',

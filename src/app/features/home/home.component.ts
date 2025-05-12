@@ -44,13 +44,69 @@ import { catchError, map } from 'rxjs/operators';
 
       <!-- Main content section -->
       <div class="content">
-        <div class="hero-section">
-          <div class="hero-content">
-            <h1>Welcome to CineReserve</h1>
-            <p>Discover the latest movies and reserve your seats today!</p>
-            <button mat-raised-button color="accent" routerLink="/public/movies">
-              <mat-icon>movie</mat-icon> Browse All Movies
+        <!-- Featured Movies Carousel -->
+        <div class="carousel-section">
+          <!-- Loading spinner -->
+          <div *ngIf="loadingFeaturedMovies" class="loading-spinner">
+            <mat-spinner></mat-spinner>
+          </div>
+          
+          <!-- Carousel -->
+          <div *ngIf="!loadingFeaturedMovies && featuredMovies.length > 0" class="carousel-container" #carousel>
+            <div class="carousel-slides">
+              <div 
+                *ngFor="let movie of featuredMovies; let i = index" 
+                class="carousel-slide"
+                [class.active]="i === currentSlide"
+                (click)="navigateToMovieDetail(movie.id!)"
+              >
+                <div class="carousel-backdrop" [style.background-image]="'url(' + movie.backdropUrl + ')'">
+                  <div class="movie-info-overlay">
+                    <h2 class="movie-title">{{ movie.title }}</h2>
+                    <div class="movie-details">
+                      <span *ngIf="movie.durationMinutes" class="duration">
+                        <mat-icon>schedule</mat-icon> {{ movie.durationMinutes }} min
+                      </span>
+                      <span *ngIf="movie.rating" class="rating">
+                        <mat-icon>star</mat-icon> {{ movie.rating }}
+                      </span>
+                    </div>
+                    <div *ngIf="movie.genres && movie.genres.length > 0" class="genres">
+                      {{ getGenresList(movie) }}
+                    </div>
+                    <p *ngIf="movie.description" class="description">{{ movie.description | slice:0:150 }}{{ movie.description.length > 150 ? '...' : '' }}</p>
+                    <button mat-raised-button color="accent" (click)="navigateToMovieDetail(movie.id!); $event.stopPropagation()">
+                      View Screenings
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Carousel controls -->
+            <div class="carousel-controls">
+              <div class="carousel-indicators">
+                <span 
+                  *ngFor="let movie of featuredMovies; let i = index" 
+                  class="indicator"
+                  [class.active]="i === currentSlide"
+                  (click)="goToSlide(i); $event.stopPropagation()"
+                ></span>
+              </div>
+            </div>
+            
+            <!-- Side navigation arrows -->
+            <button mat-fab class="nav-arrow left-arrow" (click)="prevSlide(); $event.stopPropagation()">
+              <mat-icon>chevron_left</mat-icon>
             </button>
+            <button mat-fab class="nav-arrow right-arrow" (click)="nextSlide(); $event.stopPropagation()">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+          
+          <!-- No movies message -->
+          <div *ngIf="!loadingFeaturedMovies && featuredMovies.length === 0" class="no-data">
+            <p>No featured movies available. Please check again later.</p>
           </div>
         </div>
         
@@ -192,32 +248,154 @@ import { catchError, map } from 'rxjs/operators';
       gap: 30px;
     }
     
-    .hero-section {
-      background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/assets/cinema-background.jpg');
+    /* Carousel styles */
+    .carousel-section {
+      margin-bottom: 20px;
+    }
+    
+    .carousel-container {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      height: 500px;
+      cursor: pointer;
+    }
+    
+    /* Side navigation arrows */
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+    }
+    
+    .left-arrow {
+      left: 20px;
+    }
+    
+    .right-arrow {
+      right: 20px;
+    }
+    
+    .nav-arrow:hover {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    
+    .carousel-slides {
+      height: 100%;
+      position: relative;
+    }
+    
+    .carousel-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.6s ease-in-out;
+      z-index: 0;
+      visibility: hidden;
+    }
+    
+    .carousel-slide.active {
+      opacity: 1;
+      z-index: 1;
+      visibility: visible;
+    }
+    
+    .carousel-backdrop {
+      width: 100%;
+      height: 100%;
       background-size: cover;
       background-position: center;
+      position: relative;
+    }
+    
+    .movie-info-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 40px 30px 30px;
       color: white;
-      padding: 60px 20px;
-      border-radius: 8px;
+      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
+    }
+    
+    .movie-info-overlay .movie-title {
+      font-size: 32px;
+      margin-bottom: 15px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+      color: #ffffff;
+    }
+    
+    .movie-info-overlay .movie-details {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 10px;
+    }
+    
+    .movie-info-overlay .duration,
+    .movie-info-overlay .rating {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .movie-info-overlay .duration mat-icon,
+    .movie-info-overlay .rating mat-icon {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .movie-info-overlay .genres {
+      font-size: 15px;
+      margin-bottom: 10px;
+      color: rgba(255, 255, 255, 0.85);
+    }
+    
+    .movie-info-overlay .description {
       margin-bottom: 20px;
+      font-size: 16px;
+      max-width: 70%;
+      line-height: 1.4;
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+      color: rgba(255, 255, 255, 0.9);
     }
     
-    .hero-content {
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: center;
+    .carousel-controls {
+      position: absolute;
+      bottom: 15px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     
-    .hero-content h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
+    .carousel-indicators {
+      display: flex;
+      gap: 10px;
     }
     
-    .hero-content p {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
+    .indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: background-color 0.3s;
     }
-
+    
+    .indicator.active {
+      background-color: white;
+    }
+    
     .section-title {
       margin-top: 30px;
       margin-bottom: 20px;
@@ -518,6 +696,26 @@ import { catchError, map } from 'rxjs/operators';
     
     /* Responsive adjustments */
     @media (max-width: 768px) {
+      .carousel-container {
+        height: 400px;
+      }
+      
+      .movie-info-overlay .description {
+        max-width: 100%;
+      }
+      
+      .nav-arrow {
+        transform: translateY(-50%) scale(0.8);
+      }
+      
+      .left-arrow {
+        left: 10px;
+      }
+      
+      .right-arrow {
+        right: 10px;
+      }
+      
       .date-selection {
         flex-direction: column;
       }
@@ -535,12 +733,44 @@ import { catchError, map } from 'rxjs/operators';
         height: 120px;
       }
     }
+    
+    @media (max-width: 480px) {
+      .carousel-container {
+        height: 350px;
+      }
+      
+      .nav-arrow {
+        transform: translateY(-50%) scale(0.7);
+      }
+      
+      .left-arrow {
+        left: 5px;
+      }
+      
+      .right-arrow {
+        right: 5px;
+      }
+      
+      .movie-info-overlay .movie-title {
+        font-size: 24px;
+      }
+      
+      .movie-info-overlay .description {
+        font-size: 14px;
+      }
+    }
   `]
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoggedIn = false;
   loading = true;
   loadingScreenings = false;
+  
+  // Featured movies carousel
+  featuredMovies: Movie[] = [];
+  loadingFeaturedMovies = true;
+  currentSlide = 0;
+  autoSlideInterval: any;
   
   // Calendar related properties
   selectedDate: Date | null = new Date();
@@ -554,13 +784,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   canScrollLeft = false;
   canScrollRight = true;
   @ViewChild('datesContainer') datesContainer!: ElementRef;
+  @ViewChild('carousel') carousel!: ElementRef;
 
   private subscriptions = new Subscription();
 
   constructor(
     private screeningService: ScreeningService,
     private movieService: MovieService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -569,8 +801,14 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isLoggedIn = event.detail.isLoggedIn;
     });
 
+    // Load featured movies
+    this.loadFeaturedMovies();
+    
     // Load available dates
     this.loadAvailableDates();
+    
+    // Set auto slide for carousel
+    this.startAutoSlide();
   }
 
   ngAfterViewInit(): void {
@@ -598,6 +836,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     // Remove scroll event listener
     if (this.datesContainer) {
       this.datesContainer.nativeElement.removeEventListener('scroll', this.updateScrollButtonsState);
+    }
+    
+    // Clear auto slide interval
+    if (this.autoSlideInterval) {
+      clearInterval(this.autoSlideInterval);
     }
   }
 
@@ -892,5 +1135,98 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       container.scrollLeft = Math.max(0, scrollLeft);
       this.updateScrollButtonsState();
     }
+  }
+
+  loadFeaturedMovies(): void {
+    this.loadingFeaturedMovies = true;
+    
+    // Get all active screenings (these are screenings in the future)
+    this.screeningService.getAllScreenings().subscribe({
+      next: (screenings) => {
+        // Filter future screenings (after current time)
+        const now = new Date();
+        const futureScreenings = screenings.filter(screening => {
+          const screeningTime = new Date(screening.startTime);
+          return screeningTime > now;
+        });
+        
+        // Get unique movie IDs from future screenings
+        const movieIdsWithFutureScreenings = new Set<number>();
+        futureScreenings.forEach(screening => {
+          if (screening.movie?.id) {
+            movieIdsWithFutureScreenings.add(screening.movie.id);
+          }
+        });
+        
+        console.log('Movies with future screenings:', movieIdsWithFutureScreenings.size);
+        
+        // Only proceed if we have movies with future screenings
+        if (movieIdsWithFutureScreenings.size === 0) {
+          this.loadingFeaturedMovies = false;
+          return;
+        }
+        
+        // Get all movies
+        this.movieService.getAllMovies().subscribe({
+          next: (movies) => {
+            // Filter movies that have future screenings and backdrop images
+            const moviesWithFutureScreenings = movies.filter(movie => 
+              movie.backdropUrl && // Has backdrop image
+              movie.id && movieIdsWithFutureScreenings.has(movie.id) // Has future screenings
+            );
+            
+            console.log('Movies with backdrop and future screenings:', moviesWithFutureScreenings.length);
+            
+            if (moviesWithFutureScreenings.length > 0) {
+              // Sort by rating if available
+              const sortedMovies = moviesWithFutureScreenings.sort((a, b) => 
+                ((b.voteAverage || 0) - (a.voteAverage || 0))
+              );
+              
+              // Limit to 5 movies for the carousel
+              this.featuredMovies = sortedMovies.slice(0, 5);
+              console.log('Featured movies:', this.featuredMovies.length);
+              
+              // Initialize the carousel with the first slide
+              if (this.featuredMovies.length > 0 && this.currentSlide >= this.featuredMovies.length) {
+                this.currentSlide = 0;
+              }
+            }
+            
+            this.loadingFeaturedMovies = false;
+          },
+          error: (error) => {
+            console.error('Error loading movies:', error);
+            this.loadingFeaturedMovies = false;
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error loading screenings:', error);
+        this.loadingFeaturedMovies = false;
+      }
+    });
+  }
+  
+  startAutoSlide(): void {
+    this.autoSlideInterval = setInterval(() => {
+      this.nextSlide();
+    }, 5000); // Change slide every 5 seconds
+  }
+  
+  goToSlide(index: number): void {
+    this.currentSlide = index;
+  }
+  
+  nextSlide(): void {
+    this.currentSlide = (this.currentSlide + 1) % this.featuredMovies.length;
+  }
+  
+  prevSlide(): void {
+    this.currentSlide = (this.currentSlide - 1 + this.featuredMovies.length) % this.featuredMovies.length;
+  }
+  
+  navigateToMovieDetail(movieId: number): void {
+    this.router.navigate(['/public/movies', movieId]);
   }
 } 
