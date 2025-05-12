@@ -46,7 +46,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
         <mat-card>
           <mat-card-content>
             <p>Movie not found or has been removed.</p>
-            <button mat-raised-button color="primary" routerLink="/public/movies">Back to Movies</button>
+            <button mat-raised-button color="accent" routerLink="/public/movies">Back to Movies</button>
           </mat-card-content>
         </mat-card>
       </div>
@@ -76,9 +76,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
             </div>
             
             <div *ngIf="movie.genres && movie.genres.length > 0" class="genres">
-              <mat-chip-set>
-                <mat-chip *ngFor="let genre of movie.genres">{{ genre.name }}</mat-chip>
-              </mat-chip-set>
+              {{ formatGenres(movie.genres) }}
             </div>
             
             <p *ngIf="movie.description" class="description">{{ movie.description }}</p>
@@ -123,7 +121,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
               <div class="action">
                 <button 
                   mat-raised-button 
-                  color="primary" 
+                  color="accent" 
                   *ngIf="isLoggedIn"
                   [routerLink]="['/reserve', screening.id]"
                 >
@@ -131,7 +129,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
                 </button>
                 <button 
                   mat-raised-button 
-                  color="primary" 
+                  color="accent" 
                   *ngIf="!isLoggedIn"
                   routerLink="/login"
                   [queryParams]="{returnUrl: '/reserve/' + screening.id}"
@@ -145,7 +143,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
       </div>
       
       <div class="back-button-container">
-        <button mat-button color="primary" routerLink="/public/movies">
+        <button mat-button color="accent" routerLink="/public/movies">
           <mat-icon>arrow_back</mat-icon> Back to Movies
         </button>
       </div>
@@ -156,6 +154,9 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
       padding-bottom: 20px;
       max-width: 1200px;
       margin: 0 auto;
+      background-color: #181818;
+      color: #FFFFFF;
+      min-height: 100vh;
     }
     
     .loading-spinner {
@@ -167,6 +168,12 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
     .not-found {
       text-align: center;
       padding: 30px;
+    }
+    
+    .not-found mat-card {
+      background-color: #202020 !important;
+      color: #FFFFFF !important;
+      border: 1px solid #303030;
     }
     
     .movie-content {
@@ -188,7 +195,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
       height: 450px;
       overflow: hidden;
       border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
     
     .poster-container img {
@@ -199,72 +206,75 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
     
     .movie-info {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
     }
     
     .movie-info h1 {
-      margin: 0;
+      margin-top: 0;
+      margin-bottom: 20px;
       font-size: 32px;
-      font-weight: 700;
+      color: #FFFFFF;
     }
     
     .movie-meta {
       display: flex;
       gap: 20px;
-      color: #666;
+      margin-bottom: 15px;
     }
     
     .meta-item {
       display: flex;
       align-items: center;
       gap: 5px;
-    }
-    
-    .meta-item mat-icon {
-      font-size: 18px;
-      height: 18px;
-      width: 18px;
+      color: rgba(255, 255, 255, 0.8);
     }
     
     .genres {
-      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    
+    ::ng-deep .mat-mdc-chip {
+      background-color: #303030 !important;
+      color: #FFFFFF !important;
     }
     
     .description {
-      margin: 10px 0;
+      margin-bottom: 20px;
       line-height: 1.6;
       font-size: 16px;
+      color: rgba(255, 255, 255, 0.9);
     }
     
     .director {
-      margin-top: 10px;
-      font-size: 16px;
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.9);
     }
     
     .trailer-button {
-      margin-top: 20px;
+      margin-bottom: 20px;
     }
     
     .section-divider {
       margin: 20px 0;
+      background-color: #303030 !important;
     }
     
     .screenings-section {
-      margin-top: 20px;
+      padding: 10px 0;
     }
     
     .screenings-section h2 {
-      font-size: 24px;
       margin-bottom: 20px;
+      font-size: 24px;
+      color: #FFFFFF;
     }
     
     .no-screenings {
-      text-align: center;
       padding: 20px;
-      background-color: #f5f5f5;
+      background-color: #202020;
       border-radius: 8px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid #303030;
     }
     
     .screenings-container {
@@ -276,56 +286,54 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
     .screening-item {
       display: flex;
       align-items: center;
-      background-color: #f9f9f9;
-      border-radius: 8px;
+      justify-content: space-between;
       padding: 15px;
-      gap: 20px;
+      background-color: #202020;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      border: 1px solid #303030;
     }
     
     .screening-time {
-      width: 120px;
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
     }
     
     .date {
-      font-size: 14px;
-      color: #666;
+      font-weight: 500;
+      color: #FFFFFF;
     }
     
     .time {
       font-size: 18px;
       font-weight: bold;
+      color: rgba(0, 176, 32, 0.9);
     }
     
     .screening-info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      text-align: center;
       flex: 1;
+      padding: 0 20px;
     }
     
     .room {
-      font-weight: bold;
+      font-weight: 500;
+      color: #FFFFFF;
     }
     
     .format {
       font-size: 14px;
-      color: #666;
+      color: rgba(255, 255, 255, 0.7);
     }
     
     .price {
-      font-weight: bold;
+      font-weight: 500;
       font-size: 18px;
-      width: 80px;
-      text-align: right;
-    }
-    
-    .action {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-    }
-    
-    .login-required {
-      font-size: 12px;
+      color: #FFFFFF;
     }
     
     .back-button-container {
@@ -346,19 +354,30 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
       
       .screening-item {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+        gap: 15px;
+        text-align: center;
       }
       
-      .screening-time, .screening-info, .price {
-        width: 100%;
-        text-align: left;
+      .screening-info {
+        padding: 0;
       }
       
       .action {
         width: 100%;
-        align-items: flex-start;
       }
+      
+      .action button {
+        width: 100%;
+      }
+    }
+    
+    .action button {
+      background-color: rgba(0, 176, 32, 0.1) !important;
+      border: 1px solid rgba(0, 176, 32, 0.5) !important;
+    }
+    
+    .action button:hover {
+      background-color: rgba(0, 176, 32, 0.2) !important;
     }
   `]
 })
@@ -441,5 +460,10 @@ export class PublicMovieDetailComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+  
+  formatGenres(genres: any[]): string {
+    if (!genres || genres.length === 0) return '';
+    return genres.map(genre => genre.name).join(', ');
   }
 } 

@@ -68,7 +68,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
                 </mat-form-field>
                 
                 <div class="login-actions">
-                  <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
+                  <button mat-raised-button color="accent" type="submit" [disabled]="loginForm.invalid">
                     Login
                   </button>
                 </div>
@@ -112,7 +112,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
         <mat-card>
           <mat-card-content>
             <p>Screening not found or has been removed.</p>
-            <button mat-raised-button color="primary" routerLink="/">Go to Home</button>
+            <button mat-raised-button color="accent" routerLink="/">Go to Home</button>
           </mat-card-content>
         </mat-card>
       </div>
@@ -208,7 +208,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
             <button mat-button color="warn" (click)="clearSelection()">Clear Selection</button>
             <button 
               mat-raised-button 
-              color="primary" 
+              color="accent" 
               [disabled]="selectedSeats.length === 0 || reserving"
               (click)="confirmReservation()"
             >
@@ -221,242 +221,317 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   `,
   styles: [`
     .reservation-container {
-      display: flex;
-      flex-direction: column;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
       min-height: 100vh;
+      background-color: #181818;
+      color: #FFFFFF;
     }
-
+    
     .header-toolbar {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      margin-bottom: 20px;
+      background-color: #121212 !important;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
     
     .spacer {
       flex: 1 1 auto;
     }
     
-    .login-form-container {
-      padding: 16px;
-      min-width: 300px;
-    }
-    
-    .login-form-container mat-form-field {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    
-    .login-actions {
-      display: flex;
-      justify-content: center;
-      margin-top: 10px;
-    }
-    
-    .register-link {
-      margin-top: 10px;
-      text-align: center;
-    }
-    
-    ::ng-deep .mat-mdc-menu-panel.login-menu {
-      max-width: none !important;
-    }
-
     .page-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      padding: 0 20px;
+      margin-bottom: 2rem;
     }
-
+    
+    .page-header h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: #FFFFFF;
+    }
+    
     .loading-spinner {
       display: flex;
       justify-content: center;
-      padding: 50px 0;
+      padding: 4rem 0;
     }
-
+    
     .error-message {
       text-align: center;
-      padding: 20px;
+      padding: 2rem 0;
     }
-
-    .screening-info-card, .seat-selection-card {
-      margin: 0 20px 20px 20px;
+    
+    .screening-info-card, 
+    .seat-selection-card {
+      background-color: #202020 !important;
+      color: #FFFFFF !important;
+      margin-bottom: 2rem;
+      border: 1px solid #303030;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-
+    
     .screening-content {
       display: flex;
-      gap: 20px;
+      gap: 2rem;
+      margin-top: 1rem;
     }
-
+    
     .movie-poster {
-      flex-shrink: 0;
-      width: 120px;
-      height: 180px;
+      width: 150px;
+      min-width: 150px;
+      height: 225px;
       overflow: hidden;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-
+    
     .movie-poster img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-
+    
     .movie-details {
       flex: 1;
     }
-
+    
     .small-icon {
       font-size: 18px;
       vertical-align: middle;
       margin-right: 4px;
     }
-
+    
     .screen {
-      background-color: #ddd;
-      height: 30px;
-      margin-bottom: 30px;
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       width: 80%;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      transform: perspective(200px) rotateX(-5deg);
+      height: 40px;
+      background-color: #303030;
+      margin: 0 auto 40px;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 176, 32, 0.3);
     }
-
+    
     .screen-label {
-      color: #555;
-      font-weight: bold;
-      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 500;
       letter-spacing: 2px;
     }
-
+    
     .seats-container {
-      margin: 20px 0;
+      margin: 2rem 0;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      gap: 12px;
+      justify-content: center;
     }
-
+    
     .seat-row {
       display: flex;
       align-items: center;
-      margin-bottom: 10px;
-      justify-content: center;
+      gap: 10px;
     }
-
+    
     .row-label {
       width: 30px;
-      font-weight: bold;
       text-align: center;
+      font-weight: 500;
+      color: #FFFFFF;
     }
-
+    
     .seats {
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
-      justify-content: center;
+      flex-wrap: wrap;
     }
-
+    
     .seat {
-      width: 30px;
-      height: 30px;
-      background-color: #90caf9;
-      border-radius: 5px;
+      width: 32px;
+      height: 32px;
+      background-color: #303030;
+      border-radius: 6px;
       display: flex;
-      align-items: center;
       justify-content: center;
-      cursor: pointer;
+      align-items: center;
       font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      color: #FFFFFF;
+      border-bottom: 4px solid #404040;
+      user-select: none;
     }
-
+    
+    .seat.available:hover {
+      background-color: rgba(0, 176, 32, 0.3);
+      transform: translateY(-2px);
+    }
+    
     .seat.unavailable {
-      background-color: #f5f5f5;
-      color: #aaa;
+      background-color: #303030;
+      color: rgba(255, 255, 255, 0.3);
       cursor: not-allowed;
+      opacity: 0.5;
+      border-bottom-color: #404040;
     }
-
+    
     .seat.selected {
-      background-color: #4caf50;
-      color: white;
+      background-color: rgba(0, 176, 32, 0.8);
+      color: #FFFFFF;
+      font-weight: bold;
+      transform: translateY(-2px);
+      border-bottom-color: rgba(0, 138, 26, 0.8);
     }
-
+    
     .seat-legend {
       display: flex;
       justify-content: center;
       gap: 20px;
-      margin: 20px 0;
+      margin: 2rem 0;
     }
-
+    
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 8px;
     }
-
+    
     .seat-sample {
       width: 20px;
       height: 20px;
-      border-radius: 3px;
+      border-radius: 4px;
     }
-
+    
     .seat-sample.available {
-      background-color: #90caf9;
+      background-color: #303030;
+      border-bottom: 2px solid #404040;
     }
-
+    
     .seat-sample.unavailable {
-      background-color: #f5f5f5;
+      background-color: #303030;
+      opacity: 0.5;
+      border-bottom: 2px solid #404040;
     }
-
+    
     .seat-sample.selected {
-      background-color: #4caf50;
+      background-color: rgba(0, 176, 32, 0.8);
+      border-bottom: 2px solid rgba(0, 138, 26, 0.8);
     }
-
+    
     .reservation-summary {
-      margin-top: 20px;
+      padding: 1.5rem 0 0;
     }
-
+    
     .selected-seats-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0.5rem 0;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      list-style: none;
-      padding: 0;
-      margin: 10px 0;
     }
-
+    
     .selected-seats-list li {
-      background-color: #f0f0f0;
-      padding: 5px 10px;
-      border-radius: 15px;
+      background-color: rgba(0, 176, 32, 0.8);
+      color: #FFFFFF;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 500;
       font-size: 14px;
     }
-
-    .total-price {
-      font-size: 18px;
-      font-weight: bold;
-      margin-top: 15px;
+    
+    .payment-info {
+      padding: 1rem 0;
     }
-
-    .no-seats-message {
-      text-align: center;
-      padding: 20px;
-      background-color: #f5f5f5;
-      border-radius: 5px;
-      margin: 20px 0;
+    
+    .reservation-price {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #FFFFFF;
     }
-
-    mat-card-actions {
+    
+    .reservation-actions {
       display: flex;
       justify-content: flex-end;
-      gap: 10px;
+      gap: 15px;
+      margin-top: 2rem;
+    }
+    
+    .login-form-container {
+      padding: 16px;
+      min-width: 300px;
+      background-color: #202020;
+      color: #FFFFFF;
+    }
+    
+    .login-form-container mat-form-field {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    
+    .login-form-container ::ng-deep .mat-mdc-form-field-label {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    .login-form-container ::ng-deep .mat-mdc-text-field-wrapper {
+      background-color: #252525 !important;
+    }
+    
+    .login-form-container ::ng-deep .mat-mdc-form-field-focus-overlay {
+      background-color: #303030 !important;
+    }
+    
+    .login-form-container ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
+    .login-form-container ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
+    .login-form-container ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+      border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    .login-form-container ::ng-deep .mat-mdc-input-element {
+      color: #FFFFFF !important;
+    }
+    
+    .login-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+    
+    .register-link {
+      margin-top: 8px;
+      text-align: center;
+    }
+    
+    .no-seats-message {
+      text-align: center;
+      padding: 2rem 0;
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    @media (max-width: 768px) {
+      .screening-content {
+        flex-direction: column;
+      }
+      
+      .movie-poster {
+        width: 100px;
+        height: 150px;
+        margin: 0 auto;
+      }
+      
+      .seat {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+      }
+      
+      .screen {
+        width: 90%;
+      }
     }
   `]
 })

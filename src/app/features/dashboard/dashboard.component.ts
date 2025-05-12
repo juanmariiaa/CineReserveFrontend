@@ -94,21 +94,24 @@ import { AuthService } from '../../core/services/auth.service';
   styles: [`
     .dashboard-container {
       padding: 20px;
+      background-color: #181818;
+      color: #FFFFFF;
+      min-height: 100vh;
     }
 
-    h2 {
+    h1, h2 {
       margin-top: 30px;
       margin-bottom: 15px;
-      color: #3f51b5;
+      color: #FFFFFF;
       font-weight: 500;
     }
 
     .admin-section {
       margin-top: 20px;
       padding: 20px;
-      background-color: #f5f5f5;
+      background-color: #222222;
       border-radius: 8px;
-      border-left: 4px solid #3f51b5;
+      border-left: 4px solid #00B020;
     }
 
     .admin-section h2 {
@@ -126,15 +129,18 @@ import { AuthService } from '../../core/services/auth.service';
       width: 300px;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
+      background-color: #2c2c2c;
+      border: 1px solid #3a3a3a;
     }
 
     .dashboard-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+      border-color: rgba(0, 176, 32, 0.6);
     }
 
     .admin-card {
-      border-left: 4px solid #3f51b5;
+      border-left: 4px solid #00B020;
     }
 
     .card-icon {
@@ -142,7 +148,7 @@ import { AuthService } from '../../core/services/auth.service';
       height: 48px;
       width: 48px;
       margin-bottom: 16px;
-      color: #3f51b5;
+      color: #00B020;
     }
 
     mat-card-content {
@@ -156,12 +162,12 @@ import { AuthService } from '../../core/services/auth.service';
     mat-card-content h2 {
       margin: 0 0 8px;
       font-size: 20px;
-      color: rgba(0, 0, 0, 0.87);
+      color: #FFFFFF;
     }
 
     mat-card-content p {
       margin: 0;
-      color: rgba(0, 0, 0, 0.6);
+      color: rgba(255, 255, 255, 0.7);
     }
   `]
 })

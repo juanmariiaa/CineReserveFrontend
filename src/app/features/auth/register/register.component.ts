@@ -72,7 +72,7 @@ import { AuthService } from '../../../core/services/auth.service';
             
             <div class="form-actions">
               <button type="button" mat-button routerLink="/login">Already have an account? Sign in</button>
-              <button type="submit" mat-raised-button color="primary" [disabled]="registerForm.invalid || isLoading">
+              <button type="submit" mat-raised-button color="accent" [disabled]="registerForm.invalid || isLoading">
                 <span *ngIf="!isLoading">Register</span>
                 <mat-spinner diameter="24" *ngIf="isLoading"></mat-spinner>
               </button>
@@ -88,7 +88,7 @@ import { AuthService } from '../../../core/services/auth.service';
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background-color: #f5f5f5;
+      background-color: #181818;
       padding: 20px;
     }
     
@@ -96,15 +96,41 @@ import { AuthService } from '../../../core/services/auth.service';
       width: 100%;
       max-width: 500px;
       padding: 20px;
+      background-color: #202020 !important;
+      color: #FFFFFF !important;
+      border: 1px solid #303030;
     }
     
     mat-card-title {
       margin-bottom: 20px;
+      color: #FFFFFF !important;
     }
     
     .full-width {
       width: 100%;
       margin-bottom: 15px;
+    }
+    
+    ::ng-deep .mat-mdc-form-field-label {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    ::ng-deep .mat-mdc-text-field-wrapper {
+      background-color: #252525 !important;
+    }
+    
+    ::ng-deep .mat-mdc-form-field-focus-overlay {
+      background-color: #303030 !important;
+    }
+    
+    ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
+    ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
+    ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+      border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    ::ng-deep .mat-mdc-input-element {
+      color: #FFFFFF !important;
     }
     
     .form-actions {
@@ -116,6 +142,10 @@ import { AuthService } from '../../../core/services/auth.service';
     
     mat-spinner {
       margin: 0 auto;
+    }
+    
+    ::ng-deep .mat-mdc-progress-spinner .mdc-circular-progress__indeterminate-circle-graphic {
+      stroke: #00B020 !important;
     }
   `]
 })

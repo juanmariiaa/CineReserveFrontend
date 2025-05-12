@@ -49,5 +49,10 @@ export const routes: Routes = [
     path: 'public/movies/:id',
     loadComponent: () => import('./features/public/movie-detail/movie-detail.component').then(c => c.PublicMovieDetailComponent)
   },
+  {
+    path: 'my-reservations',
+    loadComponent: () => import('./features/user/reservations/user-reservations.component').then(c => c.UserReservationsComponent),
+    canActivate: [authGuard]
+  },
   ...ADMIN_ROUTES
 ];

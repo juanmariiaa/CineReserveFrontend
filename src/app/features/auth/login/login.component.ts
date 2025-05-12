@@ -44,7 +44,7 @@ import { CommonModule } from '@angular/common';
             
             <div class="form-actions">
               <button type="button" mat-button routerLink="/register">Don't have an account? Register</button>
-              <button type="submit" mat-raised-button color="primary" [disabled]="loginForm.invalid">
+              <button type="submit" mat-raised-button color="accent" [disabled]="loginForm.invalid">
                 Login
             </button>
             </div>
@@ -59,17 +59,47 @@ import { CommonModule } from '@angular/common';
       justify-content: center;
       align-items: center;
       height: 100vh;
+      background-color: #181818;
     }
     
     mat-card {
       width: 100%;
       max-width: 400px;
       padding: 20px;
+      background-color: #202020 !important;
+      color: #FFFFFF !important;
+      border: 1px solid #303030;
+    }
+    
+    mat-card-title {
+      color: #FFFFFF !important;
     }
     
     .full-width {
       width: 100%;
       margin-bottom: 15px;
+    }
+    
+    ::ng-deep .mat-mdc-form-field-label {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    ::ng-deep .mat-mdc-text-field-wrapper {
+      background-color: #252525 !important;
+    }
+    
+    ::ng-deep .mat-mdc-form-field-focus-overlay {
+      background-color: #303030 !important;
+    }
+    
+    ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
+    ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
+    ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+      border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    ::ng-deep .mat-mdc-input-element {
+      color: #FFFFFF !important;
     }
     
     .form-actions {

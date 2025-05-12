@@ -77,14 +77,17 @@ import { AuthService } from '../../../../core/services/auth.service';
       left: 0;
       right: 0;
       z-index: 100;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
       height: 64px;
+      background-color: #121212;
+      color: #FFFFFF;
     }
     
     .title {
       font-size: 1.2rem;
       font-weight: 500;
       margin-left: 8px;
+      color: #FFFFFF;
     }
     
     .spacer {
@@ -94,10 +97,12 @@ import { AuthService } from '../../../../core/services/auth.service';
     .username {
       font-size: 0.9rem;
       margin-right: 16px;
+      color: rgba(255, 255, 255, 0.8);
     }
     
     .user-btn {
       margin-right: 8px;
+      color: #FFFFFF;
     }
     
     .sidenav-container {
@@ -110,31 +115,47 @@ import { AuthService } from '../../../../core/services/auth.service';
     
     .admin-sidenav {
       width: 200px;
-      background-color: #f5f5f5;
-      border-right: 1px solid #e0e0e0;
+      background-color: #202020;
+      border-right: 1px solid #303030;
+      color: #FFFFFF;
     }
     
     .mat-nav-list a {
       display: flex;
       align-items: center;
       height: 48px;
-      color: #333;
+      color: rgba(255, 255, 255, 0.8);
+      border-bottom: 1px solid #252525;
     }
     
     .mat-nav-list a mat-icon {
       margin-right: 16px;
+      color: rgba(255, 255, 255, 0.6);
     }
     
     .mat-nav-list a.active {
-      background-color: #e0e0e0;
-      color: #3f51b5;
+      background-color: #252525;
+      color: #00B020;
       font-weight: 500;
+      border-left: 3px solid #00B020;
+    }
+    
+    .mat-nav-list a.active mat-icon {
+      color: #00B020;
+    }
+    
+    .mat-nav-list a:hover {
+      background-color: #252525;
     }
     
     .return-link {
       margin-top: 16px;
-      border-top: 1px solid #e0e0e0;
-      color: #3f51b5 !important;
+      border-top: 1px solid #303030;
+      color: #00B020 !important;
+    }
+    
+    .return-link mat-icon {
+      color: #00B020 !important;
     }
   `]
 })

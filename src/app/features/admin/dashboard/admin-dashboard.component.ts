@@ -63,6 +63,14 @@ import { RouterLink } from '@angular/router';
   styles: [`
     .admin-dashboard-container {
       padding: 20px;
+      background-color: #181818;
+      color: #FFFFFF;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #FFFFFF;
+      margin-bottom: 20px;
     }
 
     .admin-dashboard-cards {
@@ -76,11 +84,15 @@ import { RouterLink } from '@angular/router';
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
       height: 100%;
+      background-color: #2c2c2c;
+      border: 1px solid #3a3a3a;
+      border-left: 4px solid #00B020;
     }
 
     .admin-dashboard-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+      border-color: rgba(0, 176, 32, 0.6);
     }
 
     .card-icon {
@@ -88,7 +100,7 @@ import { RouterLink } from '@angular/router';
       height: 48px;
       width: 48px;
       margin-bottom: 16px;
-      color: #3f51b5;
+      color: #00B020;
     }
 
     mat-card-content {
@@ -102,11 +114,12 @@ import { RouterLink } from '@angular/router';
     h2 {
       margin: 0 0 8px;
       font-size: 24px;
+      color: #FFFFFF;
     }
 
     p {
       margin: 0;
-      color: rgba(0, 0, 0, 0.6);
+      color: rgba(255, 255, 255, 0.7);
     }
   `]
 })

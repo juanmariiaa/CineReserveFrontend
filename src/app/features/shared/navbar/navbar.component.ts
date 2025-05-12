@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../../core/services/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -26,7 +27,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatDividerModule
   ],
   template: `
     <mat-toolbar color="primary" class="header-toolbar">
@@ -59,7 +61,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
               </mat-form-field>
               
               <div class="login-actions">
-                <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
+                <button mat-raised-button color="accent" type="submit" [disabled]="loginForm.invalid">
                   Login
                 </button>
               </div>
@@ -81,6 +83,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
           {{ username }} <mat-icon>arrow_drop_down</mat-icon>
         </button>
         <mat-menu #userMenu="matMenu">
+          <button mat-menu-item routerLink="/my-reservations">
+            <mat-icon>confirmation_number</mat-icon> My Reservations
+          </button>
+          <mat-divider></mat-divider>
           <button mat-menu-item (click)="logout()">
             <mat-icon>exit_to_app</mat-icon> Sign Out
           </button>
@@ -93,6 +99,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
       position: sticky;
       top: 0;
       z-index: 1000;
+      background-color: #121212;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     }
     
     .spacer {
@@ -102,11 +111,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     .login-form-container {
       padding: 16px;
       min-width: 300px;
+      background-color: #202020;
+      color: #FFFFFF;
     }
     
     .login-form-container mat-form-field {
       width: 100%;
       margin-bottom: 10px;
+      color: #FFFFFF;
     }
     
     .login-actions {
@@ -120,8 +132,34 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
       text-align: center;
     }
     
+    .register-link a {
+      color: #00B020;
+    }
+    
     ::ng-deep .mat-mdc-menu-panel.login-menu {
       max-width: none !important;
+      background-color: #202020;
+    }
+    
+    ::ng-deep .mat-mdc-menu-panel {
+      background-color: #202020 !important;
+    }
+    
+    ::ng-deep .mat-mdc-menu-item {
+      color: #FFFFFF !important;
+    }
+    
+    ::ng-deep .mat-mdc-menu-item mat-icon {
+      color: rgba(0, 176, 32, 0.9) !important;
+    }
+    
+    ::ng-deep .mat-mdc-menu-item:hover:not([disabled]) {
+      background-color: rgba(0, 176, 32, 0.1) !important;
+    }
+    
+    /* Movie button styling */
+    button[routerlink="/public/movies"] mat-icon {
+      color: #00B020;
     }
   `]
 })

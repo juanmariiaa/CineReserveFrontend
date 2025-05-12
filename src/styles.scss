@@ -1,4 +1,133 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body { 
+  height: 100%; 
+}
+
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+  background-color: #181818; 
+  color: #FFFFFF;
+}
+
+/* Override Angular Material Default Styles */
+.mat-mdc-card {
+  background-color: #202020 !important;
+  color: #FFFFFF !important;
+}
+
+.mat-mdc-card-title {
+  color: #FFFFFF !important;
+}
+
+.mat-mdc-card-subtitle {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.mat-toolbar.mat-primary {
+  background-color: #121212 !important;
+  color: #FFFFFF !important;
+}
+
+.mat-mdc-raised-button.mat-primary {
+  background-color: #121212 !important;
+}
+
+.mat-mdc-raised-button.mat-accent,
+.mat-mdc-button.mat-accent,
+.mat-mdc-outlined-button.mat-accent {
+  background-color: #00B020 !important;
+  color: #FFFFFF !important;
+}
+
+.mat-mdc-button, 
+.mat-mdc-outlined-button {
+  color: #FFFFFF !important;
+}
+
+.mat-mdc-menu-panel {
+  background-color: #202020 !important;
+}
+
+.mat-mdc-menu-item {
+  color: #FFFFFF !important;
+}
+
+.mat-mdc-menu-item:hover:not([disabled]) {
+  background-color: rgba(0, 176, 32, 0.2) !important;
+}
+
+.mat-mdc-form-field-label {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.mat-mdc-input-element {
+  color: #FFFFFF !important;
+}
+
+.mat-mdc-tab-group {
+  background-color: #202020 !important;
+}
+
+.mat-mdc-tab-header {
+  background-color: #202020 !important;
+}
+
+.mat-mdc-tab {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.mat-mdc-tab.mat-mdc-tab-active {
+  color: #00B020 !important;
+}
+
+.mat-mdc-tab-body-content {
+  color: #FFFFFF !important;
+}
+
+.mat-mdc-divider {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.mat-mdc-table {
+  background-color: #202020 !important;
+  color: #FFFFFF !important;
+}
+
+.mat-mdc-paginator {
+  background-color: #202020 !important;
+  color: #FFFFFF !important;
+}
+
+a {
+  color: #00B020;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.mat-primary .mat-mdc-pseudo-checkbox-checked {
+  background-color: #00B020 !important;
+}
+
+/* Make sure scrollbars match the theme */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #181818;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #303030;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #404040;
+}

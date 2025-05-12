@@ -19,6 +19,7 @@ import { MovieWithScreenings, ScreeningTime } from '../../core/models/movie-scre
 import { NavbarComponent } from '../shared/navbar/navbar.component';
 import { forkJoin, Observable, of, Subscription } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -41,194 +42,194 @@ import { catchError, map } from 'rxjs/operators';
   template: `
     <div class="home-container">
       <app-navbar></app-navbar>
-
-      <!-- Main content section -->
+      
       <div class="content">
-        <!-- Featured Movies Carousel -->
-        <div class="carousel-section">
-          <!-- Loading spinner -->
-          <div *ngIf="loadingFeaturedMovies" class="loading-spinner">
-            <mat-spinner></mat-spinner>
-          </div>
-          
-          <!-- Carousel -->
-          <div *ngIf="!loadingFeaturedMovies && featuredMovies.length > 0" class="carousel-container" #carousel>
-            <div class="carousel-slides">
-              <div 
-                *ngFor="let movie of featuredMovies; let i = index" 
-                class="carousel-slide"
-                [class.active]="i === currentSlide"
-                (click)="navigateToMovieDetail(movie.id!)"
-              >
-                <div class="carousel-backdrop" [style.background-image]="'url(' + movie.backdropUrl + ')'">
-                  <div class="movie-info-overlay">
-                    <h2 class="movie-title">{{ movie.title }}</h2>
-                    <div class="movie-details">
-                      <span *ngIf="movie.durationMinutes" class="duration">
-                        <mat-icon>schedule</mat-icon> {{ movie.durationMinutes }} min
-                      </span>
-                      <span *ngIf="movie.rating" class="rating">
-                        <mat-icon>star</mat-icon> {{ movie.rating }}
-                      </span>
+        <div class="welcome-section">
+          <!-- Featured Movies Carousel -->
+          <div class="carousel-section">
+            <!-- Loading spinner -->
+            <div *ngIf="loadingFeaturedMovies" class="loading-spinner">
+              <mat-spinner></mat-spinner>
+            </div>
+            
+            <!-- Carousel -->
+            <div *ngIf="!loadingFeaturedMovies && featuredMovies.length > 0" class="carousel-container" #carousel>
+              <div class="carousel-slides">
+                <div 
+                  *ngFor="let movie of featuredMovies; let i = index" 
+                  class="carousel-slide"
+                  [class.active]="i === currentSlide"
+                  (click)="navigateToMovieDetail(movie.id!)"
+                >
+                  <div class="carousel-backdrop" [style.background-image]="'url(' + movie.backdropUrl + ')'">
+                    <div class="movie-info-overlay">
+                      <h2 class="movie-title">{{ movie.title }}</h2>
+                      <div class="movie-details">
+                        <span *ngIf="movie.durationMinutes" class="duration">
+                          <mat-icon>schedule</mat-icon> {{ movie.durationMinutes }} min
+                        </span>
+                        <span *ngIf="movie.rating" class="rating">
+                          <mat-icon>star</mat-icon> {{ movie.rating }}
+                        </span>
+                      </div>
+                      <div *ngIf="movie.genres && movie.genres.length > 0" class="genres">
+                        {{ getGenresList(movie) }}
+                      </div>
+                      <p *ngIf="movie.description" class="description">{{ movie.description | slice:0:150 }}{{ movie.description.length > 150 ? '...' : '' }}</p>
+                      <button mat-raised-button color="accent" (click)="navigateToMovieDetail(movie.id!); $event.stopPropagation()">
+                        View Screenings
+                      </button>
                     </div>
-                    <div *ngIf="movie.genres && movie.genres.length > 0" class="genres">
-                      {{ getGenresList(movie) }}
-                    </div>
-                    <p *ngIf="movie.description" class="description">{{ movie.description | slice:0:150 }}{{ movie.description.length > 150 ? '...' : '' }}</p>
-                    <button mat-raised-button color="accent" (click)="navigateToMovieDetail(movie.id!); $event.stopPropagation()">
-                      View Screenings
-                    </button>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            <!-- Carousel controls -->
-            <div class="carousel-controls">
-              <div class="carousel-indicators">
-                <span 
-                  *ngFor="let movie of featuredMovies; let i = index" 
-                  class="indicator"
-                  [class.active]="i === currentSlide"
-                  (click)="goToSlide(i); $event.stopPropagation()"
-                ></span>
-              </div>
-            </div>
-            
-            <!-- Side navigation arrows -->
-            <button mat-fab class="nav-arrow left-arrow" (click)="prevSlide(); $event.stopPropagation()">
-              <mat-icon>chevron_left</mat-icon>
-            </button>
-            <button mat-fab class="nav-arrow right-arrow" (click)="nextSlide(); $event.stopPropagation()">
-              <mat-icon>chevron_right</mat-icon>
-            </button>
-          </div>
-          
-          <!-- No movies message -->
-          <div *ngIf="!loadingFeaturedMovies && featuredMovies.length === 0" class="no-data">
-            <p>No featured movies available. Please check again later.</p>
-          </div>
-        </div>
-        
-        <!-- Calendar section -->
-        <div class="calendar-section">
-          <h1 class="section-title">Screenings Calendar</h1>
-          
-          <!-- Loading spinner -->
-          <div *ngIf="loading" class="loading-spinner">
-            <mat-spinner></mat-spinner>
-          </div>
-          
-          <!-- No dates message -->
-          <div *ngIf="!loading && allDates.length === 0" class="no-data">
-            <p>Calendar could not be loaded. Please check again later.</p>
-          </div>
-          
-          <!-- Date selection -->
-          <div *ngIf="!loading && allDates.length > 0" class="date-selection">
-            <h3 class="date-selection-title">Select a date to view screenings</h3>
-            <div class="horizontal-calendar">
-              <button 
-                mat-icon-button 
-                class="scroll-button left"
-                (click)="scrollDates('left')"
-                [disabled]="!canScrollLeft"
-              >
-                <mat-icon>chevron_left</mat-icon>
-              </button>
               
-              <div class="dates-container" #datesContainer>
-                <div 
-                  *ngFor="let date of allDates" 
-                  class="calendar-date"
-                  [class.active]="isSelectedDate(date)"
-                  [class.has-screenings]="hasScreeningsForDate(date)"
-                  (click)="onDateSelected(date)"
-                >
-                  <div class="weekday">{{ getWeekday(date) }}</div>
-                  <div class="date-number">{{ getDateNumber(date) }}</div>
-                  <div class="month">{{ getMonth(date) }}</div>
+              <!-- Carousel controls -->
+              <div class="carousel-controls">
+                <div class="carousel-indicators">
+                  <span 
+                    *ngFor="let movie of featuredMovies; let i = index" 
+                    class="indicator"
+                    [class.active]="i === currentSlide"
+                    (click)="goToSlide(i); $event.stopPropagation()"
+                  ></span>
                 </div>
               </div>
               
-              <button 
-                mat-icon-button 
-                class="scroll-button right"
-                (click)="scrollDates('right')"
-                [disabled]="!canScrollRight"
-              >
+              <!-- Side navigation arrows -->
+              <button mat-fab class="nav-arrow left-arrow" (click)="prevSlide(); $event.stopPropagation()">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+              <button mat-fab class="nav-arrow right-arrow" (click)="nextSlide(); $event.stopPropagation()">
                 <mat-icon>chevron_right</mat-icon>
               </button>
             </div>
+            
+            <!-- No movies message -->
+            <div *ngIf="!loadingFeaturedMovies && featuredMovies.length === 0" class="no-data">
+              <p>No featured movies available. Please check again later.</p>
+            </div>
           </div>
           
-          <!-- Selected date screenings -->
-          <div *ngIf="selectedDate && !loadingScreenings" class="screenings-for-date">
-            <h2 class="date-heading">
-              Screenings for {{ selectedDate | date:'EEEE, MMMM d, y' }}
-            </h2>
+          <!-- Calendar section -->
+          <div class="calendar-section">
+            <h1 class="section-title">Screenings Calendar</h1>
             
-            <!-- No screenings message -->
-            <div *ngIf="moviesWithScreenings.length === 0" class="no-data">
-              <p>No screenings available for this date.</p>
+            <!-- Loading spinner -->
+            <div *ngIf="loading" class="loading-spinner">
+              <mat-spinner></mat-spinner>
             </div>
             
-            <!-- Movies with screenings -->
-            <div *ngIf="moviesWithScreenings.length > 0" class="movies-container">
-              <mat-card *ngFor="let item of moviesWithScreenings" class="movie-screening-card">
-                <div class="movie-info">
-                  <div class="poster-container" *ngIf="item.movie.posterUrl">
-                    <img [src]="item.movie.posterUrl" [alt]="item.movie.title + ' poster'" class="movie-poster">
-                  </div>
-                  <div class="movie-details">
-                    <h3 class="movie-title">{{ item.movie.title }}</h3>
-                    <div class="movie-meta">
-                      <span *ngIf="item.movie.durationMinutes" class="duration">
-                        <mat-icon>schedule</mat-icon> {{ item.movie.durationMinutes }} min
-                      </span>
-                      <span *ngIf="item.movie.rating" class="rating">
-                        <mat-icon>star</mat-icon> {{ item.movie.rating }}
-                      </span>
-                    </div>
-                    <div *ngIf="item.movie.genres && item.movie.genres.length > 0" class="genres">
-                      {{ getGenresList(item.movie) }}
-                    </div>
-                    <a mat-button color="primary" [routerLink]="['/public/movies', item.movie.id]">
-                      <mat-icon>info</mat-icon> Details
-                    </a>
+            <!-- No dates message -->
+            <div *ngIf="!loading && allDates.length === 0" class="no-data">
+              <p>Calendar could not be loaded. Please check again later.</p>
+            </div>
+            
+            <!-- Date selection -->
+            <div *ngIf="!loading && allDates.length > 0" class="date-selection">
+              <h3 class="date-selection-title">Select a date to view screenings</h3>
+              <div class="horizontal-calendar">
+                <button 
+                  mat-icon-button 
+                  class="scroll-button left"
+                  (click)="scrollDates('left')"
+                  [disabled]="!canScrollLeft"
+                >
+                  <mat-icon>chevron_left</mat-icon>
+                </button>
+                
+                <div class="dates-container" #datesContainer>
+                  <div 
+                    *ngFor="let date of allDates" 
+                    class="calendar-date"
+                    [class.active]="isSelectedDate(date)"
+                    [class.has-screenings]="hasScreeningsForDate(date)"
+                    (click)="onDateSelected(date)"
+                  >
+                    <div class="weekday">{{ getWeekday(date) }}</div>
+                    <div class="date-number">{{ getDateNumber(date) }}</div>
+                    <div class="month">{{ getMonth(date) }}</div>
                   </div>
                 </div>
                 
-                <div class="screening-times">
-                  <h4>Available Times</h4>
-                  <div class="time-buttons">
-                    <button 
-                      *ngFor="let screening of item.screeningTimes" 
-                      mat-stroked-button
-                      [color]="isLoggedIn ? 'primary' : ''"
-                      [routerLink]="isLoggedIn ? ['/reserve', screening.screeningId] : ['/login']"
-                      [queryParams]="!isLoggedIn ? {returnUrl: '/reserve/' + screening.screeningId} : null"
-                      class="time-button"
-                    >
-                      <div class="time-display">
-                        <span class="time">{{ screening.time }}</span>
-                        <span class="format-tags">
-                          {{ screening.format }}
-                          <span *ngIf="screening.is3D" class="tag">3D</span>
-                          <span *ngIf="screening.hasSubtitles" class="tag">SUB</span>
+                <button 
+                  mat-icon-button 
+                  class="scroll-button right"
+                  (click)="scrollDates('right')"
+                  [disabled]="!canScrollRight"
+                >
+                  <mat-icon>chevron_right</mat-icon>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Selected date screenings -->
+            <div *ngIf="selectedDate && !loadingScreenings" class="screenings-for-date">
+              <h2 class="date-heading">
+                Screenings for {{ selectedDate | date:'EEEE, MMMM d, y' }}
+              </h2>
+              
+              <!-- No screenings message -->
+              <div *ngIf="moviesWithScreenings.length === 0" class="no-data">
+                <p>No screenings available for this date.</p>
+              </div>
+              
+              <!-- Movies with screenings -->
+              <div *ngIf="moviesWithScreenings.length > 0" class="movies-container">
+                <mat-card *ngFor="let item of moviesWithScreenings" class="movie-screening-card">
+                  <div class="movie-screening-info">
+                    <div class="movie-poster" *ngIf="item.movie.posterUrl">
+                      <img [src]="item.movie.posterUrl" [alt]="item.movie.title + ' poster'" class="movie-poster-img">
+                    </div>
+                    <div class="movie-details">
+                      <h3 class="movie-title">{{ item.movie.title }}</h3>
+                      <div class="movie-meta">
+                        <span *ngIf="item.movie.durationMinutes" class="movie-duration">
+                          <mat-icon>schedule</mat-icon> {{ item.movie.durationMinutes }} min
+                        </span>
+                        <span *ngIf="item.movie.rating" class="movie-rating">
+                          <mat-icon>star</mat-icon> {{ item.movie.rating }}
                         </span>
                       </div>
-                      <div class="room-number">Room {{ screening.roomNumber }}</div>
-                    </button>
+                      <div *ngIf="item.movie.genres && item.movie.genres.length > 0" class="movie-genres">
+                        {{ getGenresList(item.movie) }}
+                      </div>
+                      <a mat-button color="accent" [routerLink]="['/public/movies', item.movie.id]">
+                        <mat-icon>info</mat-icon> Movie Details
+                      </a>
+                    </div>
                   </div>
-                </div>
-              </mat-card>
+                  
+                  <div class="screening-times">
+                    <h4>Available Times</h4>
+                    <div class="time-buttons">
+                      <button 
+                        *ngFor="let screening of item.screeningTimes" 
+                        mat-stroked-button
+                        [routerLink]="isLoggedIn ? ['/reserve', screening.screeningId] : ['/login']"
+                        [queryParams]="!isLoggedIn ? {returnUrl: '/reserve/' + screening.screeningId} : null"
+                        class="time-button"
+                      >
+                        <div class="time-display">
+                          <span class="time">{{ screening.time }}</span>
+                          <span class="format-tags">
+                            {{ screening.format }}
+                            <span *ngIf="screening.is3D" class="tag">3D</span>
+                            <span *ngIf="screening.hasSubtitles" class="tag">SUB</span>
+                          </span>
+                        </div>
+                        <div class="room-number">Room {{ screening.roomNumber }}</div>
+                      </button>
+                    </div>
+                  </div>
+                </mat-card>
+              </div>
             </div>
-          </div>
-          
-          <!-- Loading screenings spinner -->
-          <div *ngIf="loadingScreenings" class="loading-spinner">
-            <mat-spinner diameter="40"></mat-spinner>
+            
+            <!-- Loading screenings spinner -->
+            <div *ngIf="loadingScreenings" class="loading-spinner">
+              <mat-spinner diameter="40"></mat-spinner>
+            </div>
           </div>
         </div>
       </div>
@@ -239,6 +240,8 @@ import { catchError, map } from 'rxjs/operators';
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      background-color: #181818;
+      color: #FFFFFF;
     }
     
     .content {
@@ -257,7 +260,7 @@ import { catchError, map } from 'rxjs/operators';
       position: relative;
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
       margin-bottom: 20px;
       height: 500px;
       cursor: pointer;
@@ -269,7 +272,7 @@ import { catchError, map } from 'rxjs/operators';
       top: 50%;
       transform: translateY(-50%);
       z-index: 10;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0, 0, 0, 0.7);
       color: white;
     }
     
@@ -282,7 +285,7 @@ import { catchError, map } from 'rxjs/operators';
     }
     
     .nav-arrow:hover {
-      background-color: rgba(0, 0, 0, 0.7);
+      background-color: rgba(0, 176, 32, 0.8);
     }
     
     .carousel-slides {
@@ -323,14 +326,14 @@ import { catchError, map } from 'rxjs/operators';
       right: 0;
       padding: 40px 30px 30px;
       color: white;
-      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
+      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
     }
     
     .movie-info-overlay .movie-title {
       font-size: 32px;
       margin-bottom: 15px;
       text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-      color: #ffffff;
+      color: #FFFFFF;
     }
     
     .movie-info-overlay .movie-details {
@@ -393,19 +396,22 @@ import { catchError, map } from 'rxjs/operators';
     }
     
     .indicator.active {
-      background-color: white;
+      background-color: #00B020;
     }
     
     .section-title {
       margin-top: 30px;
       margin-bottom: 20px;
       font-size: 28px;
+      color: #FFFFFF;
     }
     
     .calendar-section {
-      background-color: #f8f9fa;
+      background-color: #282828;
       border-radius: 8px;
       padding: 20px;
+      border: 1px solid #3a3a3a;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
     
     .loading-spinner {
@@ -417,8 +423,9 @@ import { catchError, map } from 'rxjs/operators';
     .no-data {
       text-align: center;
       padding: 30px;
-      background-color: #f5f5f5;
+      background-color: #252525;
       border-radius: 8px;
+      color: #FFFFFF;
     }
     
     .date-selection {
@@ -429,16 +436,18 @@ import { catchError, map } from 'rxjs/operators';
       margin-bottom: 12px;
       font-size: 18px;
       font-weight: 500;
+      color: #FFFFFF;
     }
     
     .horizontal-calendar {
       display: flex;
       align-items: center;
       position: relative;
-      background-color: white;
+      background-color: #303030;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       padding: 5px 0;
+      border: 1px solid #3a3a3a;
     }
     
     .dates-container {
@@ -469,14 +478,16 @@ import { catchError, map } from 'rxjs/operators';
       transition: all 0.2s;
       text-align: center;
       position: relative;
+      color: #FFFFFF;
+      background-color: #363636;
     }
     
     .calendar-date:hover {
-      background-color: #f0f0f0;
+      background-color: #424242;
     }
     
     .calendar-date.active {
-      background-color: #673ab7;
+      background-color: rgba(0, 176, 32, 0.7);
       color: white;
     }
     
@@ -489,7 +500,7 @@ import { catchError, map } from 'rxjs/operators';
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background-color: #ff4081;
+      background-color: rgba(0, 176, 32, 0.7);
     }
     
     .calendar-date.active.has-screenings:after {
@@ -500,6 +511,7 @@ import { catchError, map } from 'rxjs/operators';
       font-size: 14px;
       font-weight: 500;
       margin-bottom: 4px;
+      color: #FFFFFF;
     }
     
     .date-number {
@@ -507,15 +519,18 @@ import { catchError, map } from 'rxjs/operators';
       font-weight: 700;
       line-height: 1;
       margin-bottom: 4px;
+      color: #FFFFFF;
     }
     
     .month {
       font-size: 14px;
+      color: #FFFFFF;
     }
     
     .scroll-button {
-      background-color: white;
+      background-color: #303030;
       z-index: 10;
+      color: #FFFFFF;
     }
     
     .scroll-button.left {
@@ -539,28 +554,34 @@ import { catchError, map } from 'rxjs/operators';
       display: flex;
       flex-direction: column;
       transition: transform 0.2s, box-shadow 0.2s;
+      background-color: #2c2c2c;
+      color: #FFFFFF;
+      border: 1px solid #3a3a3a;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
     
     .movie-screening-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      border-color: rgba(0, 176, 32, 0.6);
     }
     
-    .movie-info {
+    .movie-screening-info {
       display: flex;
       gap: 12px;
       margin-bottom: 12px;
     }
     
-    .poster-container {
+    .movie-poster {
       width: 100px;
       height: 150px;
       overflow: hidden;
       border-radius: 4px;
       flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
     
-    .movie-poster {
+    .movie-poster-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -581,6 +602,7 @@ import { catchError, map } from 'rxjs/operators';
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: #FFFFFF;
     }
     
     .movie-meta {
@@ -589,30 +611,31 @@ import { catchError, map } from 'rxjs/operators';
       flex-wrap: wrap;
     }
     
-    .duration, .rating {
+    .movie-duration, .movie-rating {
       display: flex;
       align-items: center;
       gap: 4px;
-      color: #666;
+      color: rgba(255, 255, 255, 0.7);
       font-size: 13px;
     }
     
-    .duration mat-icon, .rating mat-icon {
+    .movie-duration mat-icon, .movie-rating mat-icon {
       font-size: 14px;
       height: 14px;
       width: 14px;
+      color: #00B020;
     }
     
-    .genres {
+    .movie-genres {
       font-size: 13px;
-      color: #666;
+      color: rgba(255, 255, 255, 0.9);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     
     .screening-times {
-      border-top: 1px solid #eee;
+      border-top: 1px solid #303030;
       padding-top: 12px;
       margin-top: auto;
     }
@@ -622,6 +645,7 @@ import { catchError, map } from 'rxjs/operators';
       margin-bottom: 10px;
       font-size: 15px;
       font-weight: 500;
+      color: #FFFFFF;
     }
     
     .time-buttons {
@@ -636,6 +660,14 @@ import { catchError, map } from 'rxjs/operators';
       height: auto;
       border-radius: 4px;
       overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background-color: rgba(48, 48, 48, 0.8);
+      color: #FFFFFF;
+    }
+    
+    .time-button:hover {
+      background-color: rgba(0, 176, 32, 0.15);
+      border-color: rgba(0, 176, 32, 0.3);
     }
     
     .time-display {
@@ -647,6 +679,7 @@ import { catchError, map } from 'rxjs/operators';
     .time {
       font-size: 14px;
       font-weight: 500;
+      color: rgba(255, 255, 255, 0.9);
     }
     
     .format-tags {
@@ -654,12 +687,13 @@ import { catchError, map } from 'rxjs/operators';
       display: flex;
       gap: 4px;
       align-items: center;
+      color: rgba(255, 255, 255, 0.7);
     }
     
     .tag {
       display: inline-block;
       padding: 1px 3px;
-      background-color: #f0f0f0;
+      background-color: rgba(255, 255, 255, 0.1);
       border-radius: 2px;
       font-size: 10px;
       font-weight: 500;
@@ -667,7 +701,7 @@ import { catchError, map } from 'rxjs/operators';
     
     .room-number {
       font-size: 11px;
-      color: #666;
+      color: rgba(255, 255, 255, 0.6);
       margin-top: 2px;
     }
     
@@ -675,6 +709,7 @@ import { catchError, map } from 'rxjs/operators';
       margin-bottom: 15px;
       font-size: 20px;
       font-weight: 500;
+      color: #FFFFFF;
     }
     
     /* Calendar specific styles */
@@ -691,7 +726,7 @@ import { catchError, map } from 'rxjs/operators';
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background-color: #ff4081;
+      background-color: #00B020;
     }
     
     /* Responsive adjustments */
@@ -724,7 +759,7 @@ import { catchError, map } from 'rxjs/operators';
         grid-template-columns: 1fr;
       }
       
-      .movie-info {
+      .movie-screening-info {
         flex-direction: row;
       }
       
@@ -791,15 +826,21 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private screeningService: ScreeningService,
     private movieService: MovieService,
+    private authService: AuthService,
     private snackBar: MatSnackBar,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    // Check login status from NavbarComponent
-    document.addEventListener('loginStatusChange', (event: any) => {
-      this.isLoggedIn = event.detail.isLoggedIn;
-    });
+    // Check if user is logged in
+    this.isLoggedIn = this.authService.isLoggedIn();
+    
+    // Subscribe to auth changes
+    this.subscriptions.add(
+      this.authService.currentUser$.subscribe(user => {
+        this.isLoggedIn = this.authService.isLoggedIn();
+      })
+    );
 
     // Load featured movies
     this.loadFeaturedMovies();

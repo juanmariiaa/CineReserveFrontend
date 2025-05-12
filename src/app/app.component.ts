@@ -9,7 +9,7 @@ import { FooterComponent } from './features/shared/footer/footer.component';
   template: `
     <div class="app-container">
       <div class="content">
-        <router-outlet></router-outlet>
+      <router-outlet></router-outlet>
       </div>
       <app-footer></app-footer>
     </div>
@@ -19,10 +19,14 @@ import { FooterComponent } from './features/shared/footer/footer.component';
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      background-color: #181818;
+      color: #FFFFFF;
     }
     
     .content {
       flex: 1;
+      display: flex;
+      flex-direction: column;
     }
   `]
 })

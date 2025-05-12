@@ -23,12 +23,16 @@ import { AdminNavbarComponent } from '../components/admin-navbar/admin-navbar.co
   styles: [`
     .admin-layout {
       min-height: 100vh;
+      background-color: #181818;
+      color: #FFFFFF;
     }
     
     .admin-content {
       padding: 20px;
       margin-top: 64px; /* Match the height of the admin toolbar */
+      background-color: #181818;
+      color: #FFFFFF;
     }
   `]
 })
-export class AdminLayoutComponent {} 
+export class AdminLayoutComponent { } 
