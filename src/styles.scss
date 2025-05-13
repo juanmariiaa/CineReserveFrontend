@@ -190,3 +190,14 @@ a:hover {
 ::-webkit-scrollbar-thumb:hover {
   background: #404040;
 }
+
+/* Error snackbar styling */
+.error-snackbar {
+  background-color: #f44336 !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.error-snackbar .mat-simple-snackbar-action {
+  color: white !important;
+}

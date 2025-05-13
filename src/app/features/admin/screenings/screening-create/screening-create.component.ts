@@ -568,36 +568,45 @@ export class ScreeningCreateComponent implements OnInit {
       format: formValue.format
     };
 
+    // Debug log to see what data is being sent
+    console.log('Sending screening data:', screeningData);
+
     if (this.isEditMode && this.screeningId) {
       // Update existing screening
       this.screeningService.updateScreening(this.screeningId, screeningData).subscribe({
-        next: () => {
+        next: (response) => {
+          console.log('Screening updated successfully:', response);
           this.snackBar.open('Screening updated successfully', 'Close', {
             duration: 3000
           });
           this.router.navigate(['/admin/screenings']);
         },
         error: (error) => {
-          this.snackBar.open('Error updating screening: ' + error.message, 'Close', {
-            duration: 5000
-          });
+          console.error('Error updating screening:', error);
           this.saving = false;
+          // Simple generic error message
+          this.snackBar.open('Error updating screening. Please try again.', 'Close', {
+            duration: 3000
+          });
         }
       });
     } else {
       // Create new screening
       this.screeningService.createScreening(screeningData).subscribe({
-        next: () => {
+        next: (response) => {
+          console.log('Screening created successfully:', response);
           this.snackBar.open('Screening scheduled successfully', 'Close', {
             duration: 3000
           });
           this.router.navigate(['/admin/screenings']);
         },
         error: (error) => {
-          this.snackBar.open('Error scheduling screening: ' + error.message, 'Close', {
-            duration: 5000
-          });
+          console.error('Error creating screening:', error);
           this.saving = false;
+          // Simple generic error message
+          this.snackBar.open('Error creating screening. Please try again.', 'Close', {
+            duration: 3000
+          });
         }
       });
     }

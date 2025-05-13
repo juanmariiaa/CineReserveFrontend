@@ -1105,15 +1105,31 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 );
 
                 const screeningTimes: ScreeningTime[] = movieScreenings.map(
-                  (s) => ({
-                    screeningId: s.id!,
-                    time: this.formatTime(s.startTime),
-                    format: s.format || 'Standard',
-                    is3D: s.is3D || false,
-                    hasSubtitles: s.hasSubtitles || false,
-                    roomNumber: s.room?.number || 0,
-                    ticketPrice: s.ticketPrice,
-                  })
+                  (s) => {
+                    // Handle case where room is a number instead of an object
+                    let roomNumber = 0;
+                    
+                    if (s.room !== null && typeof s.room === 'number') {
+                      // If room is a number, use it directly
+                      roomNumber = s.room;
+                    } else if (s.room && s.room.number) {
+                      // If room is an object with a number property
+                      roomNumber = s.room.number;
+                    } else if (s.roomId) {
+                      // Fallback to roomId if available
+                      roomNumber = s.roomId;
+                    }
+                    
+                    return {
+                      screeningId: s.id!,
+                      time: this.formatTime(s.startTime),
+                      format: s.format || 'Standard',
+                      is3D: s.is3D || false,
+                      hasSubtitles: s.hasSubtitles || false,
+                      roomNumber: roomNumber,
+                      ticketPrice: s.ticketPrice,
+                    };
+                  }
                 );
 
                 // Sort by time

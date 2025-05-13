@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ScreeningService } from '../../../../core/services/screening.service';
@@ -8,9 +8,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTableModule } from '@angular/material/table';
-import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
@@ -123,7 +123,7 @@ import { MatChipsModule } from '@angular/material/chips';
                     Room
                   </th>
                   <td mat-cell *matCellDef="let screening">
-                    {{ screening.room?.number || 'Unknown' }}
+                    {{ screening.room?.number }}
                   </td>
                 </ng-container>
 
@@ -200,6 +200,7 @@ import { MatChipsModule } from '@angular/material/chips';
               <mat-paginator
                 [pageSizeOptions]="[5, 10, 25, 100]"
                 aria-label="Select page of screenings"
+                #paginator
               ></mat-paginator>
             </div>
           </div>
@@ -322,19 +323,14 @@ import { MatChipsModule } from '@angular/material/chips';
     `,
   ],
 })
-export class ScreeningManagementComponent implements OnInit {
+export class ScreeningManagementComponent implements OnInit, AfterViewInit {
   screenings: Screening[] = [];
   loading = true;
-  displayedColumns: string[] = [
-    'id',
-    'movie',
-    'room',
-    'date',
-    'time',
-    'price',
-    'actions',
-  ];
-  dataSource: any;
+  displayedColumns: string[] = ['id', 'movie', 'room', 'date', 'time', 'price', 'actions'];
+  dataSource = new MatTableDataSource<Screening>([]);
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private screeningService: ScreeningService,
@@ -346,34 +342,76 @@ export class ScreeningManagementComponent implements OnInit {
     this.loadScreenings();
   }
 
+  ngAfterViewInit(): void {
+    // This ensures paginator and sort are set after the view is initialized
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+
   loadScreenings(): void {
     this.loading = true;
     this.screeningService.getAllScreenings().subscribe({
-      next: (data) => {
-        this.screenings = data;
-        this.dataSource = this.screenings;
+      next: (screenings) => {
+        // Process screenings to ensure room data is complete (silently fix issues)
+        this.screenings = screenings.map(screening => {
+          // Handle case where room is a number instead of an object
+          if (screening.room !== null && typeof screening.room === 'number') {
+            // Create a proper room object without warning
+            const roomNumber = screening.room;
+            screening.room = { 
+              id: roomNumber, 
+              number: roomNumber, 
+              capacity: 0 
+            };
+          }
+          // Add fallback for missing room data
+          else if (!screening.room) {
+            screening.room = { number: 0, capacity: 0 }; // Default placeholder
+          } 
+          // If room exists but number is missing
+          else if (screening.room && !screening.room.number) {
+            screening.room.number = screening.roomId || 0; // Use roomId as fallback
+          }
+          
+          // Add fallback for missing movie data
+          if (!screening.movie) {
+            screening.movie = { title: 'Unknown Movie', posterUrl: '', tmdbId: 0 };
+          }
+          
+          return screening;
+        });
+        
+        this.dataSource.data = this.screenings;
         this.loading = false;
       },
       error: (error) => {
-        this.snackBar.open(
-          'Error loading screenings: ' + error.message,
-          'Close',
-          {
-            duration: 5000,
-          }
-        );
+        console.error('Error loading screenings:', error);
+        this.snackBar.open('Error loading screenings. Please try again.', 'Close', {
+          duration: 5000
+        });
         this.loading = false;
-      },
+      }
     });
   }
 
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   confirmDelete(screening: Screening): void {
-    if (confirm(`Are you sure you want to delete this screening?`)) {
+    const movieTitle = screening.movie?.title || 'Unknown';
+    const roomNumber = screening.room?.number;
+    const screeningDate = new Date(screening.startTime).toLocaleDateString();
+    const screeningTime = new Date(screening.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    const message = `Are you sure you want to delete screening for "${movieTitle}" in Room ${roomNumber} on ${screeningDate} at ${screeningTime}?`;
+    
+    if (confirm(message)) {
       this.deleteScreening(screening.id!);
     }
   }
@@ -382,19 +420,16 @@ export class ScreeningManagementComponent implements OnInit {
     this.screeningService.deleteScreening(id).subscribe({
       next: () => {
         this.snackBar.open('Screening deleted successfully', 'Close', {
-          duration: 3000,
+          duration: 3000
         });
         this.loadScreenings();
       },
       error: (error) => {
-        this.snackBar.open(
-          'Error deleting screening: ' + error.message,
-          'Close',
-          {
-            duration: 5000,
-          }
-        );
-      },
+        console.error('Error deleting screening:', error);
+        this.snackBar.open('Error deleting screening. Please try again.', 'Close', {
+          duration: 5000
+        });
+      }
     });
   }
 }
