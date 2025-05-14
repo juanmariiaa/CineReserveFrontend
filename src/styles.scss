@@ -201,3 +201,60 @@ a:hover {
 .error-snackbar .mat-simple-snackbar-action {
   color: white !important;
 }
+
+/* Critical fixes for dropdown menus and select panels */
+.mat-mdc-select-panel, 
+.mdc-menu-surface.mat-mdc-select-panel, 
+div.cdk-overlay-pane div.mat-mdc-select-panel,
+div.mat-mdc-select-panel {
+  background-color: #202020 !important;
+  color: #ffffff !important;
+}
+
+/* Ensure dropdown options are styled correctly */
+.mat-mdc-option .mdc-list-item__primary-text {
+  color: #ffffff !important;
+}
+
+/* Fix overlay pane backgrounds */
+.cdk-overlay-pane {
+  background-color: transparent !important;
+}
+
+/* Override the Material menu surface with !important */
+.mdc-menu-surface {
+  background-color: #202020 !important;
+  color: #ffffff !important;
+  overflow: visible !important;
+}
+
+/* Make sure dropdown indicators are visible */
+.mat-mdc-select-arrow {
+  color: #ffffff !important;
+}
+
+/* Specific styles for all dropdown options */
+.mat-mdc-option:hover:not(.mat-mdc-option-disabled),
+.mat-mdc-option.mat-mdc-option-active {
+  background-color: rgba(0, 176, 32, 0.2) !important;
+}
+
+.mat-mdc-option.mat-mdc-option-selected {
+  background-color: rgba(0, 176, 32, 0.3) !important;
+  color: #ffffff !important;
+}
+
+/* Ensure text is visible on all form fields */
+.mat-mdc-form-field .mat-mdc-text-field-wrapper {
+  background-color: transparent !important;
+}
+
+.mat-mdc-form-field-infix {
+  color: #ffffff !important;
+}
+
+/* Fix for autocomplete panels */
+.mat-mdc-autocomplete-panel {
+  background-color: #202020 !important;
+  color: #ffffff !important;
+}

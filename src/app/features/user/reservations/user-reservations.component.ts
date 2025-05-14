@@ -12,9 +12,11 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { trigger, transition, style, animate, stagger, query } from '@angular/animations';
 import { ReservationService } from '../../../core/services/reservation.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
+import { NavbarComponent } from '../../shared/navbar/navbar.component';
 
 @Component({
   selector: 'app-user-reservations',
@@ -33,276 +35,592 @@ import { UserService } from '../../../core/services/user.service';
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
+    NavbarComponent,
     DatePipe
+  ],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('500ms ease-in', style({ opacity: 1 })),
+      ]),
+    ]),
+    trigger('staggerList', [
+      transition('* => *', [
+        query(':enter', [
+          style({ opacity: 0, transform: 'translateY(20px)' }),
+          stagger('100ms', [
+            animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+          ])
+        ], { optional: true })
+      ])
+    ])
   ],
   template: `
     <div class="user-reservations-container">
-      <div class="header">
-        <h1>My Reservations</h1>
-        <button mat-raised-button color="primary" routerLink="/">
-          <mat-icon>arrow_back</mat-icon> Back to Home
-        </button>
-      </div>
+      <app-navbar></app-navbar>
+      
+      <div class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">My Reservations</h1>
+          <button mat-raised-button color="accent" routerLink="/">
+            <mat-icon>arrow_back</mat-icon> Back to Home
+          </button>
+        </div>
 
-      <div *ngIf="loading" class="loading-container">
-        <mat-spinner></mat-spinner>
-      </div>
+        <div *ngIf="loading" class="loading-container">
+          <mat-spinner></mat-spinner>
+        </div>
 
-      <div *ngIf="!loading && reservations.length === 0" class="no-reservations">
-        <mat-card>
-          <mat-card-content>
-            <p>You don't have any reservations yet.</p>
-            <button mat-raised-button color="primary" routerLink="/">
-              Browse Movies
-            </button>
-          </mat-card-content>
-        </mat-card>
-      </div>
+        <div *ngIf="!loading && reservations.length === 0" class="no-reservations" @fadeIn>
+          <mat-card>
+            <mat-card-content>
+              <mat-icon class="empty-icon">event_busy</mat-icon>
+              <p>You don't have any reservations yet.</p>
+              <button mat-raised-button color="accent" routerLink="/movies">
+                Browse Movies
+              </button>
+            </mat-card-content>
+          </mat-card>
+        </div>
 
-      <div *ngIf="!loading && reservations.length > 0" class="reservations-list">
-        <mat-card *ngFor="let reservation of reservations" class="reservation-card" 
-          [ngClass]="{'past-reservation': isPastReservation(reservation.screening.startTime)}">
-          <mat-card-header>
-            <mat-card-title>
-              {{ reservation.screening.movie.title }}
-              <span *ngIf="isPastReservation(reservation.screening.startTime)" class="past-badge">PAST</span>
-              <span *ngIf="isUpcoming(reservation.screening.startTime)" class="upcoming-badge">UPCOMING</span>
-              <span *ngIf="isTodayReservation(reservation.screening.startTime)" class="today-badge">TODAY</span>
-            </mat-card-title>
-            <mat-card-subtitle>
-              {{ formatDate(reservation.screening.startTime) }} | Room {{ reservation.screening.room.number }}
-            </mat-card-subtitle>
-          </mat-card-header>
-          
-          <mat-card-content>
-            <div class="reservation-info">
-              <div class="movie-poster" *ngIf="reservation.screening.movie.posterUrl">
-                <img [src]="reservation.screening.movie.posterUrl" [alt]="reservation.screening.movie.title">
-              </div>
-              
-              <div class="reservation-details">
-                <p><strong>Reservation Date:</strong> {{ formatDate(reservation.reservationDate) }}</p>
-                <p><strong>Status:</strong> 
-                  <span [ngClass]="getStatusClass(reservation.status)">{{ reservation.status }}</span>
-                </p>
-                <p><strong>Price:</strong> {{ getReservationTotal(reservation) | currency:'EUR' }}</p>
-                
-                <div class="seats-info">
-                  <p><strong>Seats:</strong></p>
-                  <div class="seats-list">
-                    <span class="seat-badge" *ngFor="let seatReservation of reservation.seatReservations">
-                      {{ seatReservation.seat.rowLabel }}{{ seatReservation.seat.columnNumber }}
-                    </span>
+        <div *ngIf="!loading && reservations.length > 0" class="reservations-sections" @fadeIn>
+          <!-- Today's reservations -->
+          <div *ngIf="getTodayReservations().length > 0" class="reservation-section">
+            <h2 class="section-title">
+              <mat-icon>today</mat-icon>
+              Today's Reservations
+            </h2>
+            <div class="reservations-list" @staggerList>
+              <mat-card *ngFor="let reservation of getTodayReservations()" class="reservation-card">
+                <div class="card-image-container">
+                  <img *ngIf="reservation.screening.movie.posterUrl" [src]="reservation.screening.movie.posterUrl" [alt]="reservation.screening.movie.title" class="card-image">
+                  <div *ngIf="!reservation.screening.movie.posterUrl" class="no-image">
+                    <mat-icon>movie</mat-icon>
+                  </div>
+                  <div class="card-time-badge">
+                    <mat-icon>schedule</mat-icon>
+                    {{ extractTime(reservation.screening.startTime) }}
                   </div>
                 </div>
-
-                <div class="screening-info" *ngIf="reservation.screening.format || reservation.screening.language">
-                  <p *ngIf="reservation.screening.format"><strong>Format:</strong> {{ reservation.screening.format }}</p>
-                  <p *ngIf="reservation.screening.language"><strong>Language:</strong> {{ reservation.screening.language }}</p>
-                  <p *ngIf="reservation.screening.is3D"><mat-icon class="small-icon">3d</mat-icon> 3D</p>
-                  <p *ngIf="reservation.screening.hasSubtitles"><mat-icon class="small-icon">subtitles</mat-icon> With subtitles</p>
-                </div>
-              </div>
+                
+                <mat-card-header>
+                  <mat-card-title>{{ reservation.screening.movie.title }}</mat-card-title>
+                  <mat-card-subtitle>
+                    {{ formatDate(reservation.screening.startTime) }} | Room {{ reservation.screening.room.number }}
+                  </mat-card-subtitle>
+                </mat-card-header>
+                
+                <mat-card-content>
+                  <div class="reservation-details">
+                    <div class="detail-row">
+                      <span class="detail-label">Status:</span>
+                      <span [ngClass]="getStatusClass(reservation.status)">{{ reservation.status }}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                      <span class="detail-label">Price:</span>
+                      <span class="detail-value price">{{ getReservationTotal(reservation) | currency:'EUR' }}</span>
+                    </div>
+                    
+                    <div class="seats-container">
+                      <span class="detail-label">Seats:</span>
+                      <div class="seats-list">
+                        <span class="seat-badge" *ngFor="let seatReservation of reservation.seatReservations">
+                          {{ seatReservation.seat.rowLabel }}{{ seatReservation.seat.columnNumber }}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div class="screening-badges">
+                      <span class="format-badge" *ngIf="reservation.screening.format">{{ reservation.screening.format }}</span>
+                      <span class="format-badge" *ngIf="reservation.screening.is3D">3D</span>
+                      <span class="format-badge" *ngIf="reservation.screening.hasSubtitles">SUB</span>
+                    </div>
+                  </div>
+                </mat-card-content>
+                
+                <mat-card-actions>
+                  <button mat-stroked-button color="primary" 
+                    [routerLink]="['/movies', reservation.screening.movie.id]">
+                    <mat-icon>movie</mat-icon> Movie Info
+                  </button>
+                  <button mat-stroked-button color="warn" 
+                    *ngIf="!isPastReservation(reservation.screening.startTime) && reservation.status !== 'CANCELLED'"
+                    (click)="cancelReservation(reservation.id)">
+                    <mat-icon>cancel</mat-icon> Cancel
+                  </button>
+                  <button mat-raised-button color="accent" 
+                    *ngIf="isTicketAvailable(reservation)"
+                    (click)="downloadTicket(reservation)">
+                    <mat-icon>confirmation_number</mat-icon> Ticket
+                  </button>
+                </mat-card-actions>
+              </mat-card>
             </div>
-          </mat-card-content>
+          </div>
           
-          <mat-card-actions>
-            <button mat-button color="primary" 
-              [routerLink]="['/movies', reservation.screening.movie.id]">
-              <mat-icon>movie</mat-icon> Movie Details
-            </button>
-            <button mat-button color="warn" 
-              *ngIf="!isPastReservation(reservation.screening.startTime) && reservation.status !== 'CANCELLED'"
-              (click)="cancelReservation(reservation.id)">
-              <mat-icon>cancel</mat-icon> Cancel Reservation
-            </button>
-            <button mat-button 
-              *ngIf="isTicketAvailable(reservation)"
-              (click)="downloadTicket(reservation)">
-              <mat-icon>confirmation_number</mat-icon> Download Ticket
-            </button>
-          </mat-card-actions>
-        </mat-card>
+          <!-- Upcoming reservations -->
+          <div *ngIf="getUpcomingReservations().length > 0" class="reservation-section">
+            <h2 class="section-title">
+              <mat-icon>event</mat-icon>
+              Upcoming Reservations
+            </h2>
+            <div class="reservations-list" @staggerList>
+              <mat-card *ngFor="let reservation of getUpcomingReservations()" class="reservation-card">
+                <div class="card-image-container">
+                  <img *ngIf="reservation.screening.movie.posterUrl" [src]="reservation.screening.movie.posterUrl" [alt]="reservation.screening.movie.title" class="card-image">
+                  <div *ngIf="!reservation.screening.movie.posterUrl" class="no-image">
+                    <mat-icon>movie</mat-icon>
+                  </div>
+                  <div class="card-date-badge">
+                    {{ formatDateShort(reservation.screening.startTime) }}
+                  </div>
+                </div>
+                
+                <mat-card-header>
+                  <mat-card-title>{{ reservation.screening.movie.title }}</mat-card-title>
+                  <mat-card-subtitle>
+                    {{ formatDate(reservation.screening.startTime) }} | Room {{ reservation.screening.room.number }}
+                  </mat-card-subtitle>
+                </mat-card-header>
+                
+                <mat-card-content>
+                  <div class="reservation-details">
+                    <div class="detail-row">
+                      <span class="detail-label">Status:</span>
+                      <span [ngClass]="getStatusClass(reservation.status)">{{ reservation.status }}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                      <span class="detail-label">Price:</span>
+                      <span class="detail-value price">{{ getReservationTotal(reservation) | currency:'EUR' }}</span>
+                    </div>
+                    
+                    <div class="seats-container">
+                      <span class="detail-label">Seats:</span>
+                      <div class="seats-list">
+                        <span class="seat-badge" *ngFor="let seatReservation of reservation.seatReservations">
+                          {{ seatReservation.seat.rowLabel }}{{ seatReservation.seat.columnNumber }}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div class="screening-badges">
+                      <span class="format-badge" *ngIf="reservation.screening.format">{{ reservation.screening.format }}</span>
+                      <span class="format-badge" *ngIf="reservation.screening.is3D">3D</span>
+                      <span class="format-badge" *ngIf="reservation.screening.hasSubtitles">SUB</span>
+                    </div>
+                  </div>
+                </mat-card-content>
+                
+                <mat-card-actions>
+                  <button mat-stroked-button color="primary" 
+                    [routerLink]="['/movies', reservation.screening.movie.id]">
+                    <mat-icon>movie</mat-icon> Movie Info
+                  </button>
+                  <button mat-stroked-button color="warn" 
+                    *ngIf="!isPastReservation(reservation.screening.startTime) && reservation.status !== 'CANCELLED'"
+                    (click)="cancelReservation(reservation.id)">
+                    <mat-icon>cancel</mat-icon> Cancel
+                  </button>
+                  <button mat-raised-button color="accent" 
+                    *ngIf="isTicketAvailable(reservation)"
+                    (click)="downloadTicket(reservation)">
+                    <mat-icon>confirmation_number</mat-icon> Ticket
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            </div>
+          </div>
+          
+          <!-- Past reservations -->
+          <div *ngIf="getPastReservations().length > 0" class="reservation-section past-section">
+            <h2 class="section-title">
+              <mat-icon>history</mat-icon>
+              Past Reservations
+            </h2>
+            <div class="reservations-list past-list" @staggerList>
+              <mat-card *ngFor="let reservation of getPastReservations()" class="reservation-card past-card">
+                <div class="card-image-container">
+                  <img *ngIf="reservation.screening.movie.posterUrl" [src]="reservation.screening.movie.posterUrl" [alt]="reservation.screening.movie.title" class="card-image">
+                  <div *ngIf="!reservation.screening.movie.posterUrl" class="no-image">
+                    <mat-icon>movie</mat-icon>
+                  </div>
+                  <div class="card-past-badge">
+                    <mat-icon>check_circle</mat-icon>
+                  </div>
+                </div>
+                
+                <mat-card-header>
+                  <mat-card-title>{{ reservation.screening.movie.title }}</mat-card-title>
+                  <mat-card-subtitle>
+                    {{ formatDate(reservation.screening.startTime) }}
+                  </mat-card-subtitle>
+                </mat-card-header>
+                
+                <mat-card-content>
+                  <div class="reservation-details">
+                    <div class="detail-row">
+                      <span class="detail-label">Status:</span>
+                      <span [ngClass]="getStatusClass(reservation.status)">{{ reservation.status }}</span>
+                    </div>
+                    
+                    <div class="seats-container">
+                      <span class="detail-label">Seats:</span>
+                      <div class="seats-list">
+                        <span class="seat-badge past-seat" *ngFor="let seatReservation of reservation.seatReservations">
+                          {{ seatReservation.seat.rowLabel }}{{ seatReservation.seat.columnNumber }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </mat-card-content>
+                
+                <mat-card-actions>
+                  <button mat-stroked-button color="primary" 
+                    [routerLink]="['/movies', reservation.screening.movie.id]">
+                    <mat-icon>movie</mat-icon> Movie Info
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   `,
   styles: [`
+    /* Main container */
     .user-reservations-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
+      min-height: 100vh;
+      background-color: #3c3b34;
+      color: #ffffff;
     }
     
-    .header {
+    /* Content area */
+    .page-content {
+      padding: 40px 20px;
+    }
+    
+    /* Page header */
+    .page-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
     
-    .header h1 {
+    .page-title {
       margin: 0;
-      font-size: 2rem;
+      font-size: 32px;
+      font-weight: 700;
       color: #FFFFFF;
+      border-left: 4px solid #ff6b6b;
+      padding-left: 15px;
     }
     
+    /* Loading state */
     .loading-container {
       display: flex;
       justify-content: center;
-      padding: 3rem 0;
+      padding: 60px 0;
     }
     
+    /* Empty state styling */
     .no-reservations {
-      text-align: center;
-      padding: 2rem 0;
+      max-width: 500px;
+      margin: 60px auto;
     }
     
+    .no-reservations mat-card {
+      background-color: #35342e !important;
+      color: #FFFFFF !important;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      padding: 40px 20px;
+    }
+    
+    .empty-icon {
+      font-size: 64px;
+      height: 64px;
+      width: 64px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 20px;
+    }
+    
+    /* Section styling */
+    .reservation-section {
+      max-width: 1200px;
+      margin: 0 auto 50px;
+    }
+    
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #FFFFFF;
+    }
+    
+    .section-title mat-icon {
+      color: #ff6b6b;
+    }
+    
+    .past-section .section-title {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    /* Card grid layout */
     .reservations-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 600px), 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
     }
     
+    .past-list {
+      opacity: 0.8;
+    }
+    
+    /* Card styling */
     .reservation-card {
       display: flex;
       flex-direction: column;
       height: 100%;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      background-color: #35342e !important;
+      color: #FFFFFF !important;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       transition: transform 0.3s, box-shadow 0.3s;
-      background-color: #202020;
-      color: #FFFFFF;
-      border: 1px solid #303030;
     }
     
     .reservation-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.5);
+    }
+    
+    .past-card {
+      opacity: 0.85;
+    }
+    
+    .past-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      border-color: #404040;
     }
     
-    .past-reservation {
-      opacity: 0.7;
-    }
-    
-    .reservation-info {
-      display: flex;
-      gap: 1.5rem;
-      margin-top: 1rem;
-    }
-    
-    .movie-poster {
-      width: 100px;
-      min-width: 100px;
-      height: 150px;
-      border-radius: 8px;
+    /* Card image container */
+    .card-image-container {
+      position: relative;
+      height: 180px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     
-    .movie-poster img {
+    .card-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 0.5s;
+    }
+    
+    .reservation-card:hover .card-image {
+      transform: scale(1.05);
+    }
+    
+    .no-image {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #2a2a25;
+    }
+    
+    .no-image mat-icon {
+      font-size: 48px;
+      height: 48px;
+      width: 48px;
+      color: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Badge styling */
+    .card-time-badge, .card-date-badge, .card-past-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .card-time-badge {
+      background-color: #ff6b6b;
+      color: white;
+    }
+    
+    .card-date-badge {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+    
+    .card-past-badge {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 8px;
+      border-radius: 50%;
+    }
+    
+    .card-past-badge mat-icon {
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
+    }
+    
+    /* Card header styling */
+    mat-card-header {
+      padding: 16px 16px 0;
+    }
+    
+    mat-card-title {
+      font-size: 18px !important;
+      font-weight: 600 !important;
+      margin-bottom: 5px !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    mat-card-subtitle {
+      color: rgba(255, 255, 255, 0.7) !important;
+      font-size: 14px !important;
+    }
+    
+    /* Card content styling */
+    mat-card-content {
+      padding: 0 16px;
+      flex: 1;
     }
     
     .reservation-details {
-      flex: 1;
-      color: #FFFFFF;
+      margin-top: 10px;
+    }
+    
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .detail-label {
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: 500;
+    }
+    
+    .detail-value {
+      color: white;
+    }
+    
+    .price {
+      color: #ff6b6b;
+      font-weight: 600;
+    }
+    
+    /* Seats styling */
+    .seats-container {
+      margin: 15px 0;
     }
     
     .seats-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
+      gap: 6px;
+      margin-top: 8px;
     }
     
     .seat-badge {
-      background-color: #303030;
-      padding: 0.25rem 0.5rem;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.9);
+      padding: 3px 8px;
       border-radius: 4px;
-      font-size: 0.85rem;
+      font-size: 13px;
       font-weight: 500;
-      color: #FFFFFF;
     }
     
-    .past-badge, .upcoming-badge, .today-badge {
-      font-size: 0.7rem;
-      padding: 0.2rem 0.5rem;
+    .past-seat {
+      background-color: transparent;
+    }
+    
+    /* Format badges */
+    .screening-badges {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+    
+    .format-badge {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      padding: 2px 8px;
       border-radius: 4px;
-      margin-left: 0.5rem;
-      vertical-align: middle;
+      font-size: 12px;
+      font-weight: 500;
     }
     
-    .past-badge {
-      background-color: #303030;
-      color: #AAAAAA;
-    }
-    
-    .upcoming-badge {
-      background-color: rgba(0, 176, 32, 0.2);
-      color: #00B020;
-    }
-    
-    .today-badge {
-      background-color: rgba(0, 176, 32, 0.4);
-      color: #FFFFFF;
-    }
-    
+    /* Status classes */
     .status-pending {
-      color: #FFC107;
+      color: #ffc107;
+      font-weight: 500;
     }
     
     .status-confirmed {
-      color: #00B020;
+      color: #4caf50;
+      font-weight: 500;
     }
     
     .status-cancelled {
-      color: #F44336;
+      color: #f44336;
+      font-weight: 500;
     }
     
     .status-completed {
-      color: #9e9e9e;
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 500;
     }
     
-    .small-icon {
-      font-size: 18px;
-      vertical-align: middle;
-      margin-right: 4px;
-      color: #00B020;
-    }
-    
+    /* Card actions */
     mat-card-actions {
-      margin-top: auto;
       display: flex;
+      gap: 8px;
+      padding: 8px 16px 16px;
       justify-content: flex-end;
-      padding: 0.5rem 1rem 1rem;
     }
     
-    mat-card-header {
-      background-color: #252525;
-      padding: 12px;
-      margin: -16px -16px 0 -16px;
-      border-bottom: 1px solid #303030;
+    /* Override material accent color */
+    ::ng-deep .mat-mdc-raised-button.mat-accent {
+      background-color: #ff6b6b !important;
     }
     
-    mat-card-title {
-      color: #FFFFFF !important;
-    }
-    
-    mat-card-subtitle {
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
-    
-    @media (max-width: 600px) {
-      .reservation-info {
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .page-header {
         flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
       }
       
-      .movie-poster {
-        width: 100%;
-        height: 200px;
-        max-width: unset;
+      .reservations-list {
+        grid-template-columns: 1fr;
       }
     }
   `]
@@ -363,9 +681,24 @@ export class UserReservationsComponent implements OnInit {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
       weekday: 'short',
-      year: 'numeric',
       month: 'short',
       day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  }
+  
+  formatDateShort(dateString: string): string {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric'
+    }).format(date);
+  }
+  
+  extractTime(dateString: string): string {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
       hour: '2-digit',
       minute: '2-digit'
     }).format(date);
@@ -415,6 +748,19 @@ export class UserReservationsComponent implements OnInit {
 
   isTicketAvailable(reservation: any): boolean {
     return reservation.status === 'CONFIRMED' && !this.isPastReservation(reservation.screening.startTime);
+  }
+  
+  // Get reservations by category
+  getTodayReservations(): any[] {
+    return this.reservations.filter(r => this.isTodayReservation(r.screening.startTime));
+  }
+  
+  getUpcomingReservations(): any[] {
+    return this.reservations.filter(r => this.isUpcoming(r.screening.startTime));
+  }
+  
+  getPastReservations(): any[] {
+    return this.reservations.filter(r => this.isPastReservation(r.screening.startTime));
   }
 
   cancelReservation(reservationId: number): void {

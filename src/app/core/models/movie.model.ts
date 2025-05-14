@@ -39,3 +39,13 @@ export interface MovieSearchResult {
   voteAverage?: number;
   [key: string]: any; // Para manejar propiedades adicionales que pueda enviar la API
 }
+
+export interface MovieWithNextScreening extends Movie {
+  nextScreening?: {
+    date: Date;
+    formattedTime: string;
+    screeningId: number;
+  };
+  director?: string;
+  actors?: string;
+}

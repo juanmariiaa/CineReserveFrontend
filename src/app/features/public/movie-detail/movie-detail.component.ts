@@ -9,6 +9,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatTabsModule } from '@angular/material/tabs';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { AuthService } from '../../../core/services/auth.service';
 import { MovieService } from '../../../core/services/movie.service';
 import { ScreeningService } from '../../../core/services/screening.service';
@@ -30,39 +32,51 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
     MatChipsModule,
     MatDividerModule,
     MatDialogModule,
+    MatTabsModule,
     NavbarComponent,
+  ],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('500ms ease-in', style({ opacity: 1 })),
+      ]),
+    ]),
+    trigger('slideUp', [
+      transition(':enter', [
+        style({ transform: 'translateY(20px)', opacity: 0 }),
+        animate('500ms ease-out', style({ transform: 'translateY(0)', opacity: 1 })),
+      ]),
+    ]),
   ],
   template: `
     <div class="movie-detail-container">
       <app-navbar></app-navbar>
 
-      <div class="content">
-        <!-- Loading spinner -->
-        <div *ngIf="loading" class="loading-spinner">
-          <mat-spinner></mat-spinner>
-        </div>
+      <!-- Loading spinner -->
+      <div *ngIf="loading" class="loading-spinner">
+        <mat-spinner></mat-spinner>
+      </div>
 
-        <!-- Movie not found message -->
-        <div *ngIf="!loading && !movie" class="not-found">
-          <mat-card>
-            <mat-card-content>
-              <p>Movie not found or has been removed.</p>
-              <button mat-raised-button color="accent" routerLink="/movies">
-                Back to Movies
-              </button>
-            </mat-card-content>
-          </mat-card>
-        </div>
+      <!-- Movie not found message -->
+      <div *ngIf="!loading && !movie" class="not-found">
+        <mat-card>
+          <mat-card-content>
+            <p>Movie not found or has been removed.</p>
+            <button mat-raised-button color="accent" routerLink="/movies">
+              Back to Movies
+            </button>
+          </mat-card-content>
+        </mat-card>
+      </div>
 
-        <!-- Movie details -->
-        <div *ngIf="!loading && movie" class="movie-content">
-          <div class="movie-header">
-            <div class="poster-container" *ngIf="movie.posterUrl">
-              <img [src]="movie.posterUrl" alt="{{ movie.title }} poster" />
-            </div>
-            <div class="movie-info">
-              <h1>{{ movie.title }}</h1>
-
+      <!-- Hero Section with Backdrop Image -->
+      <div *ngIf="!loading && movie" class="hero-section" [style.background-image]="movie.backdropUrl ? 'url(' + movie.backdropUrl + ')' : 'none'">
+        <div class="backdrop-overlay">
+          <div class="hero-content" @fadeIn>
+            <div class="hero-text">
+              <h1 class="movie-title">{{ movie.title }}</h1>
+              
               <div class="movie-meta">
                 <div *ngIf="movie.durationMinutes" class="meta-item">
                   <mat-icon>schedule</mat-icon>
@@ -72,152 +86,235 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
                   <mat-icon>calendar_today</mat-icon>
                   <span>{{ movie.releaseDate | date : 'yyyy' }}</span>
                 </div>
-                <div *ngIf="movie.rating" class="meta-item">
-                  <mat-icon>star</mat-icon>
+                <div *ngIf="movie.rating" class="meta-item rating-badge">
                   <span>{{ movie.rating }}</span>
                 </div>
+                <div *ngIf="movie.voteAverage" class="meta-item">
+                  <mat-icon>star</mat-icon>
+                  <span>{{ movie.voteAverage }}/10</span>
+                </div>
               </div>
-
-              <div
-                *ngIf="movie.genres && movie.genres.length > 0"
-                class="genres"
-              >
-                {{ formatGenres(movie.genres) }}
+              
+              <div *ngIf="movie.genres && movie.genres.length > 0" class="genres-container">
+                <mat-chip-set>
+                  <mat-chip *ngFor="let genre of movie.genres">{{ genre.name }}</mat-chip>
+                </mat-chip-set>
               </div>
-
-              <p *ngIf="movie.description" class="description">
-                {{ movie.description }}
-              </p>
-
-              <div *ngIf="movie.director" class="director">
-                <strong>Director:</strong> {{ movie.director }}
-              </div>
-
-              <div *ngIf="movie.trailerUrl" class="trailer-button">
-                <a
-                  mat-raised-button
-                  color="accent"
-                  [href]="movie.trailerUrl"
-                  target="_blank"
-                >
+              
+              <div class="hero-buttons">
+                <button *ngIf="hasScreenings" mat-raised-button color="accent" (click)="scrollToScreenings()">
+                  <mat-icon>event_seat</mat-icon> Reserve Tickets
+                </button>
+                <a *ngIf="movie.trailerUrl" mat-raised-button color="primary" [href]="movie.trailerUrl" target="_blank">
                   <mat-icon>play_arrow</mat-icon> Watch Trailer
                 </a>
               </div>
             </div>
-          </div>
-
-          <mat-divider class="section-divider"></mat-divider>
-
-          <!-- Screenings section -->
-          <div class="screenings-section">
-            <h2>Available Screenings</h2>
-
-            <div *ngIf="screenings.length === 0" class="no-screenings">
-              <p>No screenings available for this movie at the moment.</p>
-            </div>
-
-            <div *ngIf="screenings.length > 0" class="screenings-container">
-              <div *ngFor="let screening of screenings" class="screening-item">
-                <div class="screening-time">
-                  <div class="date">{{ formatDate(screening.startTime) }}</div>
-                  <div class="time">{{ formatTime(screening.startTime) }}</div>
-                </div>
-                <div class="screening-info">
-                  <div class="room">Room {{ screening.room?.number }}</div>
-                  <div class="format">
-                    {{ screening.format }}
-                    <span *ngIf="screening.is3D"> | 3D</span>
-                    <span *ngIf="screening.hasSubtitles"> | Subtitles</span>
-                  </div>
-                </div>
-                <div class="price">
-                  {{ screening.ticketPrice | currency : 'EUR' }}
-                </div>
-                <div class="action">
-                  <button
-                    mat-raised-button
-                    color="accent"
-                    *ngIf="isLoggedIn"
-                    [routerLink]="['/reserve', screening.id]"
-                  >
-                    <mat-icon>event_seat</mat-icon> Reserve
-                  </button>
-                  <button
-                    mat-raised-button
-                    color="accent"
-                    *ngIf="!isLoggedIn"
-                    routerLink="/login"
-                    [queryParams]="{ returnUrl: '/reserve/' + screening.id }"
-                  >
-                    <mat-icon>login</mat-icon> Login to Reserve
-                  </button>
-                </div>
-              </div>
+            
+            <div *ngIf="movie.posterUrl" class="poster-container">
+              <img [src]="movie.posterUrl" alt="{{ movie.title }} poster" />
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="back-button-container">
-          <button mat-button color="accent" routerLink="/movies">
-            <mat-icon>arrow_back</mat-icon> Back to Movies
+      <!-- Details Section -->
+      <div *ngIf="!loading && movie" class="details-section" @slideUp>
+        <mat-card class="info-card">
+          <mat-card-content>
+            <div class="detail-grid">
+              <div class="synopsis-column">
+                <h2>Synopsis</h2>
+                <p *ngIf="movie.description" class="description">{{ movie.description }}</p>
+              </div>
+              
+              <div class="crew-column">
+                <div *ngIf="movie.director" class="crew-item">
+                  <h3>Director</h3>
+                  <p>{{ movie.director }}</p>
+                </div>
+                
+                <div class="movie-facts">
+                  <div *ngIf="movie.durationMinutes" class="fact-item">
+                    <h3>Runtime</h3>
+                    <p>{{ movie.durationMinutes }} minutes</p>
+                  </div>
+                  
+                  <div *ngIf="movie.releaseDate" class="fact-item">
+                    <h3>Release Date</h3>
+                    <p>{{ movie.releaseDate | date }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Screenings Section -->
+      <div id="screenings" *ngIf="!loading && movie" class="screenings-section" @slideUp>
+        <h2>Available Screenings</h2>
+        
+        <div *ngIf="screenings.length === 0" class="no-screenings">
+          <mat-icon>event_busy</mat-icon>
+          <p>No screenings available for this movie at the moment.</p>
+          <button mat-raised-button color="primary" routerLink="/movies">
+            Browse Other Movies
           </button>
+        </div>
+        
+        <div *ngIf="screenings.length > 0" class="screenings-container">
+          <mat-card>
+            <mat-card-content>
+              <!-- Group screenings by date -->
+              <div *ngFor="let date of getUniqueDates()" class="screening-date-group">
+                <h3 class="screening-date">{{ formatDateHeading(date) }}</h3>
+                
+                <div class="screening-list">
+                  <div *ngFor="let screening of getScreeningsByDate(date)" class="screening-item" @fadeIn>
+                    <div class="screening-time">
+                      <span class="time">{{ formatTime(screening.startTime) }}</span>
+                    </div>
+                    
+                    <div class="screening-details">
+                      <div class="room">
+                        Room {{ screening.room?.number }}
+                      </div>
+                      
+                      <div class="format-badges">
+                        <span class="format-badge">{{ screening.format }}</span>
+                        <span *ngIf="screening.is3D" class="format-badge">3D</span>
+                        <span *ngIf="screening.hasSubtitles" class="format-badge">SUB</span>
+                      </div>
+                    </div>
+                    
+                    <div class="screening-price">
+                      {{ screening.ticketPrice | currency : 'EUR' }}
+                    </div>
+                    
+                    <div class="screening-action">
+                      <button
+                        mat-raised-button
+                        color="accent"
+                        *ngIf="isLoggedIn"
+                        [routerLink]="['/reserve', screening.id]"
+                      >
+                        <mat-icon>event_seat</mat-icon> Reserve Seats
+                      </button>
+                      <button
+                        mat-raised-button
+                        color="accent"
+                        *ngIf="!isLoggedIn"
+                        routerLink="/login"
+                        [queryParams]="{ returnUrl: '/reserve/' + screening.id }"
+                      >
+                        <mat-icon>login</mat-icon> Login to Reserve
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
         </div>
       </div>
     </div>
   `,
   styles: [
     `
+      /* Main container */
       .movie-detail-container {
-        display: flex;
-        flex-direction: column;
         min-height: 100vh;
-        background-color: #181818;
+        background-color: #3c3b34;
         color: #ffffff;
-      }
-
-      .content {
-        padding: 20px;
         display: flex;
         flex-direction: column;
-        flex: 1;
       }
 
+      /* Loading & Not Found States */
       .loading-spinner {
         display: flex;
         justify-content: center;
-        padding: 50px 0;
+        align-items: center;
+        height: 400px;
       }
 
       .not-found {
         text-align: center;
         padding: 30px;
+        margin: 40px auto;
+        max-width: 600px;
       }
 
       .not-found mat-card {
-        background-color: #202020 !important;
+        background-color: #35342e !important;
         color: #ffffff !important;
-        border: 1px solid #303030;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       }
 
-      .movie-content {
+      /* Hero Section with Backdrop */
+      .hero-section {
+        position: relative;
+        height: 80vh;
+        min-height: 480px;
+        max-height: 700px;
+        background-size: cover;
+        background-position: center;
+        margin-bottom: 30px;
+      }
+
+      .backdrop-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(60, 59, 52, 0.7) 0%,
+          rgba(60, 59, 52, 0.8) 50%,
+          rgba(60, 59, 52, 0.95) 90%,
+          rgba(60, 59, 52, 1) 100%
+        );
         display: flex;
-        flex-direction: column;
-        gap: 30px;
+        align-items: center;
+        padding: 0 40px;
       }
 
-      .movie-header {
+      .hero-content {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
         display: flex;
-        gap: 30px;
-        margin-top: 20px;
+        justify-content: space-between;
+        align-items: center;
+        gap: 40px;
       }
 
+      .hero-text {
+        flex: 1;
+        max-width: 650px;
+      }
+
+      .movie-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Poster in Hero Section */
       .poster-container {
         flex-shrink: 0;
         width: 300px;
         height: 450px;
+        border-radius: 12px;
         overflow: hidden;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        transform: translateY(20px);
       }
 
       .poster-container img {
@@ -226,180 +323,303 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
         object-fit: cover;
       }
 
-      .movie-info {
-        flex: 1;
-      }
-
-      .movie-info h1 {
-        margin-top: 0;
-        margin-bottom: 20px;
-        font-size: 32px;
-        color: #ffffff;
-      }
-
+      /* Movie Meta Information */
       .movie-meta {
         display: flex;
+        flex-wrap: wrap;
         gap: 20px;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
       }
 
       .meta-item {
         display: flex;
         align-items: center;
         gap: 5px;
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.9);
       }
 
-      .genres {
-        margin-bottom: 20px;
+      .meta-item mat-icon {
+        color: #ff6b6b;
+      }
+
+      .rating-badge {
+        background-color: #ff6b6b;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+      }
+
+      /* Genres */
+      .genres-container {
+        margin-bottom: 25px;
       }
 
       ::ng-deep .mat-mdc-chip {
-        background-color: #303030 !important;
-        color: #ffffff !important;
+        background-color: transparent !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: rgba(255, 255, 255, 0.95) !important;
+      }
+
+      ::ng-deep .mat-mdc-chip:hover {
+        border-color: #ff6b6b !important;
+      }
+
+      /* Hero Buttons */
+      .hero-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+      }
+
+      ::ng-deep .mat-mdc-raised-button.mat-accent {
+        background-color: #ff6b6b !important;
+      }
+
+      ::ng-deep .mat-mdc-raised-button.mat-primary {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+      }
+
+      /* Details Section */
+      .details-section {
+        padding: 0 40px;
+        margin-bottom: 40px;
+      }
+
+      .info-card {
+        background-color: #35342e !important;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 30px;
+      }
+
+      .synopsis-column h2,
+      .crew-column h3 {
+        color: white;
+        margin-bottom: 15px;
+        font-weight: 600;
       }
 
       .description {
-        margin-bottom: 20px;
+        font-size: 1rem;
         line-height: 1.6;
-        font-size: 16px;
         color: rgba(255, 255, 255, 0.9);
       }
 
-      .director {
+      .crew-item, .fact-item {
         margin-bottom: 20px;
+      }
+
+      .crew-item h3, .fact-item h3 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+        color: #ff6b6b;
+      }
+
+      .crew-item p, .fact-item p {
         color: rgba(255, 255, 255, 0.9);
+        line-height: 1.5;
       }
 
-      .trailer-button {
-        margin-bottom: 20px;
-      }
-
-      .section-divider {
-        margin: 20px 0;
-        background-color: #303030 !important;
-      }
-
+      /* Screenings Section */
       .screenings-section {
-        padding: 10px 0;
+        padding: 0 40px;
+        margin-bottom: 40px;
       }
 
       .screenings-section h2 {
         margin-bottom: 20px;
-        font-size: 24px;
-        color: #ffffff;
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: white;
+      }
+
+      .screenings-container mat-card {
+        background-color: #35342e !important;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       }
 
       .no-screenings {
-        padding: 20px;
-        background-color: #202020;
-        border-radius: 8px;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.7);
-        border: 1px solid #303030;
-      }
-
-      .screenings-container {
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        padding: 40px;
+        text-align: center;
+        background-color: #35342e;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .no-screenings mat-icon {
+        font-size: 48px;
+        height: 48px;
+        width: 48px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .screening-date-group {
+        margin-bottom: 30px;
+      }
+
+      .screening-date {
+        margin-bottom: 15px;
+        font-weight: 600;
+        color: #ff6b6b;
+        font-size: 1.3rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 10px;
+      }
+
+      .screening-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
       }
 
       .screening-item {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 15px;
-        background-color: #202020;
+        background-color: rgba(255, 255, 255, 0.05);
         border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        border: 1px solid #303030;
+        padding: 15px;
+        transition: all 0.3s ease;
+      }
+
+      .screening-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       .screening-time {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-      }
-
-      .date {
-        font-weight: 500;
-        color: #ffffff;
+        text-align: center;
+        width: 80px;
       }
 
       .time {
-        font-size: 18px;
-        font-weight: bold;
-        color: rgba(0, 176, 32, 0.9);
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: white;
       }
 
-      .screening-info {
+      .screening-details {
+        flex: 1;
         display: flex;
         flex-direction: column;
         gap: 5px;
-        text-align: center;
-        flex: 1;
-        padding: 0 20px;
       }
 
       .room {
+        font-weight: 600;
+        color: white;
+      }
+
+      .format-badges {
+        display: flex;
+        gap: 8px;
+      }
+
+      .format-badge {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
         font-weight: 500;
-        color: #ffffff;
       }
 
-      .format {
-        font-size: 14px;
-        color: rgba(255, 255, 255, 0.7);
+      .screening-price {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #ff6b6b;
+        padding: 0 15px;
       }
 
-      .price {
-        font-weight: 500;
-        font-size: 18px;
-        color: #ffffff;
-      }
-
+      /* Back Button */
       .back-button-container {
-        margin-top: 30px;
-        padding: 0 20px;
+        padding: 0 40px 40px;
       }
 
-      @media (max-width: 768px) {
-        .movie-header {
+      /* Responsive Styles */
+      @media (max-width: 992px) {
+        .hero-content {
           flex-direction: column;
+          padding-top: 100px;
+          align-items: flex-start;
         }
 
         .poster-container {
-          width: 200px;
-          height: 300px;
-          margin: 0 auto;
+          margin-top: 30px;
+          align-self: center;
+        }
+
+        .hero-section {
+          height: auto;
+          min-height: 90vh;
+        }
+
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .backdrop-overlay {
+          padding: 0 20px;
+        }
+
+        .details-section,
+        .screenings-section,
+        .back-button-container {
+          padding: 0 20px;
+        }
+
+        .movie-title {
+          font-size: 2.2rem;
         }
 
         .screening-item {
           flex-direction: column;
+          align-items: flex-start;
           gap: 15px;
-          text-align: center;
         }
 
-        .screening-info {
-          padding: 0;
+        .screening-time,
+        .screening-details,
+        .screening-price,
+        .screening-action {
+          width: 100%;
+          text-align: left;
         }
 
-        .action {
+        .screening-action button {
           width: 100%;
         }
 
-        .action button {
-          width: 100%;
+        .poster-container {
+          width: 220px;
+          height: 330px;
         }
       }
 
-      .action button {
-        background-color: rgba(0, 176, 32, 0.1) !important;
-        border: 1px solid rgba(0, 176, 32, 0.5) !important;
-      }
+      @media (max-width: 576px) {
+        .hero-buttons {
+          flex-direction: column;
+        }
 
-      .action button:hover {
-        background-color: rgba(0, 176, 32, 0.2) !important;
+        .hero-buttons button,
+        .hero-buttons a {
+          width: 100%;
+        }
       }
     `,
   ],
@@ -409,6 +629,7 @@ export class PublicMovieDetailComponent implements OnInit {
   screenings: Screening[] = [];
   loading = true;
   isLoggedIn = false;
+  hasScreenings = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -450,6 +671,7 @@ export class PublicMovieDetailComponent implements OnInit {
         this.screeningService.getScreeningsByMovie(movieId).subscribe({
           next: (screenings) => {
             this.screenings = screenings;
+            this.hasScreenings = screenings.length > 0;
             this.loading = false;
           },
           error: (error: any) => {
@@ -477,6 +699,15 @@ export class PublicMovieDetailComponent implements OnInit {
     });
   }
 
+  formatDateHeading(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    });
+  }
+
   formatTime(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', {
@@ -488,5 +719,33 @@ export class PublicMovieDetailComponent implements OnInit {
   formatGenres(genres: any[]): string {
     if (!genres || genres.length === 0) return '';
     return genres.map((genre) => genre.name).join(', ');
+  }
+
+  scrollToScreenings(): void {
+    const element = document.getElementById('screenings');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  // Get unique dates from screenings
+  getUniqueDates(): string[] {
+    const dates = this.screenings.map(screening => {
+      const date = new Date(screening.startTime);
+      return date.toISOString().split('T')[0]; // Get only date part
+    });
+    
+    // Remove duplicates
+    return [...new Set(dates)].sort();
+  }
+
+  // Get screenings for a specific date
+  getScreeningsByDate(date: string): Screening[] {
+    return this.screenings.filter(screening => {
+      const screeningDate = new Date(screening.startTime);
+      return screeningDate.toISOString().split('T')[0] === date;
+    }).sort((a, b) => {
+      return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+    });
   }
 }
