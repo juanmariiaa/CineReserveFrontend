@@ -88,9 +88,7 @@ interface FilterOptions {
 
       <div class="movie-list-container">
         <!-- Page title and trending section -->
-        <div class="page-header">
-        <h1 class="page-title">Discover Movies</h1>
-        </div>
+
 
         <!-- Trending/Editor's Pick section -->
         <div *ngIf="!loading && trendingMovies.length > 0" class="trending-section">
