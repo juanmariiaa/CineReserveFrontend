@@ -9,6 +9,10 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTableModule } from '@angular/material/table';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatBadgeModule } from '@angular/material/badge';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -48,20 +52,16 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
     MatInputModule,
     MatFormFieldModule,
     NavbarComponent,
+    MatTooltipModule,
+    MatTableModule,
+    MatChipsModule,
+    MatBadgeModule,
   ],
   template: `
     <div class="reservation-container">
-      <!-- Usar NavbarComponent en lugar de la barra personalizada -->
       <app-navbar></app-navbar>
 
-      <div class="content">
-        <div class="page-header">
-          <h1>Seat Reservation</h1>
-          <button mat-raised-button color="accent" routerLink="/">
-            <mat-icon>arrow_back</mat-icon> Back to Home
-          </button>
-        </div>
-
+      <div class="content" [class.loading]="loading">
         <div *ngIf="loading" class="loading-spinner">
           <mat-spinner></mat-spinner>
         </div>
@@ -78,126 +78,206 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         </div>
 
         <ng-container *ngIf="!loading && screening">
-          <mat-card class="screening-info-card">
-            <mat-card-header>
-              <mat-card-title>{{ screening.movie?.title }}</mat-card-title>
-              <mat-card-subtitle>
-                Room {{ screening.room?.number }} |
-                {{ formatDate(screening.startTime) }}
-              </mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <div class="screening-content">
-                <div class="movie-poster" *ngIf="screening.movie?.posterUrl">
-                  <img
-                    [src]="screening.movie?.posterUrl"
-                    alt="{{ screening.movie?.title }} poster"
-                  />
-                </div>
-                <div class="movie-details">
-                  <p>
-                    <strong>Price:</strong>
-                    {{ screening.ticketPrice | currency : 'EUR' }}
-                  </p>
-                  <p *ngIf="screening.format">
-                    <strong>Format:</strong> {{ screening.format }}
-                  </p>
-                  <p *ngIf="screening.language">
-                    <strong>Language:</strong> {{ screening.language }}
-                  </p>
-                  <p *ngIf="screening.is3D">
-                    <mat-icon class="small-icon">3d</mat-icon> 3D
-                  </p>
-                  <p *ngIf="screening.hasSubtitles">
-                    <mat-icon class="small-icon">subtitles</mat-icon> With
-                    subtitles
-                  </p>
-                </div>
-              </div>
-            </mat-card-content>
-          </mat-card>
-
-          <mat-card class="seat-selection-card">
-            <mat-card-header>
-              <mat-card-title>Select Your Seats</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <div class="screen">
-                <div class="screen-label">SCREEN</div>
-              </div>
-
-              <div *ngIf="seats.length === 0" class="no-seats-message">
-                No seats available for this screening.
-              </div>
-
-              <div *ngIf="seats.length > 0" class="seats-container">
-                <div class="seat-row" *ngFor="let row of seatRows">
-                  <div class="row-label">{{ row }}</div>
-                  <div class="seats">
-                    <div
-                      *ngFor="let seat of getSeatsForRow(row)"
-                      class="seat"
-                      [class.unavailable]="!seat.available"
-                      [class.selected]="isSelected(seat)"
-                      (click)="toggleSeatSelection(seat)"
-                    >
-                      {{ seat.number }}
+          <div class="reservation-layout">
+            <!-- Main content area -->
+            <div class="reservation-main">
+              <!-- Movie Info Bar -->
+              <mat-card class="info-bar">
+                <div class="movie-info">
+                  <div class="movie-poster" *ngIf="screening.movie?.posterUrl">
+                    <img
+                      [src]="screening.movie?.posterUrl"
+                      alt="{{ screening.movie?.title }} poster"
+                    />
+                  </div>
+                  <div class="movie-details">
+                    <h2>{{ screening.movie?.title }}</h2>
+                    <div class="session-info">
+                      <div class="info-item">
+                        <mat-icon>event_seat</mat-icon>
+                        <span>Room {{ screening.room?.number }}</span>
+                      </div>
+                      <div class="info-item">
+                        <mat-icon>access_time</mat-icon>
+                        <span>{{ formatDate(screening.startTime) }}</span>
+                      </div>
+                      <div class="info-item">
+                        <mat-icon>euro</mat-icon>
+                        <span>{{ screening.ticketPrice | currency: 'EUR' }}</span>
+                      </div>
+                      <div class="info-item">
+                        <mat-icon>movie</mat-icon>
+                        <span>{{ screening.format }}</span>
+                      </div>
+                      <div class="info-item">
+                        <mat-icon>language</mat-icon>
+                        <span>{{ screening.language }}</span>
+                      </div>
+                      <div class="info-chips">
+                        <mat-chip *ngIf="screening.is3D" color="accent" selected>3D</mat-chip>
+                        <mat-chip *ngIf="screening.hasSubtitles" color="primary" selected>Subtitles</mat-chip>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </mat-card>
 
-              <div class="seat-legend">
-                <div class="legend-item">
-                  <div class="seat-sample available"></div>
-                  <span>Available</span>
-                </div>
-                <div class="legend-item">
-                  <div class="seat-sample unavailable"></div>
-                  <span>Taken</span>
-                </div>
-                <div class="legend-item">
-                  <div class="seat-sample selected"></div>
-                  <span>Selected</span>
-                </div>
-              </div>
+              <!-- Seat Selection Area -->
+              <mat-card class="seat-selection-card">
+                <mat-card-header>
+                  <mat-card-title>
+                    <span>Select Your Seats</span>
+                    <span *ngIf="selectedSeats.length > 0" class="selection-counter">
+                      {{ selectedSeats.length }} selected
+                    </span>
+                  </mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="screen-area">
+                    <div class="screen">
+                      <div class="screen-label">SCREEN</div>
+                    </div>
+                  </div>
 
-              <mat-divider></mat-divider>
+                  <div *ngIf="seats.length === 0" class="no-seats-message">
+                    <mat-icon>error_outline</mat-icon>
+                    <p>No seats available for this screening.</p>
+                  </div>
 
-              <div class="reservation-summary">
-                <h3>Reservation Summary</h3>
-                <p *ngIf="selectedSeats.length === 0">No seats selected</p>
-                <div *ngIf="selectedSeats.length > 0">
-                  <p>Selected Seats:</p>
-                  <ul class="selected-seats-list">
-                    <li *ngFor="let seat of selectedSeats">
-                      {{ seat.row }}{{ seat.number }}
-                    </li>
-                  </ul>
-                  <p class="total-price">
-                    Total: {{ getTotalPrice() | currency : 'EUR' }}
-                  </p>
-                </div>
+                  <div *ngIf="seats.length > 0" class="seats-container">
+                    <div class="seat-row" *ngFor="let row of seatRows">
+                      <div class="row-label">{{ row }}</div>
+                      <div class="seats">
+                        <div
+                          *ngFor="let seat of getSeatsForRow(row)"
+                          class="seat"
+                          [class.unavailable]="!seat.available"
+                          [class.selected]="isSelected(seat)"
+                          (click)="toggleSeatSelection(seat)"
+                          [matTooltip]="'Row ' + seat.row + ', Seat ' + seat.number"
+                          matTooltipPosition="above"
+                        >
+                          {{ seat.number }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="seat-legend">
+                    <div class="legend-item">
+                      <div class="seat-sample available"></div>
+                      <span>Available</span>
+                    </div>
+                    <div class="legend-item">
+                      <div class="seat-sample unavailable"></div>
+                      <span>Taken</span>
+                    </div>
+                    <div class="legend-item">
+                      <div class="seat-sample selected"></div>
+                      <span>Selected</span>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="reservation-sidebar">
+              <mat-card class="summary-card">
+                <mat-card-header>
+                  <mat-card-title>Reservation Summary</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <div *ngIf="selectedSeats.length === 0" class="empty-selection">
+                    <mat-icon>event_seat</mat-icon>
+                    <p>No seats selected</p>
+                    <p class="hint-text">Select seats from the seat map to continue</p>
+                  </div>
+
+                  <div *ngIf="selectedSeats.length > 0" class="selection-details">
+                    <h3>Selected Seats</h3>
+                    
+                    <table mat-table [dataSource]="selectedSeats" class="seats-table">
+                      <!-- Row Column -->
+                      <ng-container matColumnDef="row">
+                        <th mat-header-cell *matHeaderCellDef>Row</th>
+                        <td mat-cell *matCellDef="let seat">{{ seat.row }}</td>
+                      </ng-container>
+                      
+                      <!-- Number Column -->
+                      <ng-container matColumnDef="number">
+                        <th mat-header-cell *matHeaderCellDef>Seat</th>
+                        <td mat-cell *matCellDef="let seat">{{ seat.number }}</td>
+                      </ng-container>
+                      
+                      <!-- Price Column -->
+                      <ng-container matColumnDef="price">
+                        <th mat-header-cell *matHeaderCellDef>Price</th>
+                        <td mat-cell *matCellDef="let seat">{{ screening?.ticketPrice | currency: 'EUR' }}</td>
+                      </ng-container>
+                      
+                      <!-- Remove Column -->
+                      <ng-container matColumnDef="remove">
+                        <th mat-header-cell *matHeaderCellDef></th>
+                        <td mat-cell *matCellDef="let seat">
+                          <button mat-icon-button color="warn" (click)="toggleSeatSelection(seat)" matTooltip="Remove seat">
+                            <mat-icon>close</mat-icon>
+                          </button>
+                        </td>
+                      </ng-container>
+                      
+                      <tr mat-header-row *matHeaderRowDef="['row', 'number', 'price', 'remove']"></tr>
+                      <tr mat-row *matRowDef="let row; columns: ['row', 'number', 'price', 'remove'];"></tr>
+                    </table>
+                    
+                    <div class="price-summary">
+                      <div class="price-row">
+                        <span>Subtotal</span>
+                        <span>{{ getTotalPrice() | currency: 'EUR' }}</span>
+                      </div>
+                      <div class="price-row total">
+                        <span>Total</span>
+                        <span>{{ getTotalPrice() | currency: 'EUR' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </mat-card-content>
+                <mat-card-actions class="card-actions">
+                  <button
+                    mat-stroked-button
+                    class="clear-button"
+                    [disabled]="selectedSeats.length === 0"
+                    (click)="clearSelection()"
+                  >
+                    <mat-icon>clear</mat-icon> Clear
+                  </button>
+                  <button
+                    mat-raised-button
+                    color="accent"
+                    class="confirm-button"
+                    [disabled]="selectedSeats.length === 0 || reserving"
+                    (click)="confirmReservation()"
+                  >
+                    <mat-icon>check_circle</mat-icon> Confirm Reservation
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+              
+              <div class="mobile-actions">
+                <button 
+                  mat-fab
+                  extended
+                  color="accent"
+                  class="mobile-confirm-button"
+                  [disabled]="selectedSeats.length === 0 || reserving"
+                  (click)="confirmReservation()"
+                >
+                  <mat-icon>check_circle</mat-icon>
+                  Confirm ({{ selectedSeats.length }})
+                </button>
               </div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <button
-                mat-stroked-button
-                class="clear-button"
-                (click)="clearSelection()"
-              >
-                <mat-icon>clear</mat-icon> Clear Selection
-              </button>
-              <button
-                mat-raised-button
-                class="confirm-button"
-                [disabled]="selectedSeats.length === 0 || reserving"
-                (click)="confirmReservation()"
-              >
-                <mat-icon>check_circle</mat-icon> Confirm Reservation
-              </button>
-            </mat-card-actions>
-          </mat-card>
+            </div>
+          </div>
         </ng-container>
       </div>
     </div>
@@ -208,7 +288,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         display: flex;
         flex-direction: column;
         min-height: 100vh;
-        background-color: #181818;
+        background-color: #3c3b34;
         color: #ffffff;
       }
 
@@ -219,23 +299,16 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         flex: 1;
       }
 
-      .page-header {
-        display: flex;
-        justify-content: space-between;
+      .content.loading {
+        justify-content: center;
         align-items: center;
-        margin-bottom: 2rem;
-      }
-
-      .page-header h1 {
-        margin: 0;
-        font-size: 2rem;
-        color: #ffffff;
       }
 
       .loading-spinner {
         display: flex;
         justify-content: center;
-        padding: 4rem 0;
+        align-items: center;
+        height: 300px;
       }
 
       .error-message {
@@ -243,28 +316,66 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         padding: 2rem 0;
       }
 
-      .screening-info-card,
-      .seat-selection-card {
-        background-color: #202020 !important;
-        color: #ffffff !important;
-        margin-bottom: 2rem;
-        border: 1px solid #303030;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      /* Layout */
+      .reservation-layout {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 20px;
+        margin-top: 20px;
       }
 
-      .screening-content {
+      @media (max-width: 1024px) {
+        .reservation-layout {
+          grid-template-columns: 1fr;
+        }
+        
+        .reservation-sidebar {
+          margin-top: 20px;
+        }
+      }
+
+      /* Card styling */
+      mat-card {
+        background-color: #3c3b34 !important;
+        color: #ffffff !important;
+        border-radius: 12px !important;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
+        margin-bottom: 20px;
+      }
+
+      mat-card-title {
+        color: #ffffff !important;
+        font-size: 1.4rem !important;
+        font-weight: 500 !important;
         display: flex;
-        gap: 2rem;
-        margin-top: 1rem;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      mat-card-subtitle {
+        color: rgba(255, 255, 255, 0.7) !important;
+      }
+
+      /* Info bar */
+      .info-bar {
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+
+      .movie-info {
+        display: flex;
+        gap: 20px;
       }
 
       .movie-poster {
-        width: 150px;
-        min-width: 150px;
-        height: 225px;
-        overflow: hidden;
+        width: 80px;
+        height: 120px;
         border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
 
       .movie-poster img {
@@ -277,25 +388,74 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         flex: 1;
       }
 
-      .small-icon {
+      .movie-details h2 {
+        margin: 0 0 10px 0;
+        font-size: 1.6rem;
+        font-weight: 500;
+        color: #ffffff;
+      }
+
+      .session-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+        margin-top: 10px;
+      }
+
+      .info-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .info-item mat-icon {
         font-size: 18px;
-        vertical-align: middle;
-        margin-right: 4px;
+        height: 18px;
+        width: 18px;
+        color: #ff6b6b;
+      }
+
+      .info-chips {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      /* Seat Selection */
+      .seat-selection-card {
+        padding: 20px;
+      }
+
+      .selection-counter {
+        background-color: #ff6b6b;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-left: 10px;
+      }
+
+      .screen-area {
+        margin: 30px 0 50px;
+        position: relative;
       }
 
       .screen {
         width: 80%;
         height: 40px;
-        background: linear-gradient(180deg, #303030, #252525);
-        margin: 0 auto 50px;
+        background: linear-gradient(180deg, #4a4940, #35342e);
+        margin: 0 auto;
         border-radius: 8px 8px 0 0;
         display: flex;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 4px 20px rgba(0, 176, 32, 0.3);
+        box-shadow: 0 4px 20px rgba(255, 107, 107, 0.2);
         position: relative;
         transform: perspective(100px) rotateX(-5deg);
-        border-bottom: 2px solid rgba(0, 176, 32, 0.7);
+        border-bottom: 2px solid rgba(255, 107, 107, 0.7);
       }
 
       .screen:after {
@@ -307,7 +467,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         height: 20px;
         background: radial-gradient(
           ellipse at center,
-          rgba(0, 176, 32, 0.2) 0%,
+          rgba(255, 107, 107, 0.2) 0%,
           rgba(0, 0, 0, 0) 70%
         );
         pointer-events: none;
@@ -318,11 +478,29 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         font-weight: 500;
         letter-spacing: 2px;
         text-transform: uppercase;
-        text-shadow: 0 0 5px rgba(0, 176, 32, 0.5);
+        text-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
+      }
+
+      .no-seats-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+      }
+
+      .no-seats-message mat-icon {
+        font-size: 48px;
+        height: 48px;
+        width: 48px;
+        margin-bottom: 20px;
+        color: #ff6b6b;
       }
 
       .seats-container {
-        margin: 3rem auto;
+        margin: 0 auto;
         display: flex;
         flex-direction: column;
         gap: 12px;
@@ -330,8 +508,8 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         max-width: 800px;
         padding: 20px;
         border-radius: 10px;
-        background-color: rgba(32, 32, 32, 0.5);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        background-color: rgba(32, 32, 32, 0.2);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.05);
       }
 
@@ -347,6 +525,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         text-align: center;
         font-weight: 500;
         color: #ffffff;
+        opacity: 0.8;
       }
 
       .seats {
@@ -359,7 +538,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
       .seat {
         width: 35px;
         height: 35px;
-        background-color: rgba(48, 48, 48, 0.8);
+        background-color: rgba(60, 59, 52, 0.8);
         border-radius: 6px 6px 2px 2px;
         display: flex;
         justify-content: center;
@@ -367,36 +546,36 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         font-size: 12px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.2s ease-in-out;
+        transition: all 0.3s ease;
         color: #ffffff;
-        border-bottom: 4px solid #404040;
+        border-bottom: 4px solid #4a4940;
         user-select: none;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         position: relative;
       }
 
       .seat.available:hover {
-        background-color: rgba(0, 176, 32, 0.5);
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 4px 8px rgba(0, 176, 32, 0.3);
+        background-color: rgba(255, 107, 107, 0.5);
+        transform: translateY(-3px) scale(1.1);
+        box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
         z-index: 2;
       }
 
       .seat.unavailable {
-        background-color: #252525;
+        background-color: #2a2922;
         color: rgba(255, 255, 255, 0.3);
         cursor: not-allowed;
         opacity: 0.5;
-        border-bottom-color: #353535;
+        border-bottom-color: #35342e;
       }
 
       .seat.selected {
-        background-color: #00b020;
+        background-color: #ff6b6b;
         color: #ffffff;
         font-weight: bold;
-        transform: translateY(-3px) scale(1.05);
-        border-bottom-color: #008a1a;
-        box-shadow: 0 4px 8px rgba(0, 176, 32, 0.4);
+        transform: translateY(-3px) scale(1.1);
+        border-bottom-color: #e55a5a;
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
         z-index: 2;
       }
 
@@ -404,212 +583,154 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         display: flex;
         justify-content: center;
         gap: 30px;
-        margin: 2rem 0;
+        margin: 30px 0 10px;
         padding: 15px;
-        background-color: rgba(32, 32, 32, 0.7);
+        background-color: rgba(32, 32, 32, 0.2);
         border-radius: 8px;
         border: 1px solid rgba(255, 255, 255, 0.05);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
       }
 
       .legend-item {
         display: flex;
         align-items: center;
         gap: 10px;
+        color: rgba(255, 255, 255, 0.8);
       }
 
       .seat-sample {
         width: 20px;
         height: 20px;
         border-radius: 4px 4px 2px 2px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
 
       .seat-sample.available {
-        background-color: rgba(48, 48, 48, 0.8);
-        border-bottom: 2px solid #404040;
+        background-color: rgba(60, 59, 52, 0.8);
+        border-bottom: 2px solid #4a4940;
       }
 
       .seat-sample.unavailable {
-        background-color: #252525;
+        background-color: #2a2922;
         opacity: 0.5;
-        border-bottom: 2px solid #353535;
+        border-bottom: 2px solid #35342e;
       }
 
       .seat-sample.selected {
-        background-color: #00b020;
-        border-bottom: 2px solid #008a1a;
+        background-color: #ff6b6b;
+        border-bottom: 2px solid #e55a5a;
       }
 
-      .reservation-summary {
-        padding: 1.5rem;
-        background-color: rgba(32, 32, 32, 0.7);
-        border-radius: 8px;
-        margin-top: 2rem;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        transition: all 0.3s ease;
+      /* Summary section */
+      .summary-card {
+        position: sticky;
+        top: 20px;
       }
 
-      .reservation-summary:hover {
-        box-shadow: 0 6px 15px rgba(0, 176, 32, 0.2);
-      }
-
-      .reservation-summary h3 {
-        color: #ffffff;
-        margin-top: 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 10px;
-        font-size: 1.2rem;
-        letter-spacing: 0.5px;
-      }
-
-      .selected-seats-list {
-        list-style-type: none;
-        padding: 0;
-        margin: 0.5rem 0;
+      .empty-selection {
         display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 20px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.7);
       }
 
-      .selected-seats-list li {
-        background-color: #00b020;
-        color: #ffffff;
-        padding: 6px 12px;
-        border-radius: 20px;
+      .empty-selection mat-icon {
+        font-size: 48px;
+        height: 48px;
+        width: 48px;
+        margin-bottom: 15px;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .hint-text {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 10px;
+      }
+
+      .selection-details h3 {
+        margin: 0 0 15px 0;
+        font-size: 1.1rem;
         font-weight: 500;
-        font-size: 14px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        animation: fadeIn 0.3s ease;
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        color: rgba(255, 255, 255, 0.9);
       }
 
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(5px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      .seats-table {
+        width: 100%;
+        background-color: transparent !important;
+        margin-bottom: 20px;
       }
 
-      .total-price {
+      ::ng-deep .seats-table .mat-header-cell {
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      ::ng-deep .seats-table .mat-cell {
+        color: rgba(255, 255, 255, 0.9) !important;
+      }
+
+      .price-summary {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .price-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .price-row.total {
         font-size: 1.2rem;
         font-weight: 500;
-        text-align: right;
-        color: #00b020;
+        color: #ffffff;
         margin-top: 15px;
-        padding-top: 10px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 15px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1);
       }
 
       .card-actions {
         display: flex;
         justify-content: space-between;
-        padding: 16px 20px 20px;
-        margin: 0;
-      }
-
-      .clear-button {
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: #ffffff;
-        transition: all 0.2s ease;
-        padding: 6px 16px;
-        border-radius: 4px;
-      }
-
-      .clear-button:hover:not([disabled]) {
-        background-color: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.5);
-        transform: translateY(-2px);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        padding: 16px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
       }
 
       .confirm-button {
-        background-color: #00b020;
-        color: #ffffff;
-        box-shadow: 0 2px 8px rgba(0, 176, 32, 0.3);
-        transition: all 0.2s ease;
-        padding: 6px 24px;
-        font-weight: 500;
-        letter-spacing: 0.5px;
-        border-radius: 4px;
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        background-color: #ff6b6b !important;
+        color: white !important;
       }
 
-      .confirm-button:hover:not([disabled]) {
-        background-color: #00c02a;
-        box-shadow: 0 4px 12px rgba(0, 176, 32, 0.5);
-        transform: translateY(-2px);
+      .clear-button {
+        color: rgba(255, 255, 255, 0.7) !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
       }
 
-      .confirm-button:disabled {
-        background-color: rgba(0, 176, 32, 0.4);
-        color: rgba(255, 255, 255, 0.5);
+      /* Mobile specific styles */
+      .mobile-actions {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 100;
+        display: none;
       }
 
-      .confirm-button .mat-icon {
-        color: #ffffff !important;
-        margin-right: 8px;
-      }
-
-      .clear-button .mat-icon {
-        margin-right: 8px;
-      }
-
-      /* Asegurar que el botón active tenga color de fondo verde */
-      .confirm-button:active,
-      .confirm-button:focus {
-        background-color: #00a01a !important;
-        color: #ffffff !important;
-      }
-
-      /* Estilos para evitar que mat-raised-button cambie a fondo blanco */
-      ::ng-deep .confirm-button.mat-mdc-raised-button.mat-accent {
-        background-color: #00b020 !important;
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .confirm-button.mat-mdc-raised-button.mat-accent:hover {
-        background-color: #00c02a !important;
-      }
-
-      .payment-info {
-        padding: 1rem 0;
-      }
-
-      .reservation-price {
-        font-size: 1.5rem;
-        font-weight: 500;
-        color: #ffffff;
-      }
-
-      .reservation-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 15px;
-        margin-top: 2rem;
-      }
-
-      .no-seats-message {
-        text-align: center;
-        padding: 2rem 0;
-        font-style: italic;
-        color: rgba(255, 255, 255, 0.7);
+      .mobile-confirm-button {
+        background-color: #ff6b6b !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
       }
 
       @media (max-width: 768px) {
-        .screening-content {
-          flex-direction: column;
-        }
-
-        .movie-poster {
-          width: 100px;
-          height: 150px;
-          margin: 0 auto;
+        .reservation-layout {
+          display: block;
         }
 
         .seat {
@@ -618,31 +739,43 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
           font-size: 11px;
         }
 
-        .screen {
-          width: 90%;
+        .movie-info {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .movie-poster {
+          width: 100%;
+          height: 200px;
+          margin: 0 auto;
         }
 
         .seats-container {
           padding: 10px;
         }
 
-        .seat-row {
-          gap: 6px;
+        .mobile-actions {
+          display: block;
         }
 
-        .seats {
-          gap: 6px;
+        .summary-card .card-actions {
+          display: none;
         }
+      }
 
-        .card-actions {
-          flex-direction: column;
-          gap: 10px;
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-        .clear-button,
-        .confirm-button {
-          width: 100%;
-        }
+      .summary-card {
+        animation: fadeIn 0.4s ease;
       }
     `,
   ],

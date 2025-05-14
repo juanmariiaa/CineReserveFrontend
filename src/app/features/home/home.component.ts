@@ -93,6 +93,9 @@ import { AuthService } from '../../core/services/auth.service';
                         <span *ngIf="movie.rating" class="rating">
                           <mat-icon>star</mat-icon> {{ movie.rating }}
                         </span>
+                        <span *ngIf="movie.rating" class="age-rating">
+                          <mat-icon>movie_filter</mat-icon> {{ movie.rating }}
+                        </span>
                       </div>
                       <div
                         *ngIf="movie.genres && movie.genres.length > 0"
@@ -101,18 +104,19 @@ import { AuthService } from '../../core/services/auth.service';
                         {{ getGenresList(movie) }}
                       </div>
                       <p *ngIf="movie.description" class="description">
-                        {{ movie.description | slice : 0 : 150
-                        }}{{ movie.description.length > 150 ? '...' : '' }}
+                        {{ movie.description | slice : 0 : 180
+                        }}{{ movie.description.length > 180 ? '...' : '' }}
                       </p>
                       <button
                         mat-raised-button
                         color="accent"
+                        class="view-screenings-btn"
                         (click)="
                           navigateToMovieDetail(movie.id!);
                           $event.stopPropagation()
                         "
                       >
-                        View Screenings
+                        <mat-icon>event_available</mat-icon> View Screenings
                       </button>
                     </div>
                   </div>
@@ -174,7 +178,7 @@ import { AuthService } from '../../core/services/auth.service';
             <!-- Date selection -->
             <div *ngIf="!loading && allDates.length > 0" class="date-selection">
               <h3 class="date-selection-title">
-                Select a date to view screenings
+                <mat-icon>date_range</mat-icon> Select a date to view screenings
               </h3>
               <div class="horizontal-calendar">
                 <button
@@ -217,7 +221,7 @@ import { AuthService } from '../../core/services/auth.service';
               class="screenings-for-date"
             >
               <h2 class="date-heading">
-                Screenings for {{ selectedDate | date : 'EEEE, MMMM d, y' }}
+                <mat-icon>movie</mat-icon> Screenings for {{ selectedDate | date : 'EEEE, MMMM d, y' }}
               </h2>
 
               <!-- No screenings message -->
@@ -266,8 +270,9 @@ import { AuthService } from '../../core/services/auth.service';
                       </div>
                       <a
                         mat-button
-                        color="accent"
+                        color="primary"
                         [routerLink]="['/movies', item.movie.id]"
+                        class="movie-details-btn"
                       >
                         <mat-icon>info</mat-icon> Movie Details
                       </a>
@@ -275,7 +280,7 @@ import { AuthService } from '../../core/services/auth.service';
                   </div>
 
                   <div class="screening-times">
-                    <h4>Available Times</h4>
+                    <h4><mat-icon>access_time</mat-icon> Available Times</h4>
                     <div class="time-buttons">
                       <button
                         *ngFor="let screening of item.screeningTimes"
@@ -327,7 +332,7 @@ import { AuthService } from '../../core/services/auth.service';
         display: flex;
         flex-direction: column;
         min-height: 100vh;
-        background-color: #181818;
+        background-color: #3c3b34;
         color: #ffffff;
       }
 
@@ -340,17 +345,23 @@ import { AuthService } from '../../core/services/auth.service';
 
       /* Carousel styles */
       .carousel-section {
-        margin-bottom: 20px;
+        margin-bottom: 30px;
       }
 
       .carousel-container {
         position: relative;
-        border-radius: 8px;
+        border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         margin-bottom: 20px;
         height: 500px;
         cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        transition: transform 0.3s ease;
+      }
+      
+      .carousel-container:hover {
+        transform: scale(1.01);
       }
 
       /* Side navigation arrows */
@@ -359,8 +370,10 @@ import { AuthService } from '../../core/services/auth.service';
         top: 50%;
         transform: translateY(-50%);
         z-index: 10;
-        background-color: rgba(0, 0, 0, 0.7);
+        background-color: rgba(60, 59, 52, 0.7);
         color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
       }
 
       .left-arrow {
@@ -372,7 +385,8 @@ import { AuthService } from '../../core/services/auth.service';
       }
 
       .nav-arrow:hover {
-        background-color: rgba(0, 176, 32, 0.8);
+        background-color: rgba(255, 107, 107, 0.9);
+        transform: translateY(-50%) scale(1.1);
       }
 
       .carousel-slides {
@@ -387,7 +401,7 @@ import { AuthService } from '../../core/services/auth.service';
         width: 100%;
         height: 100%;
         opacity: 0;
-        transition: opacity 0.6s ease-in-out;
+        transition: opacity 0.8s ease-in-out;
         z-index: 0;
         visibility: hidden;
       }
@@ -411,54 +425,60 @@ import { AuthService } from '../../core/services/auth.service';
         bottom: 0;
         left: 0;
         right: 0;
-        padding: 40px 30px 30px;
+        padding: 80px 40px 40px;
         color: white;
         background: linear-gradient(
           to top,
-          rgba(0, 0, 0, 0.9) 0%,
-          rgba(0, 0, 0, 0.6) 60%,
+          rgba(0, 0, 0, 0.95) 0%,
+          rgba(0, 0, 0, 0.8) 40%,
+          rgba(0, 0, 0, 0.5) 70%,
           transparent 100%
         );
       }
 
       .movie-info-overlay .movie-title {
-        font-size: 32px;
+        font-size: 38px;
+        font-weight: 700;
         margin-bottom: 15px;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
         color: #ffffff;
+        line-height: 1.2;
+        letter-spacing: -0.5px;
       }
 
       .movie-info-overlay .movie-details {
         display: flex;
         gap: 20px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
       }
 
       .movie-info-overlay .duration,
       .movie-info-overlay .rating {
         display: flex;
         align-items: center;
-        gap: 5px;
-        font-size: 15px;
+        gap: 8px;
+        font-size: 16px;
         color: rgba(255, 255, 255, 0.9);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
       }
 
       .movie-info-overlay .duration mat-icon,
       .movie-info-overlay .rating mat-icon {
-        color: rgba(255, 255, 255, 0.9);
+        color: #ff6b6b;
+        text-shadow: none;
       }
 
       .movie-info-overlay .genres {
-        font-size: 15px;
-        margin-bottom: 10px;
+        font-size: 16px;
+        margin-bottom: 15px;
         color: rgba(255, 255, 255, 0.85);
       }
 
       .movie-info-overlay .description {
-        margin-bottom: 20px;
-        font-size: 16px;
+        margin-bottom: 25px;
+        font-size: 17px;
         max-width: 70%;
-        line-height: 1.4;
+        line-height: 1.5;
         text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
         color: rgba(255, 255, 255, 0.9);
       }
@@ -471,6 +491,7 @@ import { AuthService } from '../../core/services/auth.service';
         display: flex;
         justify-content: center;
         align-items: center;
+        z-index: 5;
       }
 
       .carousel-indicators {
@@ -484,62 +505,70 @@ import { AuthService } from '../../core/services/auth.service';
         border-radius: 50%;
         background-color: rgba(255, 255, 255, 0.5);
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
       }
 
       .indicator.active {
-        background-color: #00b020;
+        background-color: #ff6b6b;
+        transform: scale(1.2);
       }
 
       .section-title {
         margin-top: 30px;
         margin-bottom: 20px;
         font-size: 28px;
+        font-weight: 600;
         color: #ffffff;
+        padding-left: 10px;
+        border-left: 4px solid #ff6b6b;
       }
 
       .calendar-section {
-        background-color: #282828;
-        border-radius: 8px;
-        padding: 20px;
-        border: 1px solid #3a3a3a;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        background-color: #35342e;
+        border-radius: 12px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        margin-bottom: 20px;
       }
 
       .loading-spinner {
         display: flex;
         justify-content: center;
+        align-items: center;
         padding: 50px 0;
       }
 
       .no-data {
         text-align: center;
         padding: 30px;
-        background-color: #252525;
+        background-color: rgba(32, 32, 32, 0.5);
         border-radius: 8px;
-        color: #ffffff;
+        color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.05);
       }
 
       .date-selection {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
       }
 
       .date-selection-title {
-        margin-bottom: 12px;
+        margin-bottom: 15px;
         font-size: 18px;
         font-weight: 500;
-        color: #ffffff;
+        color: rgba(255, 255, 255, 0.9);
       }
 
       .horizontal-calendar {
         display: flex;
         align-items: center;
         position: relative;
-        background-color: #303030;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        padding: 5px 0;
-        border: 1px solid #3a3a3a;
+        background-color: rgba(32, 32, 32, 0.5);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        padding: 8px 0;
+        border: 1px solid rgba(255, 255, 255, 0.05);
       }
 
       .dates-container {
@@ -557,30 +586,38 @@ import { AuthService } from '../../core/services/auth.service';
       }
 
       .calendar-date {
-        min-width: 80px;
-        height: 80px;
-        border-radius: 8px;
-        margin: 0 4px;
+        min-width: 85px;
+        height: 85px;
+        border-radius: 10px;
+        margin: 0 5px;
         padding: 10px 5px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
         text-align: center;
         position: relative;
         color: #ffffff;
-        background-color: #363636;
+        background-color: rgba(60, 59, 52, 0.8);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.05);
       }
 
       .calendar-date:hover {
-        background-color: #424242;
+        background-color: rgba(76, 75, 68, 0.9);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       }
 
       .calendar-date.active {
-        background-color: rgba(0, 176, 32, 0.7);
+        background-color: #ff6b6b;
         color: white;
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        border-color: rgba(255, 107, 107, 0.6);
+        z-index: 2;
       }
 
       .calendar-date.has-screenings:after {
@@ -592,22 +629,24 @@ import { AuthService } from '../../core/services/auth.service';
         width: 6px;
         height: 6px;
         border-radius: 50%;
-        background-color: rgba(0, 176, 32, 0.7);
+        background-color: #ff6b6b;
+        box-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
       }
 
       .calendar-date.active.has-screenings:after {
-        background-color: white;
+        background-color: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
       }
 
       .weekday {
         font-size: 14px;
         font-weight: 500;
         margin-bottom: 4px;
-        color: #ffffff;
+        color: rgba(255, 255, 255, 0.9);
       }
 
       .date-number {
-        font-size: 24px;
+        font-size: 26px;
         font-weight: 700;
         line-height: 1;
         margin-bottom: 4px;
@@ -616,13 +655,26 @@ import { AuthService } from '../../core/services/auth.service';
 
       .month {
         font-size: 14px;
-        color: #ffffff;
+        color: rgba(255, 255, 255, 0.8);
       }
 
       .scroll-button {
-        background-color: #303030;
+        background-color: rgba(60, 59, 52, 0.8);
         z-index: 10;
         color: #ffffff;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .scroll-button:hover:not([disabled]) {
+        background-color: #ff6b6b;
+        transform: scale(1.1);
+      }
+
+      .scroll-button[disabled] {
+        opacity: 0.4;
+        cursor: not-allowed;
       }
 
       .scroll-button.left {
@@ -635,133 +687,167 @@ import { AuthService } from '../../core/services/auth.service';
 
       .movies-container {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
       }
 
       .movie-screening-card {
-        padding: 12px;
+        padding: 18px;
         margin-bottom: 0;
         height: 100%;
         display: flex;
         flex-direction: column;
-        transition: transform 0.2s, box-shadow 0.2s;
-        background-color: #2c2c2c;
+        transition: all 0.3s ease;
+        background-color: #35342e;
         color: #ffffff;
-        border: 1px solid #3a3a3a;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        border-radius: 16px;
+        overflow: hidden;
       }
 
       .movie-screening-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        border-color: rgba(0, 176, 32, 0.6);
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+        border-color: rgba(255, 107, 107, 0.4);
       }
 
       .movie-screening-info {
         display: flex;
-        gap: 12px;
-        margin-bottom: 12px;
+        gap: 18px;
+        margin-bottom: 18px;
       }
 
       .movie-poster {
-        width: 100px;
-        height: 150px;
+        width: 120px;
+        height: 180px;
         overflow: hidden;
-        border-radius: 4px;
+        border-radius: 12px;
         flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.15);
       }
 
       .movie-poster-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+
+      .movie-screening-card:hover .movie-poster-img {
+        transform: scale(1.08);
       }
 
       .movie-details {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 12px;
         flex: 1;
         min-width: 0;
       }
 
       .movie-title {
         margin: 0;
-        font-size: 18px;
-        font-weight: 500;
-        white-space: nowrap;
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.2;
         overflow: hidden;
         text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
         color: #ffffff;
+        letter-spacing: -0.2px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
       }
 
       .movie-meta {
         display: flex;
-        gap: 12px;
+        gap: 15px;
         flex-wrap: wrap;
+        align-items: center;
       }
 
       .movie-duration,
       .movie-rating {
         display: flex;
         align-items: center;
-        gap: 4px;
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 13px;
+        gap: 5px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        background-color: rgba(255, 107, 107, 0.15);
+        padding: 4px 10px;
+        border-radius: 20px;
       }
 
       .movie-duration mat-icon,
       .movie-rating mat-icon {
-        font-size: 14px;
-        height: 14px;
-        width: 14px;
-        color: #00b020;
+        font-size: 16px;
+        height: 16px;
+        width: 16px;
+        color: #ff6b6b;
       }
 
       .movie-genres {
-        font-size: 13px;
-        color: rgba(255, 255, 255, 0.9);
-        white-space: nowrap;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.85);
         overflow: hidden;
         text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        font-style: italic;
+        padding: 2px 0;
+        border-bottom: 1px dashed rgba(255, 107, 107, 0.2);
+        margin-top: -5px;
       }
 
       .screening-times {
-        border-top: 1px solid #303030;
-        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        padding-top: 15px;
         margin-top: auto;
       }
 
       .screening-times h4 {
         margin-top: 0;
-        margin-bottom: 10px;
-        font-size: 15px;
-        font-weight: 500;
-        color: #ffffff;
+        margin-bottom: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.95);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      
+      .screening-times h4 mat-icon {
+        color: #ff6b6b;
       }
 
       .time-buttons {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 10px;
       }
 
       .time-button {
         min-width: auto;
-        padding: 4px 8px;
+        padding: 8px 14px;
         height: auto;
-        border-radius: 4px;
+        border-radius: 24px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        background-color: rgba(48, 48, 48, 0.8);
+        background-color: rgba(60, 59, 52, 0.9);
         color: #ffffff;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
       }
 
       .time-button:hover {
-        background-color: rgba(0, 176, 32, 0.15);
-        border-color: rgba(0, 176, 32, 0.3);
+        background-color: rgba(255, 107, 107, 0.2);
+        border-color: rgba(255, 107, 107, 0.6);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
       }
 
       .time-display {
@@ -771,9 +857,10 @@ import { AuthService } from '../../core/services/auth.service';
       }
 
       .time {
-        font-size: 14px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.9);
+        font-size: 16px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.95);
+        letter-spacing: 0.3px;
       }
 
       .format-tags {
@@ -781,29 +868,47 @@ import { AuthService } from '../../core/services/auth.service';
         display: flex;
         gap: 4px;
         align-items: center;
-        color: rgba(255, 255, 255, 0.7);
+        color: rgba(255, 255, 255, 0.85);
       }
 
       .tag {
         display: inline-block;
-        padding: 1px 3px;
-        background-color: rgba(255, 255, 255, 0.1);
-        border-radius: 2px;
+        padding: 2px 6px;
+        background-color: rgba(255, 107, 107, 0.25);
+        border-radius: 4px;
         font-size: 10px;
-        font-weight: 500;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.95);
+        letter-spacing: 0.5px;
       }
 
       .room-number {
         font-size: 11px;
-        color: rgba(255, 255, 255, 0.6);
-        margin-top: 2px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 4px;
+        font-weight: 500;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 2px 8px;
+        border-radius: 10px;
       }
 
       .date-heading {
-        margin-bottom: 15px;
-        font-size: 20px;
-        font-weight: 500;
+        margin-bottom: 20px;
+        font-size: 22px;
+        font-weight: 600;
         color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .date-heading::before {
+        content: "";
+        display: inline-block;
+        width: 4px;
+        height: 24px;
+        background-color: #ff6b6b;
+        border-radius: 2px;
       }
 
       /* Calendar specific styles */
@@ -827,10 +932,21 @@ import { AuthService } from '../../core/services/auth.service';
       @media (max-width: 768px) {
         .carousel-container {
           height: 400px;
+          border-radius: 8px;
+        }
+
+        .movie-info-overlay {
+          padding: 50px 20px 25px;
+        }
+
+        .movie-info-overlay .movie-title {
+          font-size: 28px;
         }
 
         .movie-info-overlay .description {
           max-width: 100%;
+          font-size: 15px;
+          margin-bottom: 20px;
         }
 
         .nav-arrow {
@@ -845,8 +961,26 @@ import { AuthService } from '../../core/services/auth.service';
           right: 10px;
         }
 
+        .calendar-section {
+          padding: 20px 15px;
+        }
+
         .date-selection {
           flex-direction: column;
+        }
+
+        .calendar-date {
+          min-width: 75px;
+          height: 75px;
+          padding: 8px 5px;
+        }
+
+        .date-number {
+          font-size: 22px;
+        }
+
+        .weekday, .month {
+          font-size: 12px;
         }
 
         .movies-container {
@@ -857,15 +991,41 @@ import { AuthService } from '../../core/services/auth.service';
           flex-direction: row;
         }
 
-        .poster-container {
-          width: 80px;
-          height: 120px;
+        .movie-poster {
+          width: 90px;
+          height: 135px;
+        }
+
+        .movie-title {
+          font-size: 18px;
+        }
+
+        .date-heading {
+          font-size: 20px;
         }
       }
 
       @media (max-width: 480px) {
+        .content {
+          padding: 15px;
+        }
+
         .carousel-container {
           height: 350px;
+        }
+
+        .movie-info-overlay .movie-title {
+          font-size: 24px;
+        }
+
+        .movie-info-overlay .description {
+          font-size: 14px;
+          line-height: 1.4;
+        }
+
+        .movie-info-overlay .movie-details {
+          flex-wrap: wrap;
+          gap: 10px;
         }
 
         .nav-arrow {
@@ -880,13 +1040,100 @@ import { AuthService } from '../../core/services/auth.service';
           right: 5px;
         }
 
-        .movie-info-overlay .movie-title {
-          font-size: 24px;
+        .calendar-date {
+          min-width: 70px;
+          height: 70px;
+          margin: 0 3px;
         }
 
-        .movie-info-overlay .description {
-          font-size: 14px;
+        .time-buttons {
+          justify-content: center;
         }
+      }
+
+      /* Animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(15px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .movie-screening-card {
+        animation: fadeIn 0.5s ease;
+        animation-fill-mode: both;
+      }
+
+      .movie-screening-card:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+
+      .movie-screening-card:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+
+      .movie-screening-card:nth-child(4) {
+        animation-delay: 0.45s;
+      }
+
+      .movie-screening-card:nth-child(5) {
+        animation-delay: 0.6s;
+      }
+
+      .view-screenings-btn {
+        background-color: #ff6b6b !important;
+        color: white !important;
+        padding: 10px 20px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-radius: 30px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease;
+        border: none;
+      }
+
+      .view-screenings-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 107, 107, 0.5);
+        background-color: #ff8080 !important;
+      }
+
+      .view-screenings-btn mat-icon {
+        margin-right: 5px;
+      }
+
+      .age-rating {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.9);
+        padding: 2px 8px;
+      }
+
+      .movie-details-btn {
+        color: #ff6b6b !important;
+        margin-top: 5px;
+        transition: all 0.3s ease;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 107, 107, 0.2);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+        align-self: flex-start;
+        padding: 3px 12px;
+        font-weight: 500;
+      }
+
+      .movie-details-btn:hover {
+        background-color: rgba(255, 107, 107, 0.15);
+        border-color: rgba(255, 107, 107, 0.4);
+        transform: translateX(3px);
       }
     `,
   ],
