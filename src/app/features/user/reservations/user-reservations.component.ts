@@ -12,7 +12,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { trigger, transition, style, animate, stagger, query } from '@angular/animations';
+import { trigger, transition, style, animate, stagger, query, state, keyframes } from '@angular/animations';
 import { ReservationService } from '../../../core/services/reservation.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
@@ -45,6 +45,38 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
         animate('500ms ease-in', style({ opacity: 1 })),
       ]),
     ]),
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('400ms ease-out', style({ opacity: 1 })),
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ opacity: 0 })),
+      ]),
+    ]),
+    trigger('slideInUp', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(30px)' }),
+        animate('500ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+    ]),
+    trigger('slideInRight', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-30px)' }),
+        animate('500ms ease-out', style({ opacity: 1, transform: 'translateX(0)' })),
+      ]),
+    ]),
+    trigger('pulseAnimation', [
+      state('inactive', style({ transform: 'scale(1)' })),
+      state('active', style({ transform: 'scale(1)' })),
+      transition('inactive => active', [
+        animate('400ms ease-in', keyframes([
+          style({ transform: 'scale(1)', offset: 0 }),
+          style({ transform: 'scale(1.1)', offset: 0.5 }),
+          style({ transform: 'scale(1)', offset: 1 })
+        ]))
+      ])
+    ]),
     trigger('staggerList', [
       transition('* => *', [
         query(':enter', [
@@ -62,37 +94,41 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
       
       <div class="page-content">
         <div class="page-header">
-          <h1 class="page-title">My Reservations</h1>
-          <button mat-raised-button color="accent" routerLink="/">
-          <mat-icon>arrow_back</mat-icon> Back to Home
-        </button>
-      </div>
+          <h1 class="page-title" @slideInRight>
+            <mat-icon class="section-icon">bookmarks</mat-icon>
+            My Reservations
+          </h1>
+          <button mat-raised-button color="accent" routerLink="/" @slideInUp>
+            <mat-icon>arrow_back</mat-icon> Back to Home
+          </button>
+        </div>
 
-      <div *ngIf="loading" class="loading-container">
-        <mat-spinner></mat-spinner>
-      </div>
+        <div *ngIf="loading" class="loading-container" @fadeInOut>
+          <mat-spinner [diameter]="50"></mat-spinner>
+          <div class="loading-text">Loading your reservations...</div>
+        </div>
 
         <div *ngIf="!loading && reservations.length === 0" class="no-reservations" @fadeIn>
-        <mat-card>
-          <mat-card-content>
+          <mat-card>
+            <mat-card-content>
               <mat-icon class="empty-icon">event_busy</mat-icon>
-            <p>You don't have any reservations yet.</p>
+              <p>You don't have any reservations yet.</p>
               <button mat-raised-button color="accent" routerLink="/movies">
-              Browse Movies
-            </button>
-          </mat-card-content>
-        </mat-card>
-      </div>
+                Browse Movies
+              </button>
+            </mat-card-content>
+          </mat-card>
+        </div>
 
-        <div *ngIf="!loading && reservations.length > 0" class="reservations-sections" @fadeIn>
+        <div *ngIf="!loading && reservations.length > 0" class="reservations-sections">
           <!-- Today's reservations -->
-          <div *ngIf="getTodayReservations().length > 0" class="reservation-section">
-            <h2 class="section-title">
+          <div *ngIf="getTodayReservations().length > 0" class="reservation-section" @slideInUp>
+            <h2 class="section-title" @slideInRight>
               <mat-icon>today</mat-icon>
               Today's Reservations
             </h2>
-            <div class="reservations-list" @staggerList>
-              <mat-card *ngFor="let reservation of getTodayReservations()" class="reservation-card">
+            <div class="reservations-list" [@staggerList]="getTodayReservations().length">
+              <mat-card *ngFor="let reservation of getTodayReservations()" class="reservation-card" @slideInUp>
                 <div class="card-image-container">
                   <img *ngIf="reservation.screening.movie.posterUrl" [src]="reservation.screening.movie.posterUrl" [alt]="reservation.screening.movie.title" class="card-image">
                   <div *ngIf="!reservation.screening.movie.posterUrl" class="no-image">
@@ -104,20 +140,20 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
                   </div>
                 </div>
                 
-          <mat-card-header>
+                <mat-card-header>
                   <mat-card-title>{{ reservation.screening.movie.title }}</mat-card-title>
-            <mat-card-subtitle>
-              {{ formatDate(reservation.screening.startTime) }} | Room {{ reservation.screening.room.number }}
-            </mat-card-subtitle>
-          </mat-card-header>
-          
-          <mat-card-content>
+                  <mat-card-subtitle>
+                    {{ formatDate(reservation.screening.startTime) }} | Room {{ reservation.screening.room.number }}
+                  </mat-card-subtitle>
+                </mat-card-header>
+                
+                <mat-card-content>
                   <div class="reservation-details">
                     <div class="detail-row">
                       <span class="detail-label">Status:</span>
                       <span [ngClass]="getStatusClass(reservation.status)">{{ reservation.status }}</span>
-              </div>
-              
+                    </div>
+                    
                     <div class="detail-row">
                       <span class="detail-label">Price:</span>
                       <span class="detail-value price">{{ getReservationTotal(reservation) | currency:'EUR' }}</span>
@@ -125,12 +161,12 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
                     
                     <div class="seats-container">
                       <span class="detail-label">Seats:</span>
-                  <div class="seats-list">
-                    <span class="seat-badge" *ngFor="let seatReservation of reservation.seatReservations">
-                      {{ seatReservation.seat.rowLabel }}{{ seatReservation.seat.columnNumber }}
-                    </span>
-                  </div>
-                </div>
+                      <div class="seats-list">
+                        <span class="seat-badge" *ngFor="let seatReservation of reservation.seatReservations">
+                          {{ seatReservation.seat.rowLabel }}{{ seatReservation.seat.columnNumber }}
+                        </span>
+                      </div>
+                    </div>
 
                     <div class="screening-badges">
                       <span class="format-badge" *ngIf="reservation.screening.format">{{ reservation.screening.format }}</span>
@@ -161,13 +197,13 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
           </div>
           
           <!-- Upcoming reservations -->
-          <div *ngIf="getUpcomingReservations().length > 0" class="reservation-section">
-            <h2 class="section-title">
+          <div *ngIf="getUpcomingReservations().length > 0" class="reservation-section" @slideInUp>
+            <h2 class="section-title" @slideInRight>
               <mat-icon>event</mat-icon>
               Upcoming Reservations
             </h2>
-            <div class="reservations-list" @staggerList>
-              <mat-card *ngFor="let reservation of getUpcomingReservations()" class="reservation-card">
+            <div class="reservations-list" [@staggerList]="getUpcomingReservations().length">
+              <mat-card *ngFor="let reservation of getUpcomingReservations()" class="reservation-card" @slideInUp>
                 <div class="card-image-container">
                   <img *ngIf="reservation.screening.movie.posterUrl" [src]="reservation.screening.movie.posterUrl" [alt]="reservation.screening.movie.title" class="card-image">
                   <div *ngIf="!reservation.screening.movie.posterUrl" class="no-image">
@@ -210,23 +246,23 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
                       <span class="format-badge" *ngIf="reservation.screening.format">{{ reservation.screening.format }}</span>
                       <span class="format-badge" *ngIf="reservation.screening.is3D">3D</span>
                       <span class="format-badge" *ngIf="reservation.screening.hasSubtitles">SUB</span>
-              </div>
-            </div>
-          </mat-card-content>
-          
-          <mat-card-actions>
+                    </div>
+                  </div>
+                </mat-card-content>
+                
+                <mat-card-actions>
                   <button mat-stroked-button color="primary" 
-              [routerLink]="['/movies', reservation.screening.movie.id]">
+                    [routerLink]="['/movies', reservation.screening.movie.id]">
                     <mat-icon>movie</mat-icon> Movie Info
-            </button>
+                  </button>
                   <button mat-stroked-button color="warn" 
-              *ngIf="!isPastReservation(reservation.screening.startTime) && reservation.status !== 'CANCELLED'"
-              (click)="cancelReservation(reservation.id)">
+                    *ngIf="!isPastReservation(reservation.screening.startTime) && reservation.status !== 'CANCELLED'"
+                    (click)="cancelReservation(reservation.id)">
                     <mat-icon>cancel</mat-icon> Cancel
-            </button>
+                  </button>
                   <button mat-raised-button color="accent" 
-              *ngIf="isTicketAvailable(reservation)"
-              (click)="downloadTicket(reservation)">
+                    *ngIf="isTicketAvailable(reservation)"
+                    (click)="downloadTicket(reservation)">
                     <mat-icon>confirmation_number</mat-icon> Ticket
                   </button>
                 </mat-card-actions>
@@ -235,13 +271,13 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
           </div>
           
           <!-- Past reservations -->
-          <div *ngIf="getPastReservations().length > 0" class="reservation-section past-section">
-            <h2 class="section-title">
+          <div *ngIf="getPastReservations().length > 0" class="reservation-section past-section" @slideInUp>
+            <h2 class="section-title" @slideInRight>
               <mat-icon>history</mat-icon>
               Past Reservations
             </h2>
-            <div class="reservations-list past-list" @staggerList>
-              <mat-card *ngFor="let reservation of getPastReservations()" class="reservation-card past-card">
+            <div class="reservations-list past-list" [@staggerList]="getPastReservations().length">
+              <mat-card *ngFor="let reservation of getPastReservations()" class="reservation-card past-card" @slideInUp>
                 <div class="card-image-container">
                   <img *ngIf="reservation.screening.movie.posterUrl" [src]="reservation.screening.movie.posterUrl" [alt]="reservation.screening.movie.title" class="card-image">
                   <div *ngIf="!reservation.screening.movie.posterUrl" class="no-image">
@@ -281,9 +317,9 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
                   <button mat-stroked-button color="primary" 
                     [routerLink]="['/movies', reservation.screening.movie.id]">
                     <mat-icon>movie</mat-icon> Movie Info
-            </button>
-          </mat-card-actions>
-        </mat-card>
+                  </button>
+                </mat-card-actions>
+              </mat-card>
             </div>
           </div>
         </div>
@@ -296,11 +332,20 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
       min-height: 100vh;
       background-color: #3c3b34;
       color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      overflow-x: hidden; /* Prevent horizontal scroll */
     }
     
     /* Content area */
     .page-content {
-      padding: 40px 20px;
+      padding: 20px 10px;
+      max-width: 1600px;
+      margin: 0 auto;
+      flex: 1;
+      width: 95%;
+      box-sizing: border-box; /* Include padding in width calculation */
     }
     
     /* Page header */
@@ -308,7 +353,6 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: 1200px;
       margin: 0 auto 40px;
       padding-bottom: 15px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -316,18 +360,43 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
     
     .page-title {
       margin: 0;
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 700;
       color: #FFFFFF;
-      border-left: 4px solid #ff6b6b;
-      padding-left: 15px;
+      border-left: 3px solid #ff6b6b;
+      padding-left: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .section-icon {
+      color: #ff6b6b;
+      font-size: 30px;
+      height: 30px;
+      width: 30px;
+      animation: pulse 2.5s infinite ease-in-out;
     }
     
     /* Loading state */
     .loading-container {
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      padding: 60px 0;
+      align-items: center;
+      padding: 40px 0;
+      min-height: 150px;
+    }
+    
+    .loading-container ::ng-deep .mat-progress-spinner circle {
+      stroke: #ff6b6b !important;
+    }
+    
+    .loading-text {
+      margin-top: 10px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      font-weight: 500;
     }
     
     /* Empty state styling */
@@ -355,7 +424,6 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
     
     /* Section styling */
     .reservation-section {
-      max-width: 1200px;
       margin: 0 auto 50px;
     }
     
@@ -367,6 +435,9 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
       font-weight: 600;
       margin-bottom: 20px;
       color: #FFFFFF;
+      position: relative;
+      padding-left: 12px;
+      border-left: 3px solid #ff6b6b;
     }
     
     .section-title mat-icon {
@@ -610,6 +681,29 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
     ::ng-deep .mat-mdc-raised-button.mat-accent {
       background-color: #ff6b6b !important;
     }
+
+    /* Animation keyframes */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUpFadeIn {
+      from { 
+        opacity: 0;
+        transform: translateY(20px); 
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0); 
+      }
+    }
     
     /* Responsive styles */
     @media (max-width: 768px) {
@@ -621,6 +715,23 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
       
       .reservations-list {
         grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      .reservations-list {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-content {
+        padding: 15px 5px;
+        width: 98%;
+      }
+      
+      .page-title {
+        font-size: 24px;
       }
     }
   `]
