@@ -1,0 +1,890 @@
+/* Import Montserrat font */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+/* Page container */
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #3c3b34;
+  color: #ffffff;
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+.content {
+  padding: 20px 10px;
+  max-width: 1600px;
+  margin: 0 auto;
+  flex: 1;
+  width: 95%;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Welcome Section Styles */
+.welcome-section {
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+/* Carousel Section Styles */
+.carousel-section {
+  position: relative;
+  margin-bottom: 40px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.carousel-container {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+}
+
+.carousel-slides {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.carousel-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  z-index: 1;
+}
+
+.carousel-slide.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.carousel-backdrop {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.movie-info-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, 
+              rgba(0, 0, 0, 0.8) 0%, 
+              rgba(0, 0, 0, 0.4) 30%, 
+              rgba(0, 0, 0, 0.3) 70%, 
+              rgba(0, 0, 0, 0.6) 100%);
+  padding: 60px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.movie-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: #ffffff;
+  text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.5);
+  max-width: 70%;
+  position: relative;
+  display: inline-block;
+  letter-spacing: -0.5px;
+  padding-bottom: 15px;
+}
+
+.movie-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100px;
+  height: 5px;
+  background: linear-gradient(90deg, #ff6b6b, rgba(255, 107, 107, 0.3));
+  border-radius: 3px;
+}
+
+.buy-tickets-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%) !important;
+  color: white !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  padding: 14px 28px !important;
+  border-radius: 30px !important;
+  letter-spacing: 0.8px !important;
+  box-shadow: 0 6px 16px rgba(255, 75, 75, 0.4) !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase !important;
+  border: none !important;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.buy-tickets-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #ff4757 0%, #ff6b6b 100%);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+  border-radius: 30px;
+}
+
+.buy-tickets-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 20px rgba(255, 75, 75, 0.5) !important;
+}
+
+.buy-tickets-btn:hover::before {
+  opacity: 1;
+}
+
+/* Carousel Controls */
+.carousel-controls {
+  position: absolute;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+}
+
+.carousel-indicators {
+  display: flex;
+  gap: 12px;
+}
+
+.indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.indicator.active {
+  background-color: #ff6b6b;
+  transform: scale(1.3);
+}
+
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 52px !important;
+  height: 52px !important;
+  min-width: unset !important;
+  padding: 0 !important;
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  color: white !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease !important;
+  border-radius: 50% !important;
+}
+
+.nav-arrow:hover {
+  background-color: #ff6b6b !important;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.nav-arrow mat-icon {
+  font-size: 32px;
+  height: 32px;
+  width: 32px;
+}
+
+.left-arrow {
+  left: 25px;
+}
+
+.right-arrow {
+  right: 25px;
+}
+
+/* Calendar Section Styles */
+.calendar-section {
+  margin-top: 40px;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #ffffff;
+  position: relative;
+  padding-left: 12px;
+  border-left: 3px solid #ff6b6b;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-icon {
+  color: #ff6b6b;
+  font-size: 30px;
+  height: 30px;
+  width: 30px;
+}
+
+.section-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  height: 1px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.date-selection {
+  margin-bottom: 30px;
+}
+
+.date-selection-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.date-selection-title mat-icon {
+  color: #ff6b6b;
+}
+
+.horizontal-calendar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  position: relative;
+}
+
+.scroll-button {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  color: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.scroll-button:hover:not([disabled]) {
+  background-color: rgba(255, 107, 107, 0.2) !important;
+}
+
+.scroll-button[disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.dates-container {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ff6b6b #1e1e1c;
+  padding: 8px 4px;
+  scroll-behavior: smooth;
+  flex: 1;
+}
+
+.dates-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.dates-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.dates-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 107, 107, 0.7);
+  border-radius: 4px;
+}
+
+.calendar-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  height: 90px;
+  border-radius: 8px;
+  background-color: #1e1e1c;
+  padding: 10px 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-date::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.calendar-date::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #ff6b6b, rgba(255, 107, 107, 0.5));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.calendar-date:hover {
+  background-color: #252523;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.calendar-date:hover::after {
+  opacity: 0.5;
+}
+
+.calendar-date.active {
+  background-color: #252523;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+.calendar-date.active::after {
+  opacity: 1;
+}
+
+.calendar-date.active::before {
+  background-color: transparent;
+}
+
+.calendar-date.has-screenings:not(.active)::after {
+  opacity: 0.3;
+}
+
+.weekday {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+}
+
+.date-number {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.month {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+}
+
+.active .weekday {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.active .date-number {
+  color: #ff6b6b;
+}
+
+.active .month {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Screenings for Date */
+.screenings-for-date {
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+
+.date-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #ffffff;
+  position: relative;
+  padding-left: 12px;
+  border-left: 3px solid #ff6b6b;
+}
+
+.date-heading mat-icon {
+  color: #ff6b6b;
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+}
+
+.date-heading::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  height: 1px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.movies-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+  margin-top: 15px;
+}
+
+.movie-screening-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #1e1e1c;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.25s, box-shadow 0.25s;
+  position: relative;
+  padding: 0;
+}
+
+.movie-screening-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.card-accent-top {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #ff6b6b, rgba(255, 107, 107, 0.5));
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.movie-screening-info {
+  display: flex;
+  padding: 20px;
+  position: relative;
+}
+
+.movie-poster {
+  width: 90px;
+  height: 135px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-right: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.movie-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.movie-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.movie-details .movie-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: white;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.movie-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.movie-duration, .movie-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.movie-duration mat-icon, .movie-rating mat-icon {
+  color: #ff6b6b;
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
+}
+
+.movie-genres {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  margin-bottom: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.screening-time-slot {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.screening-time-link {
+  display: block;
+  padding: 14px 20px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.screening-time-link:hover {
+  background-color: rgba(255, 107, 107, 0.15);
+}
+
+.time-info {
+  display: flex;
+  align-items: center;
+}
+
+.time-display {
+  font-weight: 700;
+  font-size: 16px;
+  color: #ffffff;
+  min-width: 80px;
+}
+
+.room-display {
+  flex: 1;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  padding-left: 15px;
+}
+
+.format-display {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+  justify-content: flex-end;
+}
+
+.tag {
+  background-color: #ff6b6b;
+  color: white;
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.no-data {
+  text-align: center;
+  padding: 30px;
+  background-color: #35342e;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive styles for the carousel */
+@media (min-width: 1400px) {
+  .movie-title {
+    font-size: 72px;
+    max-width: 65%;
+  }
+  
+  .movie-title::after {
+    width: 120px;
+    height: 6px;
+  }
+  
+  .movie-info-overlay {
+    padding: 70px 100px;
+  }
+  
+  .buy-tickets-btn {
+    font-size: 18px !important;
+    padding: 16px 32px !important;
+  }
+}
+
+@media (min-width: 1800px) {
+  .carousel-container {
+    height: 600px;
+  }
+  
+  .movie-title {
+    font-size: 84px;
+    max-width: 60%;
+  }
+  
+  .movie-title::after {
+    width: 140px;
+    height: 7px;
+  }
+  
+  .movie-info-overlay {
+    padding: 80px 120px;
+  }
+  
+  .buy-tickets-btn {
+    font-size: 20px !important;
+    padding: 18px 36px !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .movie-info-overlay {
+    padding: 50px 60px;
+  }
+  
+  .movie-title {
+    font-size: 56px;
+    max-width: 80%;
+    padding-bottom: 12px;
+  }
+  
+  .movie-title::after {
+    width: 90px;
+    height: 5px;
+  }
+}
+
+@media (max-width: 992px) {
+  .carousel-container {
+    height: 450px;
+  }
+  
+  .movie-info-overlay {
+    padding: 40px 50px;
+  }
+  
+  .movie-title {
+    font-size: 48px;
+    max-width: 85%;
+    padding-bottom: 10px;
+  }
+  
+  .movie-title::after {
+    width: 80px;
+    height: 4px;
+  }
+  
+  .nav-arrow {
+    width: 46px !important;
+    height: 46px !important;
+  }
+  
+  .nav-arrow mat-icon {
+    font-size: 28px;
+    height: 28px;
+    width: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-container {
+    height: 400px;
+  }
+  
+  .movie-info-overlay {
+    padding: 30px 40px;
+  }
+  
+  .movie-title {
+    font-size: 40px;
+    max-width: 90%;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+  }
+  
+  .movie-title::after {
+    width: 70px;
+    height: 4px;
+  }
+  
+  .buy-tickets-btn {
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+  }
+  
+  .nav-arrow {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  .nav-arrow mat-icon {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+  }
+  
+  .left-arrow {
+    left: 15px;
+  }
+  
+  .right-arrow {
+    right: 15px;
+  }
+  
+  .indicator {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .movies-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .movie-screening-info {
+    padding: 16px;
+  }
+  
+  .screening-time-link {
+    padding: 12px 16px;
+  }
+  
+  .movie-details .movie-title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel-container {
+    height: 350px;
+  }
+  
+  .movie-info-overlay {
+    padding: 20px 30px;
+  }
+  
+  .movie-title {
+    font-size: 36px;
+    max-width: 100%;
+    margin-bottom: 16px;
+    padding-bottom: 6px;
+  }
+  
+  .movie-title::after {
+    width: 60px;
+    height: 3px;
+  }
+  
+  .buy-tickets-btn {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
+  
+  .nav-arrow {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  
+  .nav-arrow mat-icon {
+    font-size: 22px;
+    height: 22px;
+    width: 22px;
+  }
+  
+  .left-arrow {
+    left: 10px;
+  }
+  
+  .right-arrow {
+    right: 10px;
+  }
+  
+  .carousel-controls {
+    bottom: 15px;
+  }
+  
+  .indicator {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .movie-poster {
+    width: 80px;
+    height: 120px;
+    margin-right: 12px;
+  }
+  
+  .time-display, .format-display {
+    min-width: auto;
+  }
+  
+  .time-info {
+    flex-wrap: wrap;
+  }
+  
+  .room-display {
+    order: 3;
+    width: 100%;
+    padding-left: 0;
+    margin-top: 6px;
+    font-size: 12px;
+  }
+  
+  .format-display {
+    font-size: 12px;
+  }
+} 
