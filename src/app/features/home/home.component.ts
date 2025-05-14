@@ -107,17 +107,6 @@ import { AuthService } from '../../core/services/auth.service';
                         {{ movie.description | slice : 0 : 180
                         }}{{ movie.description.length > 180 ? '...' : '' }}
                       </p>
-                      <button
-                        mat-raised-button
-                        color="accent"
-                        class="view-screenings-btn"
-                        (click)="
-                          navigateToMovieDetail(movie.id!);
-                          $event.stopPropagation()
-                        "
-                      >
-                        <mat-icon>event_available</mat-icon> View Screenings
-                      </button>
                     </div>
                   </div>
                 </div>
