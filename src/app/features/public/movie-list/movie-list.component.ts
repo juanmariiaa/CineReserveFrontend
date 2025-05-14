@@ -121,8 +121,9 @@ interface FilterOptions {
                         <mat-icon>info</mat-icon> View Details
                       </button>
                       <button *ngIf="movie.nextScreening" 
-                              mat-stroked-button 
-                              color="primary" 
+                              mat-raised-button 
+                              color="accent" 
+                              class="reserve-btn"
                               [routerLink]="['/reserve', movie.nextScreening.screeningId]">
                         <mat-icon>event_seat</mat-icon> Reserve Seats
                       </button>
@@ -338,6 +339,7 @@ interface FilterOptions {
                       *ngIf="movie.nextScreening"
                       mat-raised-button
                       color="accent"
+                      class="reserve-btn"
                       [routerLink]="['/reserve', movie.nextScreening.screeningId]"
                     >
                       <mat-icon>event_seat</mat-icon> Reserve

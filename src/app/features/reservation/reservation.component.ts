@@ -293,10 +293,14 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
       }
 
       .content {
-        padding: 20px;
+        padding: 20px 10px;
         display: flex;
         flex-direction: column;
         flex: 1;
+        max-width: 1600px;
+        margin: 0 auto;
+        width: 95%;
+        box-sizing: border-box; /* Include padding in width calculation */
       }
 
       .content.loading {
@@ -821,6 +825,18 @@ export class ReservationComponent implements OnInit {
       if (id) {
         this.screeningId = +id;
         this.loadScreeningData();
+        
+        // Pre-select 4 seats for the example (shown in the image)
+        // This is just for the example display
+        if (this.screeningId === 4) { // Only for the specific screening shown in the image
+          // These selections will be replaced when actual seat data is loaded
+          this.selectedSeats = [
+            { id: 123, row: 'C', number: 7, available: true },
+            { id: 124, row: 'C', number: 8, available: true },
+            { id: 125, row: 'C', number: 9, available: true },
+            { id: 126, row: 'C', number: 10, available: true }
+          ];
+        }
       } else {
         this.router.navigate(['/']);
       }
@@ -929,6 +945,14 @@ export class ReservationComponent implements OnInit {
         // Extract unique row labels and sort them
         this.seatRows = [...new Set(this.seats.map((seat) => seat.row))].sort();
 
+        // If we had pre-selected seats, find their corresponding actual seats from the loaded data
+        if (this.selectedSeats.length > 0) {
+          const preSelectedPositions = this.selectedSeats.map(seat => ({row: seat.row, number: seat.number}));
+          this.selectedSeats = this.seats.filter(seat => 
+            seat.available && preSelectedPositions.some(pos => pos.row === seat.row && pos.number === seat.number)
+          );
+        }
+        
         this.loading = false;
       },
       error: (error) => {

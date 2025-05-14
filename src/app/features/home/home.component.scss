@@ -681,6 +681,8 @@
   font-size: 14px;
   color: rgba(255, 255, 255, 0.6);
   padding-left: 15px;
+  padding-right: 15px;
+  text-align: center;
 }
 
 .format-display {
@@ -865,11 +867,23 @@
   }
   
   .screening-time-link {
-    padding: 12px 16px;
+    padding: 16px;
   }
   
-  .movie-details .movie-title {
-    font-size: 20px;
+  .time-info {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+  }
+  
+  .time-display {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ff6b6b;
+    min-width: auto;
   }
 }
 
@@ -933,23 +947,70 @@
     margin-right: 12px;
   }
   
-  .time-display, .format-display {
-    min-width: auto;
+  .time-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
   }
   
-  .time-info {
-    flex-wrap: wrap;
+  .time-display {
+    font-size: 16px;
+    font-weight: 700;
+    min-width: auto;
+    color: #ff6b6b;
   }
   
   .room-display {
-    order: 3;
-    width: 100%;
-    padding-left: 0;
-    margin-top: 6px;
-    font-size: 12px;
+    flex: 0 1 auto;
+    font-size: 13px;
+    text-align: center;
+    padding-left: 6px;
+    padding-right: 6px;
   }
   
   .format-display {
     font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: flex-end;
+    min-width: auto;
+  }
+  
+  .tag {
+    padding: 1px 4px;
+    font-size: 10px;
+    margin-left: 2px;
+  }
+  
+  .screening-time-link {
+    padding: 14px 12px;
+  }
+}
+
+@media (max-width: 370px) {
+  .time-info {
+    gap: 6px;
+  }
+  
+  .time-display {
+    font-size: 15px;
+  }
+  
+  .room-display {
+    font-size: 12px;
+  }
+  
+  .format-display {
+    font-size: 11px;
+    gap: 2px;
+  }
+  
+  .tag {
+    padding: 1px 3px;
+    font-size: 9px;
   }
 } 

@@ -69,6 +69,20 @@
     color: white !important;
   }
   
+  /* Button styling */
+  .mat-mdc-raised-button.mat-accent {
+    background-color: #ff6b6b !important;
+    color: white !important;
+  }
+  
+  .mat-mdc-raised-button.mat-accent:hover {
+    background-color: #ff5252 !important;
+  }
+  
+  .mat-mdc-raised-button.mat-accent .mat-icon {
+    color: white !important;
+  }
+  
   .cdk-overlay-container .cdk-overlay-pane .mat-mdc-select-panel,
   .mat-mdc-select-panel,
   .cdk-overlay-pane .mat-mdc-select-panel, 
@@ -392,6 +406,15 @@
 .trending-actions {
   display: flex;
   gap: 15px;
+}
+
+.trending-actions button {
+  min-width: 120px;
+}
+
+.trending-actions button.mat-accent {
+  background-color: #ff6b6b !important;
+  color: white !important;
 }
 
 /* Search and Filter Styles */
@@ -737,6 +760,21 @@ mat-card-actions {
 
 mat-card-actions button {
   flex: 1;
+}
+
+mat-card-actions button.mat-accent {
+  background-color: #ff6b6b !important;
+  color: white !important;
+}
+
+/* Reserve button consistency */
+button.reserve-btn {
+  background-color: #ff6b6b !important;
+  color: white !important;
+}
+
+button.reserve-btn mat-icon {
+  color: white !important;
 }
 
 /* Responsive Adjustments */

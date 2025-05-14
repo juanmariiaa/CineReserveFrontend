@@ -98,8 +98,8 @@ import { AuthService } from '../../core/services/auth.service';
                   >
                     <div class="movie-info-overlay">
                       <h2 class="movie-title" @slideInRight>{{ movie.title }}</h2>
-                      <button 
-                        mat-raised-button 
+                      <button
+                        mat-raised-button
                         class="buy-tickets-btn"
                         @slideInUp
                         (click)="navigateToMovieDetail(movie.id!); $event.stopPropagation()"
@@ -279,10 +279,11 @@ import { AuthService } from '../../core/services/auth.service';
                       <div class="time-info">
                         <span class="time-display">{{ screening.time }}</span>
                         <span class="room-display">Room {{ screening.roomNumber }}</span>
-                        <span class="format-display">{{ screening.format }}
+                        <div class="format-display">
+                          <span>{{ screening.format }}</span>
                           <span *ngIf="screening.is3D" class="tag">3D</span>
                           <span *ngIf="screening.hasSubtitles" class="tag">SUB</span>
-                        </span>
+                        </div>
                       </div>
                     </a>
                   </div>
@@ -544,8 +545,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             
             if (elapsedTime < minimumLoadingTime) {
               setTimeout(() => {
-                this.moviesWithScreenings = [];
-                this.loadingScreenings = false;
+            this.moviesWithScreenings = [];
+            this.loadingScreenings = false;
               }, minimumLoadingTime - elapsedTime);
             } else {
               this.moviesWithScreenings = [];
@@ -568,8 +569,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             
             if (elapsedTime < minimumLoadingTime) {
               setTimeout(() => {
-                this.moviesWithScreenings = [];
-                this.loadingScreenings = false;
+            this.moviesWithScreenings = [];
+            this.loadingScreenings = false;
               }, minimumLoadingTime - elapsedTime);
             } else {
               this.moviesWithScreenings = [];
@@ -652,7 +653,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
               
               if (elapsedTime < minimumLoadingTime) {
                 setTimeout(() => {
-                  this.loadingScreenings = false;
+              this.loadingScreenings = false;
                 }, minimumLoadingTime - elapsedTime);
               } else {
                 this.loadingScreenings = false;
@@ -661,7 +662,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             error: (error) => {
               console.error('Error loading movies:', error);
               setTimeout(() => {
-                this.loadingScreenings = false;
+              this.loadingScreenings = false;
               }, Math.max(0, minimumLoadingTime - (new Date().getTime() - loadingStartTime)));
             },
           });
@@ -678,7 +679,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           );
           setTimeout(() => {
-            this.loadingScreenings = false;
+          this.loadingScreenings = false;
           }, Math.max(0, minimumLoadingTime - (new Date().getTime() - loadingStartTime)));
         },
       });
@@ -882,7 +883,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           
           if (elapsedTime < minimumLoadingTime) {
             setTimeout(() => {
-              this.loadingFeaturedMovies = false;
+          this.loadingFeaturedMovies = false;
             }, minimumLoadingTime - elapsedTime);
           } else {
             this.loadingFeaturedMovies = false;
@@ -931,7 +932,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             
             if (elapsedTime < minimumLoadingTime) {
               setTimeout(() => {
-                this.loadingFeaturedMovies = false;
+            this.loadingFeaturedMovies = false;
               }, minimumLoadingTime - elapsedTime);
             } else {
               this.loadingFeaturedMovies = false;
@@ -940,7 +941,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           error: (error) => {
             console.error('Error loading movies:', error);
             setTimeout(() => {
-              this.loadingFeaturedMovies = false;
+            this.loadingFeaturedMovies = false;
             }, Math.max(0, minimumLoadingTime - (new Date().getTime() - loadingStartTime)));
           },
         });
@@ -948,7 +949,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (error) => {
         console.error('Error loading screenings:', error);
         setTimeout(() => {
-          this.loadingFeaturedMovies = false;
+        this.loadingFeaturedMovies = false;
         }, Math.max(0, minimumLoadingTime - (new Date().getTime() - loadingStartTime)));
       },
     });

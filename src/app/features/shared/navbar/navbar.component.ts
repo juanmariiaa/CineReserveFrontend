@@ -478,6 +478,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
         margin-right: 16px;
       }
       
+      .menu-button mat-icon {
+        color: white;
+      }
+      
       /* Mobile Navigation */
       .mobile-nav-backdrop {
         position: fixed;
