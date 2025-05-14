@@ -99,26 +99,26 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
             My Reservations
           </h1>
           <button mat-raised-button color="accent" routerLink="/" @slideInUp>
-            <mat-icon>arrow_back</mat-icon> Back to Home
-          </button>
-        </div>
+          <mat-icon>arrow_back</mat-icon> Back to Home
+        </button>
+      </div>
 
         <div *ngIf="loading" class="loading-container" @fadeInOut>
           <mat-spinner [diameter]="50"></mat-spinner>
           <div class="loading-text">Loading your reservations...</div>
-        </div>
+      </div>
 
         <div *ngIf="!loading && reservations.length === 0" class="no-reservations" @fadeIn>
-          <mat-card>
-            <mat-card-content>
+        <mat-card>
+          <mat-card-content>
               <mat-icon class="empty-icon">event_busy</mat-icon>
-              <p>You don't have any reservations yet.</p>
+            <p>You don't have any reservations yet.</p>
               <button mat-raised-button color="accent" routerLink="/movies">
-                Browse Movies
-              </button>
-            </mat-card-content>
-          </mat-card>
-        </div>
+              Browse Movies
+            </button>
+          </mat-card-content>
+        </mat-card>
+      </div>
 
         <div *ngIf="!loading && reservations.length > 0" class="reservations-sections">
           <!-- Today's reservations -->
@@ -140,33 +140,33 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
                   </div>
                 </div>
                 
-                <mat-card-header>
+          <mat-card-header>
                   <mat-card-title>{{ reservation.screening.movie.title }}</mat-card-title>
-                  <mat-card-subtitle>
-                    {{ formatDate(reservation.screening.startTime) }} | Room {{ reservation.screening.room.number }}
-                  </mat-card-subtitle>
-                </mat-card-header>
-                
-                <mat-card-content>
+            <mat-card-subtitle>
+              {{ formatDate(reservation.screening.startTime) }} | Room {{ reservation.screening.room.number }}
+            </mat-card-subtitle>
+          </mat-card-header>
+          
+          <mat-card-content>
                   <div class="reservation-details">
                     <div class="detail-row">
                       <span class="detail-label">Status:</span>
                       <span [ngClass]="getStatusClass(reservation.status)">{{ reservation.status }}</span>
-                    </div>
-                    
+              </div>
+              
                     <div class="detail-row">
                       <span class="detail-label">Price:</span>
                       <span class="detail-value price">{{ getReservationTotal(reservation) | currency:'EUR' }}</span>
                     </div>
-                    
+                
                     <div class="seats-container">
                       <span class="detail-label">Seats:</span>
-                      <div class="seats-list">
-                        <span class="seat-badge" *ngFor="let seatReservation of reservation.seatReservations">
-                          {{ seatReservation.seat.rowLabel }}{{ seatReservation.seat.columnNumber }}
-                        </span>
-                      </div>
-                    </div>
+                  <div class="seats-list">
+                    <span class="seat-badge" *ngFor="let seatReservation of reservation.seatReservations">
+                      {{ seatReservation.seat.rowLabel }}{{ seatReservation.seat.columnNumber }}
+                    </span>
+                  </div>
+                </div>
 
                     <div class="screening-badges">
                       <span class="format-badge" *ngIf="reservation.screening.format">{{ reservation.screening.format }}</span>
@@ -246,23 +246,23 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
                       <span class="format-badge" *ngIf="reservation.screening.format">{{ reservation.screening.format }}</span>
                       <span class="format-badge" *ngIf="reservation.screening.is3D">3D</span>
                       <span class="format-badge" *ngIf="reservation.screening.hasSubtitles">SUB</span>
-                    </div>
-                  </div>
-                </mat-card-content>
-                
-                <mat-card-actions>
+              </div>
+            </div>
+          </mat-card-content>
+          
+          <mat-card-actions>
                   <button mat-stroked-button color="primary" 
-                    [routerLink]="['/movies', reservation.screening.movie.id]">
+              [routerLink]="['/movies', reservation.screening.movie.id]">
                     <mat-icon>movie</mat-icon> Movie Info
-                  </button>
+            </button>
                   <button mat-stroked-button color="warn" 
-                    *ngIf="!isPastReservation(reservation.screening.startTime) && reservation.status !== 'CANCELLED'"
-                    (click)="cancelReservation(reservation.id)">
+              *ngIf="!isPastReservation(reservation.screening.startTime) && reservation.status !== 'CANCELLED'"
+              (click)="cancelReservation(reservation.id)">
                     <mat-icon>cancel</mat-icon> Cancel
-                  </button>
+            </button>
                   <button mat-raised-button color="accent" 
-                    *ngIf="isTicketAvailable(reservation)"
-                    (click)="downloadTicket(reservation)">
+              *ngIf="isTicketAvailable(reservation)"
+              (click)="downloadTicket(reservation)">
                     <mat-icon>confirmation_number</mat-icon> Ticket
                   </button>
                 </mat-card-actions>
@@ -317,9 +317,9 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
                   <button mat-stroked-button color="primary" 
                     [routerLink]="['/movies', reservation.screening.movie.id]">
                     <mat-icon>movie</mat-icon> Movie Info
-                  </button>
-                </mat-card-actions>
-              </mat-card>
+            </button>
+          </mat-card-actions>
+        </mat-card>
             </div>
           </div>
         </div>
@@ -702,7 +702,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
       to { 
         opacity: 1;
         transform: translateY(0); 
-      }
+    }
     }
     
     /* Responsive styles */

@@ -281,10 +281,10 @@ import { AuthService } from '../../core/services/auth.service';
                         <span class="room-display">Room {{ screening.roomNumber }}</span>
                         <div class="format-display">
                           <span>{{ screening.format }}</span>
-                          <span *ngIf="screening.is3D" class="tag">3D</span>
+                            <span *ngIf="screening.is3D" class="tag">3D</span>
                           <span *ngIf="screening.hasSubtitles" class="tag">SUB</span>
                         </div>
-                      </div>
+                        </div>
                     </a>
                   </div>
                 </mat-card>

@@ -14,7 +14,7 @@ export interface Screening {
     hasSubtitles?: boolean;
     language?: string;
     format?: string;
-}
+  }
 
 export interface ScreeningBasicDTO {
     id: number;
@@ -31,18 +31,18 @@ export interface ScreeningBasicDTO {
     format: string;
     availableSeats: number;
     capacity: number;
-}
+  }
 
-export interface Seat {
+  export interface Seat {
     id?: number;
     rowLabel: string;
     columnNumber: number;
     roomId?: number;
-}
+  }
 
-export interface SeatReservation {
+  export interface SeatReservation {
     id?: number;
     reservationId: number;
     seatId: number;
     screeningId: number;
-}
+  }

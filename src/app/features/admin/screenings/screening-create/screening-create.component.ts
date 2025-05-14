@@ -406,18 +406,18 @@ export class ScreeningCreateComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
-    
+
     // Get movies for autocomplete
     this.movieService.getAllMovies().subscribe({
       next: (movies) => {
         this.movies = movies;
         this.setupMovieAutocomplete();
-        
+
         // Get rooms with basic data only
         this.roomService.getAllRoomsBasic().subscribe({
           next: (rooms) => {
             this.rooms = rooms;
-            
+
             if (this.isEditMode && this.screeningId) {
               this.loadScreeningData();
             } else {

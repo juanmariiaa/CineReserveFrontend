@@ -24,7 +24,7 @@ import { AuthService } from '../../../../core/services/auth.service';
     MatMenuModule,
   ],
   template: `
-    <mat-toolbar color="primary" class="admin-toolbar">
+    <mat-toolbar class="admin-toolbar">
       <button mat-icon-button class="menu-icon" (click)="toggleSidenav()">
         <mat-icon>menu</mat-icon>
       </button>
@@ -43,51 +43,70 @@ import { AuthService } from '../../../../core/services/auth.service';
         [opened]="sidenavOpen"
         class="admin-sidenav"
       >
-        <mat-nav-list>
-          <a
-            mat-list-item
-            routerLink="/admin/dashboard"
-            routerLinkActive="active"
-          >
-            <mat-icon>dashboard</mat-icon> Dashboard
+        <div class="nav-list">
+          <a class="nav-item" routerLink="/admin/dashboard" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>dashboard</mat-icon>
+            </div>
+            <span>Dashboard</span>
           </a>
-          <a mat-list-item routerLink="/admin/movies" routerLinkActive="active">
-            <mat-icon>movie</mat-icon> Movies
+          
+          <a class="nav-item" routerLink="/admin/movies" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>movie</mat-icon>
+            </div>
+            <span>Movies</span>
           </a>
-          <a
-            mat-list-item
-            routerLink="/admin/screenings"
-            routerLinkActive="active"
-          >
-            <mat-icon>theaters</mat-icon> Screenings
+          
+          <a class="nav-item" routerLink="/admin/screenings" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>theaters</mat-icon>
+            </div>
+            <span>Screenings</span>
           </a>
-          <a mat-list-item routerLink="/admin/rooms" routerLinkActive="active">
-            <mat-icon>weekend</mat-icon> Rooms
+          
+          <a class="nav-item" routerLink="/admin/rooms" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>weekend</mat-icon>
+            </div>
+            <span>Rooms</span>
           </a>
-          <a mat-list-item routerLink="/admin/users" routerLinkActive="active">
-            <mat-icon>people</mat-icon> Users
+          
+          <a class="nav-item" routerLink="/admin/users" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>people</mat-icon>
+            </div>
+            <span>Users</span>
           </a>
-          <a
-            mat-list-item
-            routerLink="/admin/reservations"
-            routerLinkActive="active"
-          >
-            <mat-icon>book_online</mat-icon> Reservations
+          
+          <a class="nav-item" routerLink="/admin/reservations" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>book_online</mat-icon>
+            </div>
+            <span>Reservations</span>
           </a>
-          <a
-            mat-list-item
-            routerLink="/admin/reports"
-            routerLinkActive="active"
-          >
-            <mat-icon>bar_chart</mat-icon> Reports
+          
+          <a class="nav-item" routerLink="/admin/reports" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>bar_chart</mat-icon>
+            </div>
+            <span>Reports</span>
           </a>
-          <a mat-list-item routerLink="/" class="return-link">
-            <mat-icon>home</mat-icon> Back to Site
+          
+          <div class="nav-divider"></div>
+          
+          <a class="nav-item return-link" routerLink="/">
+            <div class="nav-icon-container">
+              <mat-icon>home</mat-icon>
+            </div>
+            <span>Back to Site</span>
           </a>
-        </mat-nav-list>
+        </div>
       </mat-sidenav>
       <mat-sidenav-content [style.marginLeft.px]="sidenavOpen ? 200 : 0">
-        <ng-content></ng-content>
+        <div class="content-wrapper">
+          <ng-content></ng-content>
+        </div>
       </mat-sidenav-content>
     </mat-sidenav-container>
   `,
@@ -101,7 +120,7 @@ import { AuthService } from '../../../../core/services/auth.service';
         z-index: 100;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         height: 64px;
-        background-color: #121212;
+        background-color: #272727 !important;
         color: #ffffff;
       }
 
@@ -122,20 +141,11 @@ import { AuthService } from '../../../../core/services/auth.service';
         color: #ffffff;
       }
 
-      .user-btn {
-        margin-right: 8px;
-        color: #ffffff;
-      }
-
       .menu-icon {
         color: #ffffff;
       }
 
       .logout-btn {
-        color: #ffffff;
-      }
-
-      .logout-btn mat-icon {
         color: #ffffff;
       }
 
@@ -145,130 +155,95 @@ import { AuthService } from '../../../../core/services/auth.service';
         bottom: 0;
         left: 0;
         right: 0;
-        background-color: #181818;
+        background-color: #3c3b34;
+      }
+
+      .content-wrapper {
+        min-height: calc(100vh - 64px);
+        padding: 20px;
+        box-sizing: border-box;
       }
 
       .admin-sidenav {
         width: 200px;
-        background-color: #202020;
-        border-right: 1px solid #303030;
+        background-color: #272727;
+        border-right: none;
         color: #ffffff;
       }
 
-      .mat-nav-list a {
+      .nav-list {
+        padding: 16px 0;
+      }
+
+      .nav-item {
         display: flex;
         align-items: center;
         height: 48px;
+        padding: 0 16px;
+        margin: 4px 8px;
+        border-radius: 4px;
+        text-decoration: none;
         color: #ffffff;
-        border-bottom: 1px solid #252525;
+        transition: background-color 0.2s;
       }
 
-      .mat-nav-list a mat-icon {
-        margin-right: 16px;
+      .nav-icon-container {
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+      }
+
+      .nav-icon-container mat-icon {
         color: #ffffff;
       }
 
-      .mat-nav-list a.active {
-        background-color: #252525;
-        color: #00b020;
+      .nav-item:hover:not(.active) {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav-item.active {
+        background-color: #ff6b6b;
+        color: #ffffff;
         font-weight: 500;
-        border-left: 3px solid #00b020;
       }
 
-      .mat-nav-list a.active mat-icon {
-        color: #00b020;
+      .nav-item.active .nav-icon-container mat-icon {
+        color: #ffffff;
       }
 
-      .mat-nav-list a:hover {
-        background-color: #252525;
+      .nav-divider {
+        height: 1px;
+        background-color: #444444;
+        margin: 8px 16px;
       }
 
       .return-link {
-        margin-top: 16px;
-        border-top: 1px solid #303030;
-        color: #00b020 !important;
+        color: #ff6b6b !important;
       }
 
-      .return-link mat-icon {
-        color: #00b020 !important;
+      .return-link .nav-icon-container mat-icon {
+        color: #ff6b6b;
       }
 
       /* Angular Material overrides */
       ::ng-deep .mat-toolbar {
-        background-color: #121212 !important;
+        background-color: #272727 !important;
         color: #ffffff !important;
       }
 
       ::ng-deep .mat-drawer-container {
-        background-color: #181818 !important;
+        background-color: #3c3b34 !important;
         color: #ffffff !important;
       }
 
       ::ng-deep .mat-drawer {
-        background-color: #202020 !important;
+        background-color: #272727 !important;
         color: #ffffff !important;
       }
 
       ::ng-deep .mat-mdc-list-item {
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .mdc-list-item__primary-text {
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .mat-mdc-list-item-icon {
-        color: #ffffff !important;
-      }
-
-      /* Forzar color de texto en elementos del listado */
-      ::ng-deep .mat-mdc-list-item .mdc-list-item__primary-text {
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .mat-mdc-list-item .mat-icon {
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .mat-mdc-list-item.active .mdc-list-item__primary-text {
-        color: #00b020 !important;
-      }
-
-      ::ng-deep .mat-mdc-list-item.active .mat-icon {
-        color: #00b020 !important;
-      }
-
-      /* Asegurarse de que todos los textos sean blancos */
-      ::ng-deep .mat-mdc-button,
-      ::ng-deep .mat-mdc-raised-button,
-      ::ng-deep .mat-mdc-outlined-button,
-      ::ng-deep .mat-mdc-icon-button {
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .mat-mdc-menu-item {
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .mat-mdc-card-title,
-      ::ng-deep .mat-mdc-card-subtitle,
-      ::ng-deep .mat-mdc-card-content {
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .mat-mdc-paginator,
-      ::ng-deep .mat-mdc-paginator-page-size-label,
-      ::ng-deep .mat-mdc-paginator-range-label {
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .mat-mdc-table {
-        color: #ffffff !important;
-        background-color: #222222 !important;
-      }
-
-      ::ng-deep .mat-mdc-header-cell,
-      ::ng-deep .mat-mdc-cell {
         color: #ffffff !important;
       }
     `,

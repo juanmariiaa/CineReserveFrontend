@@ -19,7 +19,7 @@ import { FooterComponent } from './features/shared/footer/footer.component';
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      background-color: #181818;
+      background-color: #3c3b34;
       color: #FFFFFF;
     }
     
@@ -27,6 +27,7 @@ import { FooterComponent } from './features/shared/footer/footer.component';
       flex: 1;
       display: flex;
       flex-direction: column;
+      background-color: #3c3b34;
     }
   `]
 })

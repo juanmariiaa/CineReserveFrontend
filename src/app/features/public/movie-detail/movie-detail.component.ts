@@ -229,6 +229,8 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
         color: #ffffff;
         display: flex;
         flex-direction: column;
+        width: 100%;
+        overflow-x: hidden; /* Prevent horizontal scroll */
       }
 
       /* Loading & Not Found States */
@@ -314,7 +316,6 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
         overflow: hidden;
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
         border: 2px solid rgba(255, 255, 255, 0.1);
-        transform: translateY(20px);
       }
 
       .poster-container img {
@@ -358,7 +359,15 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
       ::ng-deep .mat-mdc-chip {
         background-color: transparent !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        color: rgba(255, 255, 255, 0.95) !important;
+        color: #ffffff !important;
+      }
+
+      ::ng-deep .mat-mdc-chip .mdc-evolution-chip__text-label {
+        color: #ffffff !important;
+      }
+
+      ::ng-deep .mat-mdc-chip-set .mat-mdc-chip .mdc-evolution-chip__text-label {
+        color: #ffffff !important;
       }
 
       ::ng-deep .mat-mdc-chip:hover {
@@ -382,7 +391,11 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
 
       /* Details Section */
       .details-section {
-        padding: 0 40px;
+        max-width: 1600px;
+        margin: 0 auto;
+        width: 95%;
+        box-sizing: border-box;
+        padding: 0 10px;
         margin-bottom: 40px;
       }
 
@@ -428,7 +441,11 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
 
       /* Screenings Section */
       .screenings-section {
-        padding: 0 40px;
+        max-width: 1600px;
+        margin: 0 auto;
+        width: 95%;
+        box-sizing: border-box;
+        padding: 0 10px;
         margin-bottom: 40px;
       }
 
@@ -578,9 +595,8 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
         }
 
         .details-section,
-        .screenings-section,
-        .back-button-container {
-          padding: 0 20px;
+        .screenings-section {
+          padding: 0 10px;
         }
 
         .movie-title {

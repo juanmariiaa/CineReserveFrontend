@@ -62,16 +62,16 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
             <span class="logo-text">CineReserve</span>
           </div>
           
-          <span class="spacer"></span>
-          
+      <span class="spacer"></span>
+
           <!-- Desktop Navigation Links - Now Centered -->
           <div class="desktop-nav">
             <button mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
               <mat-icon>home</mat-icon> Home
             </button>
             <button mat-button routerLink="/movies" routerLinkActive="active-link">
-              <mat-icon>movie</mat-icon> Browse Movies
-            </button>
+        <mat-icon>movie</mat-icon> Browse Movies
+      </button>
             <button mat-button *ngIf="isAdmin" routerLink="/admin/dashboard" routerLinkActive="active-link">
               <mat-icon>dashboard</mat-icon> Admin Dashboard
             </button>
@@ -81,43 +81,43 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
           
           <!-- Auth Actions -->
           <div class="auth-container">
-            <!-- Not logged in: show login dropdown -->
+      <!-- Not logged in: show login dropdown -->
             <div *ngIf="!isLoggedIn" class="auth-actions">
               <button mat-button [matMenuTriggerFor]="loginMenu" class="login-button">
                 <mat-icon>person</mat-icon> Login
-              </button>
-              <mat-menu #loginMenu="matMenu" class="login-menu">
-                <div class="login-form-container" (click)="$event.stopPropagation()">
-                  <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-                    <mat-form-field appearance="outline">
-                      <mat-label>Username</mat-label>
-                      <input matInput formControlName="username" />
+        </button>
+        <mat-menu #loginMenu="matMenu" class="login-menu">
+          <div class="login-form-container" (click)="$event.stopPropagation()">
+            <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+              <mat-form-field appearance="outline">
+                <mat-label>Username</mat-label>
+                <input matInput formControlName="username" />
                       <mat-error *ngIf="loginForm.get('username')?.hasError('required')">Required</mat-error>
-                    </mat-form-field>
+              </mat-form-field>
 
-                    <mat-form-field appearance="outline">
-                      <mat-label>Password</mat-label>
-                      <input matInput type="password" formControlName="password" />
+              <mat-form-field appearance="outline">
+                <mat-label>Password</mat-label>
+                <input matInput type="password" formControlName="password" />
                       <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Required</mat-error>
-                    </mat-form-field>
+              </mat-form-field>
 
-                    <div class="login-actions">
+              <div class="login-actions">
                       <button mat-raised-button color="accent" type="submit" [disabled]="loginForm.invalid">
-                        Login
-                      </button>
-                    </div>
-                  </form>
-                  <div class="register-link">
+                  Login
+                </button>
+              </div>
+            </form>
+            <div class="register-link">
                     <a mat-button routerLink="/register">Don't have an account? Register</a>
-                  </div>
-                </div>
-              </mat-menu>
-              <button mat-raised-button color="accent" routerLink="/register" class="register-button">
-                Register
-              </button>
             </div>
+          </div>
+        </mat-menu>
+              <button mat-raised-button color="accent" routerLink="/register" class="register-button">
+          Register
+        </button>
+      </div>
 
-            <!-- Logged in: show username with dropdown -->
+      <!-- Logged in: show username with dropdown -->
             <div *ngIf="isLoggedIn" class="user-profile">
               <div class="user-button" [matMenuTriggerFor]="userMenu">
                 <span class="avatar-circle">{{ username.charAt(0) }}</span>
@@ -125,21 +125,21 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
                 <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
               </div>
               <mat-menu #userMenu="matMenu" class="user-menu">
-                <button mat-menu-item routerLink="/my-reservations">
-                  <mat-icon>confirmation_number</mat-icon> My Reservations
-                </button>
+          <button mat-menu-item routerLink="/my-reservations">
+            <mat-icon>confirmation_number</mat-icon> My Reservations
+          </button>
                 <button mat-menu-item *ngIf="isAdmin" routerLink="/admin/dashboard">
                   <mat-icon>dashboard</mat-icon> Admin Dashboard
                 </button>
-                <mat-divider></mat-divider>
-                <button mat-menu-item (click)="logout()">
-                  <mat-icon>exit_to_app</mat-icon> Sign Out
-                </button>
-              </mat-menu>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>exit_to_app</mat-icon> Sign Out
+          </button>
+        </mat-menu>
             </div>
           </div>
-        </div>
-      </mat-toolbar>
+      </div>
+    </mat-toolbar>
       
       <!-- Mobile Navigation -->
       <div class="mobile-nav-backdrop" *ngIf="mobileNavOpen" (click)="closeMobileNav()" @fadeInOut></div>
@@ -283,7 +283,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
       .desktop-nav button:hover {
         background-color: rgba(255, 255, 255, 0.1);
       }
-      
+
       /* Auth Container */
       .auth-container {
         min-width: 150px;
@@ -303,7 +303,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
       .spacer {
         flex: 1 1 auto;
       }
-      
+
       /* Auth Actions */
       .auth-actions {
         display: flex;
@@ -408,7 +408,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
         color: #ffffff;
         border-radius: 12px;
       }
-      
+
       .login-form-container mat-form-field {
         width: 100%;
         margin-bottom: 16px;
@@ -422,7 +422,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
       ::ng-deep .login-form-container .mat-mdc-form-field-focus-overlay {
         background-color: rgba(255, 255, 255, 0.04);
       }
-      
+
       .login-actions {
         display: flex;
         justify-content: center;
@@ -437,41 +437,41 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
         border-radius: 8px;
         font-weight: 500;
       }
-      
+
       .register-link {
         margin-top: 16px;
         text-align: center;
       }
-      
+
       .register-link a {
         color: #ff6b6b;
       }
-      
+
       /* Menu Styling */
       ::ng-deep .mat-mdc-menu-panel.login-menu {
         max-width: none !important;
       }
-      
+
       ::ng-deep .mat-mdc-menu-panel {
         background-color: #35342e !important;
         border-radius: 12px !important;
         overflow: hidden;
         padding: 0 !important;
       }
-      
+
       ::ng-deep .mat-mdc-menu-item {
         color: #ffffff !important;
         font-weight: 500;
       }
-      
+
       ::ng-deep .mat-mdc-menu-item mat-icon {
         color: #ff6b6b !important;
       }
-      
+
       ::ng-deep .mat-mdc-menu-item:hover:not([disabled]) {
         background-color: rgba(255, 107, 107, 0.1) !important;
       }
-      
+
       /* Mobile Menu Button */
       .menu-button {
         display: none;

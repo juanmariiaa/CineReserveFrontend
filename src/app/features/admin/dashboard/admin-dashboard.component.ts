@@ -10,133 +10,160 @@ import { RouterLink } from '@angular/router';
   imports: [CommonModule, MatCardModule, MatIconModule, RouterLink],
   template: `
     <div class="admin-dashboard-container">
-      <h1>Administration Panel</h1>
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">Administration Panel</h1>
+      </div>
 
       <div class="admin-dashboard-cards">
-        <mat-card routerLink="/admin/movies" class="admin-dashboard-card">
-          <mat-card-content>
-            <mat-icon class="card-icon">movie</mat-icon>
+        <div class="dashboard-card" routerLink="/admin/movies">
+          <div class="card-icon-container">
+            <mat-icon>movie</mat-icon>
+          </div>
+          <div class="card-content">
             <h2>Movies</h2>
             <p>Manage movie catalog</p>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
 
-        <mat-card routerLink="/admin/rooms" class="admin-dashboard-card">
-          <mat-card-content>
-            <mat-icon class="card-icon">weekend</mat-icon>
+        <div class="dashboard-card" routerLink="/admin/rooms">
+          <div class="card-icon-container">
+            <mat-icon>weekend</mat-icon>
+          </div>
+          <div class="card-content">
             <h2>Rooms</h2>
             <p>Configure cinema rooms</p>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
 
-        <mat-card routerLink="/admin/screenings" class="admin-dashboard-card">
-          <mat-card-content>
-            <mat-icon class="card-icon">event</mat-icon>
+        <div class="dashboard-card" routerLink="/admin/screenings">
+          <div class="card-icon-container">
+            <mat-icon>event</mat-icon>
+          </div>
+          <div class="card-content">
             <h2>Screenings</h2>
             <p>Schedule movie screenings</p>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
 
-        <mat-card routerLink="/admin/reservations" class="admin-dashboard-card">
-          <mat-card-content>
-            <mat-icon class="card-icon">book</mat-icon>
+        <div class="dashboard-card" routerLink="/admin/reservations">
+          <div class="card-icon-container">
+            <mat-icon>book</mat-icon>
+          </div>
+          <div class="card-content">
             <h2>Reservations</h2>
             <p>Manage customer reservations</p>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
 
-        <mat-card routerLink="/admin/users" class="admin-dashboard-card">
-          <mat-card-content>
-            <mat-icon class="card-icon">people</mat-icon>
+        <div class="dashboard-card" routerLink="/admin/users">
+          <div class="card-icon-container">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="card-content">
             <h2>Users</h2>
             <p>Manage user accounts</p>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
       </div>
     </div>
   `,
   styles: [
     `
       .admin-dashboard-container {
-        padding: 20px;
-        background-color: #181818;
-        color: #ffffff;
-        min-height: 100vh;
         width: 100%;
+        color: #ffffff;
       }
 
-      h1 {
+      .dashboard-title-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .dashboard-title-marker {
+        width: 5px;
+        height: 30px;
+        background-color: #ff6b6b;
+        margin-right: 10px;
+      }
+
+      .dashboard-title {
         color: #ffffff;
-        margin-bottom: 20px;
+        font-size: 24px;
+        font-weight: 500;
+        margin: 0;
       }
 
       .admin-dashboard-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 25px;
       }
 
-      .admin-dashboard-card {
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        height: 100%;
-        background-color: #2c2c2c;
-        border: 1px solid #3a3a3a;
-        border-left: 4px solid #00b020;
-      }
-
-      .admin-dashboard-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
-        border-color: rgba(0, 176, 32, 0.6);
-      }
-
-      .card-icon {
-        font-size: 48px;
-        height: 48px;
-        width: 48px;
-        margin-bottom: 16px;
-        color: #00b020;
-      }
-
-      mat-card-content {
+      .dashboard-card {
         display: flex;
         flex-direction: column;
+        cursor: pointer;
+        transition: transform 0.2s;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .dashboard-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .card-icon-container {
+        background-color: #ff6b6b;
+        height: 120px;
+        display: flex;
+        justify-content: center;
         align-items: center;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+      }
+
+      .card-icon-container mat-icon {
+        font-size: 40px;
+        height: 40px;
+        width: 40px;
+        color: white;
+      }
+
+      .card-content {
+        padding: 20px;
         text-align: center;
-        padding: 24px;
+        background-color: #333333;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
       }
 
       h2 {
-        margin: 0 0 8px;
-        font-size: 24px;
+        margin: 0 0 8px 0;
+        font-size: 18px;
+        font-weight: 500;
         color: #ffffff;
       }
 
       p {
         margin: 0;
-        color: #ffffff;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
       }
 
-      /* Angular Material overrides */
-      ::ng-deep .mat-mdc-card {
-        background-color: #2c2c2c !important;
-        color: #ffffff !important;
-        border: 1px solid #3a3a3a !important;
+      @media (max-width: 768px) {
+        .admin-dashboard-cards {
+          grid-template-columns: repeat(2, 1fr);
+        }
       }
 
-      ::ng-deep .mat-mdc-card-content {
-        color: #ffffff !important;
-      }
-
-      /* Asegurar que todos los elementos del dashboard usen el tema oscuro */
-      ::ng-deep .admin-dashboard-container * {
-        color: #ffffff;
-      }
-
-      ::ng-deep .mat-mdc-button-touch-target {
-        background-color: transparent !important;
+      @media (max-width: 480px) {
+        .admin-dashboard-cards {
+          grid-template-columns: 1fr;
+        }
       }
     `,
   ],
