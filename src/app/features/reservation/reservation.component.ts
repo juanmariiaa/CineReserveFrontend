@@ -19,7 +19,8 @@ import {
 import { ScreeningService } from '../../core/services/screening.service';
 import { ReservationService } from '../../core/services/reservation.service';
 import { AuthService } from '../../core/services/auth.service';
-import { Screening, Seat } from '../../core/models/screening.model';
+import { Screening, ScreeningBasicDTO, Seat } from '../../core/models/screening.model';
+import { Room } from '../../core/models/room.model';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatInputModule } from '@angular/material/input';
@@ -743,22 +744,43 @@ export class ReservationComponent implements OnInit {
   }
 
   loadScreeningData(): void {
-    if (!this.screeningId) return;
-
     this.loading = true;
-    this.screeningService.getScreeningById(this.screeningId).subscribe({
-      next: (screening) => {
-        this.screening = screening;
-        this.loadSeats();
-      },
-      error: (error) => {
-        console.error('Error loading screening:', error);
-        this.snackBar.open('Could not load screening details.', 'Close', {
-          duration: 5000,
-        });
-        this.loading = false;
-      },
-    });
+    if (this.screeningId) {
+      this.screeningService.getScreeningBasicById(this.screeningId).subscribe({
+        next: (data) => {
+          this.screening = {
+            id: data.id,
+            movieId: data.movieId,
+            roomId: data.roomId,
+            startTime: data.startTime,
+            endTime: data.endTime,
+            ticketPrice: data.ticketPrice,
+            is3D: data.is3D,
+            hasSubtitles: data.hasSubtitles,
+            language: data.language,
+            format: data.format
+          };
+          
+          // Create a simple room object with only the needed fields for the reservation view
+          // Using type assertion to avoid type errors with the full Room interface
+          this.screening.room = {
+            id: data.roomId,
+            number: data.roomNumber,
+            capacity: data.capacity
+          } as any;
+          
+          // Load seats after screening data is loaded
+          this.loadSeats();
+        },
+        error: (error) => {
+          console.error('Error loading screening:', error);
+          this.snackBar.open('Error loading screening details. Please try again.', 'Close', {
+            duration: 5000
+          });
+          this.loading = false;
+        }
+      });
+    }
   }
 
   loadSeats(): void {

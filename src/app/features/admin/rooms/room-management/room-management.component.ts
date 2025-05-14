@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { RoomService } from '../../../../core/services/room.service';
-import { Room } from '../../../../core/models/screening.model';
+import { Room, RoomBasicDTO } from '../../../../core/models/room.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -242,15 +242,16 @@ export class RoomManagementComponent implements OnInit {
 
   loadRooms(): void {
     this.loading = true;
-    this.roomService.getAllRooms().subscribe({
+    this.roomService.getAllRoomsBasic().subscribe({
       next: (data) => {
         this.rooms = data;
         this.dataSource = this.rooms;
         this.loading = false;
       },
       error: (error) => {
-        this.snackBar.open('Error loading rooms: ' + error.message, 'Close', {
-          duration: 5000
+        console.error('Error fetching rooms:', error);
+        this.snackBar.open('Failed to load rooms. Please try again.', 'Close', {
+          duration: 3000
         });
         this.loading = false;
       }

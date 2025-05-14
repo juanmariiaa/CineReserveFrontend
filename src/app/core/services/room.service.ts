@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Room } from '../models/screening.model';
+import { Room, RoomBasicDTO } from '../models/room.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -14,8 +14,16 @@ export class RoomService {
     return this.http.get<Room[]>(`${environment.apiUrl}/rooms`);
   }
 
+  getAllRoomsBasic(): Observable<RoomBasicDTO[]> {
+    return this.http.get<RoomBasicDTO[]>(`${environment.apiUrl}/rooms/basic`);
+  }
+
   getRoomById(id: number): Observable<Room> {
     return this.http.get<Room>(`${environment.apiUrl}/rooms/${id}`);
+  }
+
+  getRoomBasicById(id: number): Observable<RoomBasicDTO> {
+    return this.http.get<RoomBasicDTO>(`${environment.apiUrl}/rooms/basic/${id}`);
   }
 
   getRoomByNumber(number: number): Observable<Room> {

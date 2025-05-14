@@ -6,7 +6,8 @@ import { ScreeningService } from '../../../../core/services/screening.service';
 import { MovieService } from '../../../../core/services/movie.service';
 import { RoomService } from '../../../../core/services/room.service';
 import { Movie } from '../../../../core/models/movie.model';
-import { Room, Screening } from '../../../../core/models/screening.model';
+import { Screening } from '../../../../core/models/screening.model';
+import { Room, RoomBasicDTO } from '../../../../core/models/room.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -356,7 +357,7 @@ import { Observable, map, startWith } from 'rxjs';
 export class ScreeningCreateComponent implements OnInit {
   screeningForm: FormGroup;
   movies: Movie[] = [];
-  rooms: Room[] = [];
+  rooms: RoomBasicDTO[] = [];
   loading = true;
   saving = false;
   minDate = new Date();
@@ -405,19 +406,18 @@ export class ScreeningCreateComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
-
-    // Load movies
+    
+    // Get movies for autocomplete
     this.movieService.getAllMovies().subscribe({
       next: (movies) => {
         this.movies = movies;
         this.setupMovieAutocomplete();
-
-        // Load rooms
-        this.roomService.getAllRooms().subscribe({
+        
+        // Get rooms with basic data only
+        this.roomService.getAllRoomsBasic().subscribe({
           next: (rooms) => {
             this.rooms = rooms;
-
-            // If in edit mode, load the screening data
+            
             if (this.isEditMode && this.screeningId) {
               this.loadScreeningData();
             } else {
@@ -425,17 +425,15 @@ export class ScreeningCreateComponent implements OnInit {
             }
           },
           error: (error) => {
-            this.snackBar.open('Error loading rooms: ' + error.message, 'Close', {
-              duration: 5000
-            });
+            console.error('Error loading rooms:', error);
+            this.snackBar.open('Failed to load rooms. Please try again.', 'Close', { duration: 3000 });
             this.loading = false;
           }
         });
       },
       error: (error) => {
-        this.snackBar.open('Error loading movies: ' + error.message, 'Close', {
-          duration: 5000
-        });
+        console.error('Error loading movies:', error);
+        this.snackBar.open('Failed to load movies. Please try again.', 'Close', { duration: 3000 });
         this.loading = false;
       }
     });

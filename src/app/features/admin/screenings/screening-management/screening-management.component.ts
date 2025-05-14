@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ScreeningService } from '../../../../core/services/screening.service';
-import { Screening } from '../../../../core/models/screening.model';
+import { Screening, ScreeningBasicDTO } from '../../../../core/models/screening.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -73,7 +73,7 @@ import { MatChipsModule } from '@angular/material/chips';
               <input
                 matInput
                 (keyup)="applyFilter($event)"
-                placeholder="Movie, room, date..."
+                placeholder="Movie, room, date, etc."
                 #input
               />
               <mat-icon matSuffix>search</mat-icon>
@@ -101,18 +101,7 @@ import { MatChipsModule } from '@angular/material/chips';
                   </th>
                   <td mat-cell *matCellDef="let screening">
                     <div class="movie-info">
-                      <img
-                        *ngIf="screening.movie?.posterUrl"
-                        [src]="screening.movie?.posterUrl"
-                        class="movie-poster"
-                      />
-                      <div
-                        *ngIf="!screening.movie?.posterUrl"
-                        class="no-poster"
-                      >
-                        <mat-icon>movie</mat-icon>
-                      </div>
-                      <span>{{ screening.movie?.title || 'Unknown' }}</span>
+                      <span>{{ screening.movieTitle }}</span>
                     </div>
                   </td>
                 </ng-container>
@@ -123,7 +112,8 @@ import { MatChipsModule } from '@angular/material/chips';
                     Room
                   </th>
                   <td mat-cell *matCellDef="let screening">
-                    {{ screening.room?.number }}
+                    Room {{ screening.roomNumber }}
+                    <span class="seats-info">({{ screening.availableSeats }}/{{ screening.capacity }} seats)</span>
                   </td>
                 </ng-container>
 
@@ -133,7 +123,7 @@ import { MatChipsModule } from '@angular/material/chips';
                     Date
                   </th>
                   <td mat-cell *matCellDef="let screening">
-                    {{ screening.startTime | date : 'dd/MM/yyyy' }}
+                    {{ screening.startTime | date : 'MMM d, y' }}
                   </td>
                 </ng-container>
 
@@ -143,7 +133,11 @@ import { MatChipsModule } from '@angular/material/chips';
                     Time
                   </th>
                   <td mat-cell *matCellDef="let screening">
-                    {{ screening.startTime | date : 'HH:mm' }}
+                    {{ screening.startTime | date : 'h:mm a' }}
+                    <div class="screening-badges">
+                      <span *ngIf="screening.is3D" class="badge badge-3d">3D</span>
+                      <span *ngIf="screening.hasSubtitles" class="badge badge-sub">SUB</span>
+                    </div>
                   </td>
                 </ng-container>
 
@@ -153,10 +147,7 @@ import { MatChipsModule } from '@angular/material/chips';
                     Price
                   </th>
                   <td mat-cell *matCellDef="let screening">
-                    {{
-                      screening.ticketPrice
-                        | currency : 'EUR' : 'symbol' : '1.2-2'
-                    }}
+                    €{{ screening.ticketPrice }}
                   </td>
                 </ng-container>
 
@@ -324,10 +315,10 @@ import { MatChipsModule } from '@angular/material/chips';
   ],
 })
 export class ScreeningManagementComponent implements OnInit, AfterViewInit {
-  screenings: Screening[] = [];
+  screenings: ScreeningBasicDTO[] = [];
   loading = true;
   displayedColumns: string[] = ['id', 'movie', 'room', 'date', 'time', 'price', 'actions'];
-  dataSource = new MatTableDataSource<Screening>([]);
+  dataSource = new MatTableDataSource<ScreeningBasicDTO>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -350,37 +341,9 @@ export class ScreeningManagementComponent implements OnInit, AfterViewInit {
 
   loadScreenings(): void {
     this.loading = true;
-    this.screeningService.getAllScreenings().subscribe({
+    this.screeningService.getAllScreeningsBasic().subscribe({
       next: (screenings) => {
-        // Process screenings to ensure room data is complete (silently fix issues)
-        this.screenings = screenings.map(screening => {
-          // Handle case where room is a number instead of an object
-          if (screening.room !== null && typeof screening.room === 'number') {
-            // Create a proper room object without warning
-            const roomNumber = screening.room;
-            screening.room = { 
-              id: roomNumber, 
-              number: roomNumber, 
-              capacity: 0 
-            };
-          }
-          // Add fallback for missing room data
-          else if (!screening.room) {
-            screening.room = { number: 0, capacity: 0 }; // Default placeholder
-          } 
-          // If room exists but number is missing
-          else if (screening.room && !screening.room.number) {
-            screening.room.number = screening.roomId || 0; // Use roomId as fallback
-          }
-          
-          // Add fallback for missing movie data
-          if (!screening.movie) {
-            screening.movie = { title: 'Unknown Movie', posterUrl: '', tmdbId: 0 };
-          }
-          
-          return screening;
-        });
-        
+        this.screenings = screenings;
         this.dataSource.data = this.screenings;
         this.loading = false;
       },
@@ -403,16 +366,16 @@ export class ScreeningManagementComponent implements OnInit, AfterViewInit {
     }
   }
 
-  confirmDelete(screening: Screening): void {
-    const movieTitle = screening.movie?.title || 'Unknown';
-    const roomNumber = screening.room?.number;
+  confirmDelete(screening: ScreeningBasicDTO): void {
+    const movieTitle = screening.movieTitle || 'Unknown';
+    const roomNumber = screening.roomNumber;
     const screeningDate = new Date(screening.startTime).toLocaleDateString();
     const screeningTime = new Date(screening.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     
     const message = `Are you sure you want to delete screening for "${movieTitle}" in Room ${roomNumber} on ${screeningDate} at ${screeningTime}?`;
     
     if (confirm(message)) {
-      this.deleteScreening(screening.id!);
+      this.deleteScreening(screening.id);
     }
   }
 
