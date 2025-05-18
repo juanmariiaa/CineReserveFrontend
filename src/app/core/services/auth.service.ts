@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { JwtResponse, LoginRequest, SignupRequest } from '../models/auth.model';
+import { GoogleTokenRequest, JwtResponse, LoginRequest, SignupRequest } from '../models/auth.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -26,6 +26,18 @@ export class AuthService {
 
   login(credentials: LoginRequest): Observable<JwtResponse> {
     return this.http.post<JwtResponse>(`${environment.apiUrl}/auth/signin`, credentials)
+      .pipe(
+        tap(response => {
+          localStorage.setItem(this.TOKEN_KEY, response.token);
+          localStorage.setItem(this.USER_KEY, JSON.stringify(response));
+          this.currentUserSubject.next(response);
+        })
+      );
+  }
+  
+  loginWithGoogle(token: string): Observable<JwtResponse> {
+    const tokenRequest: GoogleTokenRequest = { token };
+    return this.http.post<JwtResponse>(`${environment.apiUrl}/auth/google`, tokenRequest)
       .pipe(
         tap(response => {
           localStorage.setItem(this.TOKEN_KEY, response.token);

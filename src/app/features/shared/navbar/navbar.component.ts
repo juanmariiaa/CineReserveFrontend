@@ -1,20 +1,22 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { AuthService } from '../../../core/services/auth.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SocialAuthService, GoogleLoginProvider } from '@abacritt/angularx-social-login';
+import { Subscription } from 'rxjs';
+
+// Import modal components
+import { LoginModalComponent } from '../../auth/login-modal/login-modal.component';
+import { RegisterModalComponent } from '../../auth/register-modal/register-modal.component';
 
 @Component({
   selector: 'app-navbar',
@@ -27,14 +29,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     MatToolbarModule,
     MatMenuModule,
     MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatSnackBarModule,
     MatDividerModule,
     MatSidenavModule,
-    MatListModule
+    MatListModule,
+    LoginModalComponent,
+    RegisterModalComponent
   ],
   animations: [
     trigger('fadeInOut', [
@@ -79,45 +78,34 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
           
           <span class="spacer"></span>
           
-          <!-- Auth Actions -->
+                    <!-- Auth Actions -->
           <div class="auth-container">
-      <!-- Not logged in: show login dropdown -->
+            <!-- Not logged in: show login and register buttons -->
             <div *ngIf="!isLoggedIn" class="auth-actions">
-              <button mat-button [matMenuTriggerFor]="loginMenu" class="login-button">
+              <button mat-button (click)="openLoginModal()" class="login-button">
                 <mat-icon>person</mat-icon> Login
-        </button>
-        <mat-menu #loginMenu="matMenu" class="login-menu">
-          <div class="login-form-container" (click)="$event.stopPropagation()">
-            <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-              <mat-form-field appearance="outline">
-                <mat-label>Username</mat-label>
-                <input matInput formControlName="username" />
-                      <mat-error *ngIf="loginForm.get('username')?.hasError('required')">Required</mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Password</mat-label>
-                <input matInput type="password" formControlName="password" />
-                      <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Required</mat-error>
-              </mat-form-field>
-
-              <div class="login-actions">
-                      <button mat-raised-button color="accent" type="submit" [disabled]="loginForm.invalid">
-                  Login
-                </button>
-              </div>
-            </form>
-            <div class="register-link">
-                    <a mat-button routerLink="/register">Don't have an account? Register</a>
+              </button>
+              <button mat-raised-button color="accent" (click)="openRegisterModal()" class="register-button">
+                Register
+              </button>
             </div>
-          </div>
-        </mat-menu>
-              <button mat-raised-button color="accent" routerLink="/register" class="register-button">
-          Register
-        </button>
-      </div>
 
-      <!-- Logged in: show username with dropdown -->
+            <!-- Auth modals -->
+            <app-login-modal 
+              [isOpen]="isLoginModalOpen" 
+              (close)="closeLoginModal()" 
+              (switchToRegister)="switchToRegister()"
+              (loginSuccess)="onAuthSuccess()">
+            </app-login-modal>
+
+            <app-register-modal 
+              [isOpen]="isRegisterModalOpen" 
+              (close)="closeRegisterModal()" 
+              (switchToLogin)="switchToLogin()"
+              (registerSuccess)="onRegisterSuccess()">
+            </app-register-modal>
+
+            <!-- Logged in: show username with dropdown -->
             <div *ngIf="isLoggedIn" class="user-profile">
               <div class="user-button" [matMenuTriggerFor]="userMenu">
                 <span class="avatar-circle">{{ username.charAt(0) }}</span>
@@ -125,21 +113,21 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
                 <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
               </div>
               <mat-menu #userMenu="matMenu" class="user-menu">
-          <button mat-menu-item routerLink="/my-reservations">
-            <mat-icon>confirmation_number</mat-icon> My Reservations
-          </button>
+                <button mat-menu-item routerLink="/my-reservations">
+                  <mat-icon>confirmation_number</mat-icon> My Reservations
+                </button>
                 <button mat-menu-item *ngIf="isAdmin" routerLink="/admin/dashboard">
                   <mat-icon>dashboard</mat-icon> Admin Dashboard
                 </button>
-          <mat-divider></mat-divider>
-          <button mat-menu-item (click)="logout()">
-            <mat-icon>exit_to_app</mat-icon> Sign Out
-          </button>
-        </mat-menu>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="logout()">
+                  <mat-icon>exit_to_app</mat-icon> Sign Out
+                </button>
+              </mat-menu>
             </div>
           </div>
-      </div>
-    </mat-toolbar>
+        </div>
+      </mat-toolbar>
       
       <!-- Mobile Navigation -->
       <div class="mobile-nav-backdrop" *ngIf="mobileNavOpen" (click)="closeMobileNav()" @fadeInOut></div>
@@ -186,10 +174,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
           
           <div class="mobile-nav-footer">
             <ng-container *ngIf="!isLoggedIn">
-              <button mat-raised-button color="accent" routerLink="/register" (click)="closeMobileNav()" class="mobile-register-btn">
+              <button mat-raised-button color="accent" (click)="openRegisterModal()" class="mobile-register-btn">
                 <mat-icon>person_add</mat-icon> Register
               </button>
-              <button mat-raised-button routerLink="/login" (click)="closeMobileNav()" class="mobile-login-btn">
+              <button mat-raised-button (click)="openLoginModal()" class="mobile-login-btn">
                 <mat-icon>login</mat-icon> Login
               </button>
             </ng-container>
@@ -400,58 +388,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
         font-size: 14px;
       }
       
-      /* Login Form */
-      .login-form-container {
-        padding: 24px;
-        min-width: 300px;
-        background-color: #35342e;
-        color: #ffffff;
-        border-radius: 12px;
-      }
-
-      .login-form-container mat-form-field {
-        width: 100%;
-        margin-bottom: 16px;
-        color: #ffffff;
-      }
-      
-      ::ng-deep .login-form-container .mat-mdc-text-field-wrapper {
-        background-color: rgba(255, 255, 255, 0.08);
-      }
-      
-      ::ng-deep .login-form-container .mat-mdc-form-field-focus-overlay {
-        background-color: rgba(255, 255, 255, 0.04);
-      }
-
-      .login-actions {
-        display: flex;
-        justify-content: center;
-        margin-top: 16px;
-      }
-      
-      .login-actions button {
-        width: 100%;
-        background-color: #ff6b6b !important;
-        color: white !important;
-        height: 44px;
-        border-radius: 8px;
-        font-weight: 500;
-      }
-
-      .register-link {
-        margin-top: 16px;
-        text-align: center;
-      }
-
-      .register-link a {
-        color: #ff6b6b;
-      }
-
       /* Menu Styling */
-      ::ng-deep .mat-mdc-menu-panel.login-menu {
-        max-width: none !important;
-      }
-
       ::ng-deep .mat-mdc-menu-panel {
         background-color: #35342e !important;
         border-radius: 12px !important;
@@ -623,16 +560,23 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
           padding: 0 12px;
         }
       }
+
+
     `,
   ],
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   isAdmin = false;
   username = '';
-  loginForm: FormGroup;
   mobileNavOpen = false;
   isMobile = false;
+  
+  // Modal states
+  isLoginModalOpen = false;
+  isRegisterModalOpen = false;
+  
+  private authStatusSub?: Subscription;
 
   @HostListener('window:resize', ['$event'])
   onResize() {
@@ -642,95 +586,129 @@ export class NavbarComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private socialAuthService: SocialAuthService
   ) {
-    this.loginForm = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required],
-    });
+    this.checkScreenSize();
   }
 
   ngOnInit(): void {
     this.updateAuthStatus();
-    this.checkScreenSize();
+  }
 
-    // Subscribe to auth changes
-    this.authService.currentUser$.subscribe((user) => {
-      this.updateAuthStatus();
-    });
+  ngOnDestroy(): void {
+    if (this.authStatusSub) {
+      this.authStatusSub.unsubscribe();
+    }
   }
 
   private checkScreenSize(): void {
     this.isMobile = window.innerWidth < 960;
-    if (!this.isMobile) {
-      this.closeMobileNav();
+    if (!this.isMobile && this.mobileNavOpen) {
+      this.mobileNavOpen = false;
     }
   }
 
   private updateAuthStatus(): void {
-    const previousStatus = this.isLoggedIn;
     this.isLoggedIn = this.authService.isLoggedIn();
-    this.isAdmin = this.authService.isAdmin();
-
-    // Get username from stored user data
-    const userData = this.authService.getUserData();
-    this.username = userData?.username || '';
-
-    // If the login status has changed, dispatch a custom event
-    if (previousStatus !== this.isLoggedIn) {
-      const event = new CustomEvent('loginStatusChange', {
-        detail: {
-          isLoggedIn: this.isLoggedIn,
-          isAdmin: this.isAdmin,
-        },
-        bubbles: true,
-      });
-      document.dispatchEvent(event);
+    if (this.isLoggedIn) {
+      const user = this.authService.getUserData();
+      if (user) {
+        this.username = user.username;
+        this.isAdmin = user.roles.includes('ROLE_ADMIN');
+      }
     }
   }
-
+  
+  // Modal control methods
+  openLoginModal(): void {
+    this.isLoginModalOpen = true;
+    // Close mobile nav if open
+    if (this.mobileNavOpen) {
+      this.closeMobileNav();
+    }
+  }
+  
+  closeLoginModal(): void {
+    this.isLoginModalOpen = false;
+  }
+  
+  openRegisterModal(): void {
+    this.isRegisterModalOpen = true;
+    // Close mobile nav if open
+    if (this.mobileNavOpen) {
+      this.closeMobileNav();
+    }
+  }
+  
+  closeRegisterModal(): void {
+    this.isRegisterModalOpen = false;
+  }
+  
+  switchToRegister(): void {
+    this.closeLoginModal();
+    this.openRegisterModal();
+  }
+  
+  switchToLogin(): void {
+    this.closeRegisterModal();
+    this.openLoginModal();
+  }
+  
+  onAuthSuccess(): void {
+    this.updateAuthStatus();
+  }
+  
+  onRegisterSuccess(): void {
+    // Handle registration success
+    this.snackBar.open('Registration successful! Please login.', 'Close', { duration: 3000 });
+  }
+  
   toggleMobileNav(): void {
     this.mobileNavOpen = !this.mobileNavOpen;
     if (this.mobileNavOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'; // Prevent scrolling when mobile nav is open
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = ''; // Restore scrolling
     }
   }
-
+  
   closeMobileNav(): void {
     this.mobileNavOpen = false;
     document.body.style.overflow = '';
   }
-
-  onLogin(): void {
-    if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.value;
-      this.authService.login({ username, password }).subscribe({
-        next: () => {
-          this.updateAuthStatus();
-          // Redirect based on user role
-          if (this.isAdmin) {
-            this.router.navigate(['/admin/dashboard']);
-          }
-          // For regular users, stay on the current page with updated UI
-        },
-        error: (error) => {
-          let errorMsg = 'Invalid credentials';
-          if (error.error && error.error.message) {
-            errorMsg = error.error.message;
-          }
-          this.snackBar.open(errorMsg, 'Close', {
-            duration: 5000,
-          });
-        },
-      });
-    }
-  }
-
+  
   logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/']);
+    // Sign out from Google when logging out
+    this.socialAuthService.signOut(true).then(() => {
+      // Explicitly revoke access to force account selection next time
+      (window as any).google?.accounts.id.disableAutoSelect();
+    }).catch(error => {
+      console.error('Error signing out from Google:', error);
+    }).finally(() => {
+      // Continue with normal logout process regardless of Google sign-out result
+      this.authService.logout();
+      this.isLoggedIn = false;
+      this.isAdmin = false;
+      this.username = '';
+      
+      // Clear any stored Google tokens in browser storage
+      localStorage.removeItem('googleToken');
+      sessionStorage.removeItem('googleToken');
+      
+      // Clear all Google cookies
+      this.clearGoogleCookies();
+      
+      this.router.navigate(['/']);
+      this.snackBar.open('You have been logged out', 'Close', { duration: 3000 });
+    });
+  }
+  
+  // Helper method to clear Google cookies
+  private clearGoogleCookies() {
+    const googleCookies = ['g_state', 'gapi-auth', 'g_csrf_token'];
+    googleCookies.forEach(cookieName => {
+      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    });
   }
 }

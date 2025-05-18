@@ -20,3 +20,7 @@ export interface LoginRequest {
     phoneNumber?: string;
     roles?: string[];
   }
+
+  export interface GoogleTokenRequest {
+    token: string;
+  }

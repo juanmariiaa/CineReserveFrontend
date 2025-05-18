@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -8,6 +8,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
+import { SocialAuthService, GoogleSigninButtonModule, SocialUser, GoogleLoginProvider } from '@abacritt/angularx-social-login';
+import { Subscription } from 'rxjs';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +23,8 @@ import { CommonModule } from '@angular/common';
     MatInputModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatDividerModule,
+    GoogleSigninButtonModule,
     RouterLink
   ],
   template: `
@@ -46,9 +51,21 @@ import { CommonModule } from '@angular/common';
               <button type="button" mat-button routerLink="/register">Don't have an account? Register</button>
               <button type="submit" mat-raised-button color="accent" [disabled]="loginForm.invalid">
                 Login
-            </button>
+              </button>
             </div>
           </form>
+          
+          <mat-divider class="divider"></mat-divider>
+          
+          <div class="social-login">
+            <p class="social-login-text">Or sign in with:</p>
+            <div class="google-btn-container">
+              <asl-google-signin-button type="standard" size="large"></asl-google-signin-button>
+              <button mat-raised-button color="primary" (click)="signInWithGoogle()" class="manual-google-btn">
+                Sign in with Google
+              </button>
+            </div>
+          </div>
         </mat-card-content>
       </mat-card>
     </div>
@@ -108,21 +125,66 @@ import { CommonModule } from '@angular/common';
       align-items: center;
       margin-top: 20px;
     }
+    
+    .divider {
+      margin: 30px 0 20px;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .social-login {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    
+    .social-login-text {
+      margin-bottom: 15px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .google-btn-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: 10px;
+    }
+    
+    .manual-google-btn {
+      width: 240px;
+      margin-top: 10px;
+    }
   `]
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
   loginForm: FormGroup;
+  private authStatusSub?: Subscription;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private socialAuthService: SocialAuthService
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
+    
+    // Subscribe to social auth state changes
+    this.authStatusSub = this.socialAuthService.authState.subscribe((user: SocialUser) => {
+      if (user && user.idToken) {
+        this.handleGoogleSignIn(user.idToken);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.authStatusSub) {
+      this.authStatusSub.unsubscribe();
+    }
   }
 
   onLogin(): void {
@@ -154,5 +216,43 @@ export class LoginComponent {
         }
       });
     }
+  }
+  
+  // Manual trigger for Google Sign-In
+  signInWithGoogle(): void {
+    this.socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID)
+      .then((user: SocialUser) => {
+        if (user && user.idToken) {
+          this.handleGoogleSignIn(user.idToken);
+        }
+      })
+      .catch(error => {
+        console.error('Google sign-in error:', error);
+        this.snackBar.open('Google sign-in failed. Please try again.', 'Close', {
+          duration: 5000
+        });
+      });
+  }
+  
+  handleGoogleSignIn(idToken: string): void {
+    this.authService.loginWithGoogle(idToken).subscribe({
+      next: () => {
+        // Redirect based on user role (always CLIENT for Google users)
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        let errorMsg = 'Google authentication failed';
+        
+        if (error.error && error.error.message) {
+          errorMsg = error.error.message;
+        } else if (error.status === 0) {
+          errorMsg = 'Could not connect to server. Please check your connection.';
+        }
+        
+        this.snackBar.open('Login error: ' + errorMsg, 'Close', {
+          duration: 5000
+        });
+      }
+    });
   }
 }
