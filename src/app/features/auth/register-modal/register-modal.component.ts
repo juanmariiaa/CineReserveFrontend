@@ -28,7 +28,7 @@ import { AuthService } from '../../../core/services/auth.service';
     ModalComponent
   ],
   template: `
-    <app-modal [isOpen]="isOpen" [title]="'Register'" (close)="close.emit()">
+    <app-modal [isOpen]="isOpen" [title]="'Register'" (close)="onModalClose()">
       <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
         <div class="form-field-container">
           <div class="form-row">
@@ -277,6 +277,7 @@ export class RegisterModalComponent implements OnDestroy {
   
   registerForm: FormGroup;
   private authStatusSub?: Subscription;
+  private isProcessingGoogleAuth = false;
   
   constructor(
     private fb: FormBuilder,
@@ -295,7 +296,9 @@ export class RegisterModalComponent implements OnDestroy {
     
     // Subscribe to social auth state changes
     this.authStatusSub = this.socialAuthService.authState.subscribe((user: SocialUser) => {
-      if (user && user.idToken) {
+      // Only process Google sign-up if modal is open and user is not already logged in
+      if (user && user.idToken && this.isOpen && !this.authService.isLoggedIn() && !this.isProcessingGoogleAuth) {
+        this.isProcessingGoogleAuth = true;
         this.handleGoogleSignUp(user.idToken);
       }
     });
@@ -305,6 +308,8 @@ export class RegisterModalComponent implements OnDestroy {
     if (this.authStatusSub) {
       this.authStatusSub.unsubscribe();
     }
+    // Reset processing flag when component is destroyed
+    this.isProcessingGoogleAuth = false;
   }
   
   onRegister(): void {
@@ -324,14 +329,24 @@ export class RegisterModalComponent implements OnDestroy {
         error: (error) => {
           let errorMsg = 'Registration failed';
           
-          if (error.error && error.error.message) {
-            errorMsg = error.error.message;
+          // Handle specific error cases
+          if (error.status === 409) {
+            errorMsg = 'Username or email already exists';
+          } else if (error.status === 400) {
+            errorMsg = 'Invalid registration data. Please check your information.';
           } else if (error.status === 0) {
             errorMsg = 'Could not connect to server. Please check your connection.';
+          } else if (error.error && typeof error.error === 'string') {
+            errorMsg = error.error;
+          } else if (error.error && error.error.message) {
+            errorMsg = error.error.message;
+          } else if (error.status >= 500) {
+            errorMsg = 'Server error. Please try again later.';
           }
           
-          this.snackBar.open('Registration error: ' + errorMsg, 'Close', {
-            duration: 5000
+          this.snackBar.open(errorMsg, 'Close', {
+            duration: 5000,
+            panelClass: ['error-snackbar']
           });
         }
       });
@@ -343,24 +358,50 @@ export class RegisterModalComponent implements OnDestroy {
     // handles creating a new user if one doesn't exist with that email
     this.authService.loginWithGoogle(idToken).subscribe({
       next: () => {
+        this.isProcessingGoogleAuth = false;
         this.close.emit();
         this.registerSuccess.emit();
         
         this.snackBar.open('Google sign-up successful!', 'Close', { duration: 3000 });
       },
       error: (error) => {
+        this.isProcessingGoogleAuth = false;
         let errorMsg = 'Google authentication failed';
         
-        if (error.error && error.error.message) {
-          errorMsg = error.error.message;
+        // Handle specific Google OAuth errors
+        if (error.status === 401) {
+          errorMsg = 'Google authentication failed. Please try again.';
         } else if (error.status === 0) {
           errorMsg = 'Could not connect to server. Please check your connection.';
+        } else if (error.status === 409) {
+          errorMsg = 'Account created successfully! Please try signing in again.';
+        } else if (error.error && typeof error.error === 'string' && error.error.length < 100) {
+          errorMsg = error.error;
+        } else if (error.error && error.error.message && error.error.message.length < 100) {
+          errorMsg = error.error.message;
+        } else if (error.status >= 500) {
+          errorMsg = 'Server error. Please try again later.';
         }
         
-        this.snackBar.open('Registration error: ' + errorMsg, 'Close', {
-          duration: 5000
+        // For first-time Google users, show a more friendly message
+        if (error.status === 400 || (error.error && 
+            (error.error.includes('User not found') || 
+             error.error.includes('first time') ||
+             error.error.includes('registration')))) {
+          errorMsg = 'Welcome! Your account has been created. Please try signing in again.';
+        }
+        
+        this.snackBar.open(errorMsg, 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
         });
       }
     });
+  }
+  
+  // Add a method to handle modal close and reset state
+  onModalClose(): void {
+    this.isProcessingGoogleAuth = false;
+    this.close.emit();
   }
 } 

@@ -24,14 +24,17 @@ import { environment } from '../../../environments/environment';
               oneTapEnabled: false,
               prompt: 'select_account',
               scopes: 'email profile',
-              use_fedcm_for_prompt: true,
+              use_fedcm_for_prompt: false,
               ux_mode: 'popup',
-              revoke_on_logout: true
+              revoke_on_logout: true,
+              plugin_name: 'CineReserve'
             } as GoogleInitOptions)
           }
         ],
         onError: (err) => {
-          console.error(err);
+          if (err && err.error !== 'popup_closed_by_user') {
+            console.warn('Google OAuth warning:', err.error || err);
+          }
         }
       } as SocialAuthServiceConfig
     }

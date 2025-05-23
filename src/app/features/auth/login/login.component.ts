@@ -160,6 +160,7 @@ import { MatDividerModule } from '@angular/material/divider';
 export class LoginComponent implements OnDestroy {
   loginForm: FormGroup;
   private authStatusSub?: Subscription;
+  private isProcessingGoogleAuth = false;
 
   constructor(
     private fb: FormBuilder,
@@ -175,7 +176,9 @@ export class LoginComponent implements OnDestroy {
     
     // Subscribe to social auth state changes
     this.authStatusSub = this.socialAuthService.authState.subscribe((user: SocialUser) => {
-      if (user && user.idToken) {
+      // Only process Google sign-in if user is not already logged in and we're not already processing
+      if (user && user.idToken && !this.authService.isLoggedIn() && !this.isProcessingGoogleAuth) {
+        this.isProcessingGoogleAuth = true;
         this.handleGoogleSignIn(user.idToken);
       }
     });
@@ -200,18 +203,24 @@ export class LoginComponent implements OnDestroy {
           }
         },
         error: (error) => {
-          let errorMsg = 'Invalid credentials';
+          let errorMsg = 'Invalid username or password';
           
-          if (error.error && error.error.message) {
-            errorMsg = error.error.message;
-          } else if (error.status === 0) {
-            errorMsg = 'Could not connect to server. Please check your connection or if the server is active.';
-          } else if (error.status === 401) {
+          // Handle specific error cases
+          if (error.status === 401) {
             errorMsg = 'Invalid username or password';
+          } else if (error.status === 0) {
+            errorMsg = 'Could not connect to server. Please check your connection.';
+          } else if (error.error && typeof error.error === 'string') {
+            errorMsg = error.error;
+          } else if (error.error && error.error.message) {
+            errorMsg = error.error.message;
+          } else if (error.status >= 500) {
+            errorMsg = 'Server error. Please try again later.';
           }
           
-          this.snackBar.open('Login error: ' + errorMsg, 'Close', {
-            duration: 5000
+          this.snackBar.open(errorMsg, 'Close', {
+            duration: 5000,
+            panelClass: ['error-snackbar']
           });
         }
       });
@@ -237,20 +246,40 @@ export class LoginComponent implements OnDestroy {
   handleGoogleSignIn(idToken: string): void {
     this.authService.loginWithGoogle(idToken).subscribe({
       next: () => {
+        this.isProcessingGoogleAuth = false;
         // Redirect based on user role (always CLIENT for Google users)
         this.router.navigate(['/']);
       },
       error: (error) => {
+        this.isProcessingGoogleAuth = false;
         let errorMsg = 'Google authentication failed';
         
-        if (error.error && error.error.message) {
-          errorMsg = error.error.message;
+        // Handle specific Google OAuth errors
+        if (error.status === 401) {
+          errorMsg = 'Google authentication failed. Please try again.';
         } else if (error.status === 0) {
           errorMsg = 'Could not connect to server. Please check your connection.';
+        } else if (error.status === 409) {
+          errorMsg = 'Account created successfully! Please try signing in again.';
+        } else if (error.error && typeof error.error === 'string' && error.error.length < 100) {
+          errorMsg = error.error;
+        } else if (error.error && error.error.message && error.error.message.length < 100) {
+          errorMsg = error.error.message;
+        } else if (error.status >= 500) {
+          errorMsg = 'Server error. Please try again later.';
         }
         
-        this.snackBar.open('Login error: ' + errorMsg, 'Close', {
-          duration: 5000
+        // For first-time Google users, show a more friendly message
+        if (error.status === 400 || (error.error && 
+            (error.error.includes('User not found') || 
+             error.error.includes('first time') ||
+             error.error.includes('registration')))) {
+          errorMsg = 'Welcome! Your account has been created. Please try signing in again.';
+        }
+        
+        this.snackBar.open(errorMsg, 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
         });
       }
     });
