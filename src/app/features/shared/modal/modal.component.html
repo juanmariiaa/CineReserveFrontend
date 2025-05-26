@@ -1,0 +1,13 @@
+<div *ngIf="isOpen" class="modal-backdrop" (click)="onBackdropClick($event)" @fadeInOut>
+      <div class="modal-container" @slideInOut>
+        <div class="modal-header">
+          <h2>{{ title }}</h2>
+          <button mat-icon-button (click)="close.emit()" class="close-button">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="modal-content">
+          <ng-content></ng-content>
+        </div>
+      </div>
+    </div>

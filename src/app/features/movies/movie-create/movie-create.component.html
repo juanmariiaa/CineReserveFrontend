@@ -1,0 +1,96 @@
+<div class="movie-create-container">
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">Add Movie</h1>
+      </div>
+      
+      <div class="action-bar">
+        <button mat-raised-button class="accent-bg" routerLink="/admin/movies">
+          <mat-icon>arrow_back</mat-icon> Back to Movie Management
+        </button>
+      </div>
+
+      <mat-card class="search-card">
+        <mat-card-content>
+          <form [formGroup]="searchForm" class="search-form">
+            <mat-form-field appearance="outline" class="search-field">
+              <mat-label>Search for a movie</mat-label>
+              <input
+                matInput
+                formControlName="searchTerm"
+                placeholder="Movie title"
+              />
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </form>
+
+          <div *ngIf="searching" class="loading-spinner">
+            <mat-spinner diameter="40" class="accent-spinner"></mat-spinner>
+          </div>
+
+          <div *ngIf="!searching && searchResults.length === 0 && searchForm.get('searchTerm')?.value" class="no-results">
+            <mat-icon>search_off</mat-icon>
+            <p>No results found for your search</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <div *ngIf="searchResults.length > 0" class="search-results-grid">
+        <mat-card *ngFor="let movie of searchResults" class="movie-card">
+          <div class="poster-container">
+            <img
+              *ngIf="getPosterPath(movie)"
+              [src]="getPosterPath(movie)"
+              [alt]="movie.title"
+              class="movie-poster"
+            />
+            <div *ngIf="!getPosterPath(movie)" class="no-poster">
+              <mat-icon>movie</mat-icon>
+            </div>
+          </div>
+
+          <mat-card-content class="movie-card-content">
+            <h3 class="movie-title">{{ movie.title }}</h3>
+
+            <div class="movie-metadata">
+              <span *ngIf="movie.releaseDate" class="release-date">
+                <mat-icon class="meta-icon">calendar_today</mat-icon>
+                {{ movie.releaseDate | date : 'yyyy' }}
+              </span>
+
+              <span *ngIf="movie.voteAverage" class="vote-average">
+                <mat-icon class="meta-icon star-icon">star</mat-icon>
+                {{ movie.voteAverage }} / 10
+              </span>
+            </div>
+
+            <div class="genres-container" *ngIf="movie['genreIds'] && movie['genreIds'].length > 0">
+              <span class="genre-chip" *ngFor="let genreId of movie['genreIds'].slice(0, 3)">
+                {{ getGenreName(genreId) }}
+              </span>
+            </div>
+
+            <p *ngIf="movie.overview" class="movie-overview">
+              {{ movie.overview | slice:0:150 }}{{ movie.overview.length > 150 ? '...' : '' }}
+            </p>
+          </mat-card-content>
+
+          <mat-card-actions align="end">
+            <button
+              mat-raised-button
+              class="accent-bg"
+              [disabled]="importing"
+              (click)="importMovie(movie.id)"
+            >
+              <mat-icon>add</mat-icon> Import
+              <mat-spinner *ngIf="importing" diameter="20" class="button-spinner"></mat-spinner>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+
+      <div *ngIf="importing" class="importing-spinner">
+        <mat-spinner class="accent-spinner"></mat-spinner>
+        <p>Importing movie...</p>
+      </div>
+    </div>

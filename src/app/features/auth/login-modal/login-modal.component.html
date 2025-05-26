@@ -1,0 +1,39 @@
+<app-modal [isOpen]="isOpen" [title]="'Login'" (close)="onModalClose()">
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <div class="form-field-container">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username" placeholder="Username">
+            <mat-error *ngIf="loginForm.get('username')?.hasError('required')">Username is required</mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="Password">
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
+          </mat-form-field>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" mat-raised-button color="accent" [disabled]="loginForm.invalid" class="action-button">
+            Login
+          </button>
+        </div>
+      </form>
+      
+      <mat-divider class="divider"></mat-divider>
+      
+      <div class="social-login-container">
+        <p class="social-login-text">Or sign in with:</p>
+        <div class="google-signin-options">
+          <asl-google-signin-button type="standard" size="medium"></asl-google-signin-button>
+        </div>
+      </div>
+      
+      <mat-divider class="divider"></mat-divider>
+      
+      <div class="register-link">
+        <p>Don't have an account?</p>
+        <button mat-button color="primary" (click)="switchToRegister.emit()" class="link-button">Register now</button>
+      </div>
+    </app-modal>

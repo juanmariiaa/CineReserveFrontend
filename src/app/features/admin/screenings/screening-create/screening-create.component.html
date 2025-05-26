@@ -1,0 +1,123 @@
+<div class="screening-create-container">
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">{{ isEditMode ? 'Edit Screening' : 'Schedule New Screening' }}</h1>
+      </div>
+
+      <div class="action-bar">
+        <button mat-raised-button routerLink="/admin/screenings">
+          <mat-icon>arrow_back</mat-icon> Back to Screenings
+        </button>
+      </div>
+
+      <div *ngIf="loading" class="loading-spinner">
+        <mat-spinner class="accent-spinner"></mat-spinner>
+      </div>
+
+      <mat-card *ngIf="!loading" class="form-card">
+        <mat-card-content>
+          <form [formGroup]="screeningForm" (ngSubmit)="onSubmit()">
+            <!-- Movie Selection with Autocomplete -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Movie</mat-label>
+              <input
+                type="text"
+                matInput
+                formControlName="movieTitle"
+                [matAutocomplete]="autoMovie"
+                placeholder="Search for a movie..."
+              >
+              <mat-autocomplete #autoMovie="matAutocomplete" [displayWith]="displayMovieTitle">
+                <mat-option *ngFor="let movie of filteredMovies | async" [value]="movie">
+                  <div class="movie-option">
+                    <img *ngIf="movie.posterUrl" [src]="movie.posterUrl" class="movie-poster">
+                    <div *ngIf="!movie.posterUrl" class="no-poster">
+                      <mat-icon>movie</mat-icon>
+                    </div>
+                    <span>{{ movie.title }}</span>
+                  </div>
+                </mat-option>
+              </mat-autocomplete>
+              <mat-error *ngIf="screeningForm.get('movieTitle')?.hasError('required')">
+                Movie selection is required
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Room Selection -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Room</mat-label>
+              <mat-select formControlName="roomId">
+                <mat-option *ngFor="let room of rooms" [value]="room.id">
+                  Room {{ room.number }} ({{ room.capacity }} seats)
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="screeningForm.get('roomId')?.hasError('required')">
+                Room selection is required
+              </mat-error>
+            </mat-form-field>
+
+            <div class="form-row">
+              <!-- Date Selection -->
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Date</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="date" [min]="minDate">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error *ngIf="screeningForm.get('date')?.hasError('required')">
+                  Date is required
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Time Selection -->
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Time</mat-label>
+                <input matInput type="time" formControlName="time">
+                <mat-error *ngIf="screeningForm.get('time')?.hasError('required')">
+                  Time is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <!-- Language -->
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Language</mat-label>
+                <input matInput formControlName="language" placeholder="e.g., English, Spanish, etc.">
+              </mat-form-field>
+
+              <!-- Format -->
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Format</mat-label>
+                <mat-select formControlName="format">
+                  <mat-option value="Digital">Digital</mat-option>
+                  <mat-option value="IMAX">IMAX</mat-option>
+                  <mat-option value="35mm">35mm Film</mat-option>
+                  <mat-option value="70mm">70mm Film</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="feature-options">
+              <h3>Additional Features</h3>
+              <div class="checkbox-row">
+                <!-- 3D Checkbox -->
+                <mat-checkbox formControlName="is3D" color="accent">3D Screening</mat-checkbox>
+
+                <!-- Subtitles Checkbox -->
+                <mat-checkbox formControlName="hasSubtitles" color="accent">With Subtitles</mat-checkbox>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button mat-button type="button" (click)="resetForm()" [disabled]="saving">
+                Reset Form
+              </button>
+              <button mat-raised-button class="accent-bg" type="submit" [disabled]="screeningForm.invalid || saving">
+                {{ isEditMode ? 'Update' : 'Schedule' }} Screening
+                <mat-spinner *ngIf="saving" diameter="20" class="button-spinner"></mat-spinner>
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>

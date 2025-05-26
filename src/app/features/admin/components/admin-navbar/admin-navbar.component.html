@@ -1,0 +1,85 @@
+<mat-toolbar class="admin-toolbar">
+      <button mat-icon-button class="menu-icon" (click)="toggleSidenav()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="title">Admin Dashboard</span>
+      <span class="spacer"></span>
+      <span class="username">{{ username }}</span>
+      <button mat-icon-button (click)="logout()" class="logout-btn">
+        <mat-icon>exit_to_app</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <mat-sidenav-container class="sidenav-container">
+      <mat-sidenav
+        #sidenav
+        [mode]="'side'"
+        [opened]="sidenavOpen"
+        class="admin-sidenav"
+      >
+        <div class="nav-list">
+          <a class="nav-item" routerLink="/admin/dashboard" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>dashboard</mat-icon>
+            </div>
+            <span>Dashboard</span>
+          </a>
+          
+          <a class="nav-item" routerLink="/admin/movies" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>movie</mat-icon>
+            </div>
+            <span>Movies</span>
+          </a>
+          
+          <a class="nav-item" routerLink="/admin/screenings" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>theaters</mat-icon>
+            </div>
+            <span>Screenings</span>
+          </a>
+          
+          <a class="nav-item" routerLink="/admin/rooms" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>weekend</mat-icon>
+            </div>
+            <span>Rooms</span>
+          </a>
+          
+          <a class="nav-item" routerLink="/admin/users" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>people</mat-icon>
+            </div>
+            <span>Users</span>
+          </a>
+          
+          <a class="nav-item" routerLink="/admin/reservations" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>book_online</mat-icon>
+            </div>
+            <span>Reservations</span>
+          </a>
+          
+          <a class="nav-item" routerLink="/admin/reports" routerLinkActive="active">
+            <div class="nav-icon-container">
+              <mat-icon>bar_chart</mat-icon>
+            </div>
+            <span>Reports</span>
+          </a>
+          
+          <div class="nav-divider"></div>
+          
+          <a class="nav-item return-link" routerLink="/">
+            <div class="nav-icon-container">
+              <mat-icon>home</mat-icon>
+            </div>
+            <span>Back to Site</span>
+          </a>
+        </div>
+      </mat-sidenav>
+      <mat-sidenav-content [style.marginLeft.px]="sidenavOpen ? 200 : 0">
+        <div class="content-wrapper">
+          <ng-content></ng-content>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>

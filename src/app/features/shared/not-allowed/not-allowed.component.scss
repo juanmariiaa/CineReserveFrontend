@@ -1,0 +1,35 @@
+.not-allowed-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+    
+    .not-allowed-card {
+      max-width: 400px;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .not-allowed-icon {
+      font-size: 48px;
+      height: 48px;
+      width: 48px;
+      margin-bottom: 1rem;
+    }
+    
+    mat-card-title {
+      font-size: 24px;
+      margin-bottom: 1rem;
+    }
+    
+    mat-card-content {
+      font-size: 16px;
+      margin-bottom: 1.5rem;
+    }
+    
+    mat-card-actions {
+      display: flex;
+      justify-content: center;
+    }

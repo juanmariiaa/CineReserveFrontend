@@ -1,0 +1,77 @@
+.movie-detail-container {
+      padding: 20px;
+    }
+    
+    .back-button {
+      margin-bottom: 20px;
+    }
+    
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      padding: 50px 0;
+    }
+    
+    .movie-header {
+      background-size: cover;
+      background-position: center;
+      background-color: rgba(0,0,0,0.7);
+      background-blend-mode: darken;
+      padding: 40px 20px;
+      color: white;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .movie-header-content {
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+    }
+    
+    .movie-poster-container {
+      flex-shrink: 0;
+    }
+    
+    .movie-poster {
+      width: 200px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    
+    .movie-info {
+      flex-grow: 1;
+    }
+    
+    .genre-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 15px 0;
+    }
+    
+    .star-icon {
+      color: gold;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    
+    .divider {
+      margin: 20px 0;
+    }
+    
+    .additional-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .info-label {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    
+    .trailer-section {
+      margin-top: 20px;
+    }

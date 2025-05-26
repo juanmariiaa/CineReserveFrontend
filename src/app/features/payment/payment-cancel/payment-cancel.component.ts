@@ -17,35 +17,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
     MatIconModule,
     NavbarComponent
   ],
-  template: `
-    <div class="payment-cancel-container">
-      <app-navbar></app-navbar>
-      
-      <div class="content">
-        <mat-card class="cancel-card">
-          <mat-card-content>
-            <div class="cancel-icon">
-              <mat-icon color="warn">cancel</mat-icon>
-            </div>
-            
-            <h1>Payment Cancelled</h1>
-            
-            <p>Your payment was not completed and your reservation has been cancelled.</p>
-            
-            <div class="actions">
-              <button mat-raised-button color="primary" routerLink="/">
-                Return to Home
-              </button>
-              
-              <button mat-button routerLink="/movies">
-                Browse Movies
-              </button>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </div>
-  `,
+  templateUrl: './payment-cancel.component.html',
   styles: `
     .payment-cancel-container {
       display: flex;

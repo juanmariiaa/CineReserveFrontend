@@ -6,30 +6,8 @@ import { FooterComponent } from './features/shared/footer/footer.component';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, FooterComponent],
-  template: `
-    <div class="app-container">
-      <div class="content">
-      <router-outlet></router-outlet>
-      </div>
-      <app-footer></app-footer>
-    </div>
-  `,
-  styles: [`
-    .app-container {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      background-color: #3c3b34;
-      color: #FFFFFF;
-    }
-    
-    .content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background-color: #3c3b34;
-    }
-  `]
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   title = 'CineReserveFrontend';

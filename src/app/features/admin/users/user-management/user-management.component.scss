@@ -1,0 +1,102 @@
+.screening-management-container {
+      padding: 20px;
+    }
+
+    .dashboard-title-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-title-marker {
+      width: 5px;
+      height: 30px;
+      background-color: #ff6b6b;
+      margin-right: 10px;
+      border-radius: 3px;
+    }
+
+    .dashboard-title {
+      font-size: 24px;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+      
+    .back-button {
+      background-color: #444444 !important;
+      color: white !important;
+      transition: background-color 0.3s ease;
+    }
+      
+    .back-button:hover {
+      background-color: #555555 !important;
+    }
+
+    .table-card {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .accent-spinner ::ng-deep circle {
+      stroke: #ff6b6b !important;
+    }
+
+    .filter-field {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .user-table {
+      width: 100%;
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    .role-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .role-chip {
+      padding: 4px 8px;
+      border-radius: 16px;
+      font-size: 12px;
+      background-color: #ff6b6b;
+      color: white;
+      font-weight: 500;
+    }
+
+    .view-button {
+      color: #ff6b6b;
+    }
+
+    .admin-button {
+      color: #ff6b6b;
+    }
+
+    .delete-button {
+      color: #ff6b6b;
+    }
+
+    ::ng-deep .mat-raised-button {
+      background-color: #ff6b6b;
+      color: white;
+    }

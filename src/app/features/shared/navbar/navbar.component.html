@@ -1,0 +1,142 @@
+<div class="navbar-container">
+      <!-- Main Toolbar -->
+      <mat-toolbar class="header-toolbar">
+        <div class="toolbar-container">
+          <!-- Mobile Menu Button -->
+          <button mat-icon-button class="menu-button" (click)="toggleMobileNav()" aria-label="Menu">
+            <mat-icon>{{ mobileNavOpen ? 'close' : 'menu' }}</mat-icon>
+          </button>
+          
+          <!-- Logo -->
+          <div class="logo-container" routerLink="/">
+            <span class="logo-text">CineReserve</span>
+          </div>
+          
+      <span class="spacer"></span>
+
+          <!-- Desktop Navigation Links - Now Centered -->
+          <div class="desktop-nav">
+            <button mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+              <mat-icon>home</mat-icon> Home
+            </button>
+            <button mat-button routerLink="/movies" routerLinkActive="active-link">
+        <mat-icon>movie</mat-icon> Browse Movies
+      </button>
+            <button mat-button *ngIf="isAdmin" routerLink="/admin/dashboard" routerLinkActive="active-link">
+              <mat-icon>dashboard</mat-icon> Admin Dashboard
+            </button>
+          </div>
+          
+          <span class="spacer"></span>
+          
+                    <!-- Auth Actions -->
+          <div class="auth-container">
+            <!-- Not logged in: show login and register buttons -->
+            <div *ngIf="!isLoggedIn" class="auth-actions">
+              <button mat-button (click)="openLoginModal()" class="login-button">
+                <mat-icon>person</mat-icon> Login
+              </button>
+              <button mat-raised-button color="accent" (click)="openRegisterModal()" class="register-button">
+                Register
+              </button>
+            </div>
+
+            <!-- Auth modals -->
+            <app-login-modal 
+              [isOpen]="isLoginModalOpen" 
+              (close)="closeLoginModal()" 
+              (switchToRegister)="switchToRegister()"
+              (loginSuccess)="onAuthSuccess()">
+            </app-login-modal>
+
+            <app-register-modal 
+              [isOpen]="isRegisterModalOpen" 
+              (close)="closeRegisterModal()" 
+              (switchToLogin)="switchToLogin()"
+              (registerSuccess)="onRegisterSuccess()">
+            </app-register-modal>
+
+            <!-- Logged in: show username with dropdown -->
+            <div *ngIf="isLoggedIn" class="user-profile">
+              <div class="user-button" [matMenuTriggerFor]="userMenu">
+                <span class="avatar-circle">{{ username.charAt(0) }}</span>
+                <span class="username">{{ username }}</span>
+                <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+              </div>
+              <mat-menu #userMenu="matMenu" class="user-menu">
+                <button mat-menu-item routerLink="/my-reservations">
+                  <mat-icon>confirmation_number</mat-icon> My Reservations
+                </button>
+                <button mat-menu-item *ngIf="isAdmin" routerLink="/admin/dashboard">
+                  <mat-icon>dashboard</mat-icon> Admin Dashboard
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="logout()">
+                  <mat-icon>exit_to_app</mat-icon> Sign Out
+                </button>
+              </mat-menu>
+            </div>
+          </div>
+        </div>
+      </mat-toolbar>
+      
+      <!-- Mobile Navigation -->
+      <div class="mobile-nav-backdrop" *ngIf="mobileNavOpen" (click)="closeMobileNav()" @fadeInOut></div>
+      <div class="mobile-nav" [class.open]="mobileNavOpen">
+        <div class="mobile-nav-header">
+          <div class="logo-container">
+            <span class="logo-text">CineReserve</span>
+          </div>
+          <button mat-icon-button (click)="closeMobileNav()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        
+        <mat-divider></mat-divider>
+        
+        <div class="mobile-nav-content">
+          <div class="mobile-nav-user" *ngIf="isLoggedIn">
+            <span class="avatar-circle large">{{ username.charAt(0) }}</span>
+            <div class="user-info">
+              <span class="username">{{ username }}</span>
+              <small *ngIf="isAdmin" class="user-role">Administrator</small>
+              <small *ngIf="!isAdmin" class="user-role">Customer</small>
+            </div>
+          </div>
+          
+          <mat-divider *ngIf="isLoggedIn"></mat-divider>
+          
+          <div class="mobile-nav-links">
+            <a class="mobile-nav-link" routerLink="/" (click)="closeMobileNav()">
+              <mat-icon>home</mat-icon> Home
+            </a>
+            <a class="mobile-nav-link" routerLink="/movies" (click)="closeMobileNav()">
+              <mat-icon>movie</mat-icon> Browse Movies
+            </a>
+            <a class="mobile-nav-link" *ngIf="isLoggedIn" routerLink="/my-reservations" (click)="closeMobileNav()">
+              <mat-icon>confirmation_number</mat-icon> My Reservations
+            </a>
+            <a class="mobile-nav-link" *ngIf="isAdmin" routerLink="/admin/dashboard" (click)="closeMobileNav()">
+              <mat-icon>dashboard</mat-icon> Admin Dashboard
+            </a>
+          </div>
+          
+          <mat-divider></mat-divider>
+          
+          <div class="mobile-nav-footer">
+            <ng-container *ngIf="!isLoggedIn">
+              <button mat-raised-button color="accent" (click)="openRegisterModal()" class="mobile-register-btn">
+                <mat-icon>person_add</mat-icon> Register
+              </button>
+              <button mat-raised-button (click)="openLoginModal()" class="mobile-login-btn">
+                <mat-icon>login</mat-icon> Login
+              </button>
+            </ng-container>
+            
+            <button mat-raised-button color="warn" *ngIf="isLoggedIn" (click)="logout(); closeMobileNav()">
+              <mat-icon>exit_to_app</mat-icon> Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>

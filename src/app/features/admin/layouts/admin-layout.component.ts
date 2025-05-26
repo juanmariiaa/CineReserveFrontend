@@ -7,15 +7,7 @@ import { AdminNavbarComponent } from '../components/admin-navbar/admin-navbar.co
   selector: 'app-admin-layout',
   standalone: true,
   imports: [CommonModule, RouterOutlet, AdminNavbarComponent],
-  template: `
-    <div class="admin-layout">
-      <app-admin-navbar>
-        <div class="admin-content">
-          <router-outlet></router-outlet>
-        </div>
-      </app-admin-navbar>
-    </div>
-  `,
+  templateUrl: './admin-layout.component.html',
   styles: [
     `
       .admin-layout {

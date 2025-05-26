@@ -1,0 +1,66 @@
+<div class="movie-detail-container">
+      <button mat-raised-button color="primary" (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon> Volver
+      </button>
+      
+      <div *ngIf="loading" class="loading-spinner">
+        <mat-spinner></mat-spinner>
+      </div>
+      
+      <div *ngIf="!loading && movie" class="movie-content">
+        <div class="movie-header" [style.backgroundImage]="'url(' + (movie.backdropUrl || '') + ')'">
+          <div class="movie-header-content">
+            <div *ngIf="movie.posterUrl" class="movie-poster-container">
+              <img [src]="movie.posterUrl" [alt]="movie.title" class="movie-poster">
+            </div>
+            <div class="movie-info">
+              <h1>{{ movie.title }}</h1>
+              <p *ngIf="movie.releaseDate">{{ movie.releaseDate | date }}</p>
+              <p *ngIf="movie.durationMinutes">{{ movie.durationMinutes }} minutos</p>
+              <div *ngIf="movie.genres && movie.genres.length > 0" class="genre-chips">
+                <mat-chip *ngFor="let genre of movie.genres">{{ genre.name }}</mat-chip>
+              </div>
+              <p *ngIf="movie.voteAverage" class="rating">
+                <mat-icon class="star-icon">star</mat-icon> {{ movie.voteAverage }} / 10
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <mat-card class="movie-details-card">
+          <mat-card-content>
+            <h2>Sinopsis</h2>
+            <p>{{ movie.description || 'No hay descripción disponible' }}</p>
+            
+            <mat-divider class="divider"></mat-divider>
+            
+            <h2>Información adicional</h2>
+            <div class="additional-info">
+              <div class="info-item">
+                <span class="info-label">Director:</span>
+                <span>{{ movie.director || 'Desconocido' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Idioma:</span>
+                <span>{{ movie.language || 'Desconocido' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">TMDB ID:</span>
+                <span>{{ movie.tmdbId }}</span>
+              </div>
+              <div class="info-item" *ngIf="movie.imdbId">
+                <span class="info-label">IMDB ID:</span>
+                <span>{{ movie.imdbId }}</span>
+              </div>
+            </div>
+            
+            <div *ngIf="movie.trailerUrl" class="trailer-section">
+              <h2>Trailer</h2>
+              <a [href]="movie.trailerUrl" target="_blank" mat-raised-button color="accent">
+                <mat-icon>play_circle_filled</mat-icon> Ver Trailer
+              </a>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
