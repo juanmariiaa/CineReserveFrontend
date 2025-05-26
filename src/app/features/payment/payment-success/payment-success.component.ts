@@ -35,7 +35,8 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      background-color: #f5f5f5;
+      background-color: #3c3b34;
+      color: #ffffff;
       font-family: 'Roboto', sans-serif;
     }
     
@@ -54,6 +55,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       text-align: center;
       max-width: 500px;
       margin: 0 auto;
+      color: #ffffff;
     }
     
     .loading-container mat-spinner, .error-container mat-icon {
@@ -64,11 +66,12 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       font-size: 48px;
       height: 48px;
       width: 48px;
+      color: #f44336;
     }
     
     .error-details {
       margin: 1rem 0;
-      color: #666;
+      color: rgba(255, 255, 255, 0.7);
     }
     
     .error-actions {
@@ -88,11 +91,13 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     
     .success-message {
       text-align: center;
-      background-color: white;
+      background-color: #35342e;
       padding: 2rem;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       width: 100%;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .success-message mat-icon {
@@ -100,45 +105,48 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       height: 48px;
       width: 48px;
       margin-bottom: 1rem;
-      color: #4CAF50;
+      color: #ff6b6b;
     }
     
     .success-message h1 {
-      color: #333;
+      color: #ffffff;
       margin-bottom: 1rem;
     }
     
     .success-message p {
-      color: #666;
+      color: rgba(255, 255, 255, 0.8);
       margin-bottom: 0.5rem;
     }
     
     .email-note {
       font-style: italic;
       margin-top: 1rem;
-      color: #888;
+      color: rgba(255, 255, 255, 0.6);
     }
     
     .ticket {
-      background-color: white;
+      background-color: #35342e;
       border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       width: 100%;
       overflow: hidden;
       padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .ticket-instructions {
-      background-color: white;
+      background-color: #35342e;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       width: 100%;
       padding: 1.5rem;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .ticket-instructions h3 {
       margin-top: 0;
-      color: #333;
+      color: #ffffff;
       margin-bottom: 1rem;
     }
     
@@ -149,7 +157,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     
     .ticket-instructions li {
       margin-bottom: 0.5rem;
-      color: #555;
+      color: rgba(255, 255, 255, 0.8);
     }
     
     .ticket-header {
@@ -160,12 +168,12 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     .ticket-header h1 {
       font-size: 28px;
       margin-bottom: 0.5rem;
-      color: #1a237e;
+      color: #ff6b6b;
     }
     
     .ticket-header h2 {
       font-size: 20px;
-      color: #424242;
+      color: rgba(255, 255, 255, 0.9);
       font-weight: normal;
     }
     
@@ -174,6 +182,9 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       flex-direction: column;
       align-items: center;
       margin-bottom: 1.5rem;
+      background-color: #ffffff;
+      padding: 1rem;
+      border-radius: 8px;
     }
     
     .qr-code {
@@ -183,12 +194,13 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     }
     
     .reservation-id {
-      color: #757575;
+      color: #333333;
       font-size: 14px;
     }
     
     mat-divider {
       margin: 1rem 0;
+      background-color: rgba(255, 255, 255, 0.1);
     }
     
     .ticket-details {
@@ -204,18 +216,18 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     
     .label {
       font-weight: 500;
-      color: #616161;
+      color: rgba(255, 255, 255, 0.7);
     }
     
     .value {
-      color: #212121;
+      color: #ffffff;
       text-align: right;
     }
     
     .ticket-footer {
       text-align: center;
       margin-top: 1.5rem;
-      color: #757575;
+      color: rgba(255, 255, 255, 0.7);
       font-size: 14px;
     }
     
@@ -235,6 +247,14 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       min-width: 160px;
     }
 
+    .actions mat-icon {
+      margin-right: 8px;
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
+      vertical-align: middle;
+    }
+
     @media print {
       .actions, app-navbar, .success-message, .ticket-instructions {
         display: none !important;
@@ -247,6 +267,16 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       .ticket {
         box-shadow: none;
         border: 1px solid #ddd;
+        background-color: white;
+        color: black;
+      }
+      
+      .ticket-header h1 {
+        color: #ff6b6b;
+      }
+      
+      .ticket-header h2, .label, .value, .ticket-footer, .ticket-footer p {
+        color: black;
       }
     }
     
@@ -294,7 +324,7 @@ export class PaymentSuccessComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Obtener el ID de sesión de los parámetros de la URL
+    // Get the session ID from URL parameters
     this.route.queryParams.subscribe((params) => {
       const sessionId = params['session_id'];
 
@@ -304,7 +334,7 @@ export class PaymentSuccessComponent implements OnInit {
         this.error = true;
         this.loading = false;
         this.errorMessage =
-          'No se pudo identificar la reserva. Parámetros de URL incompletos. Por favor, verifica en la sección "Mis Reservas" o en tu correo electrónico.';
+          'Could not identify the reservation. Incomplete URL parameters. Please check your "My Reservations" section or your email.';
       }
     });
   }
@@ -316,21 +346,34 @@ export class PaymentSuccessComponent implements OnInit {
         switchMap((reservation) => {
           if (!reservation) {
             throw new Error(
-              'No se encontró la reserva asociada a esta sesión de pago.'
+              'No reservation was found associated with this payment session.'
             );
           }
 
           this.reservation = reservation;
 
-          // Formatear la lista de asientos
-          if (reservation && reservation.seatReservations) {
-            const seats = reservation.seatReservations.map(
-              (sr: any) => `${sr.seat.row}${sr.seat.number}`
-            );
+          // Format the seat list
+          if (
+            reservation &&
+            reservation.seatReservations &&
+            reservation.seatReservations.length > 0
+          ) {
+            const seats = reservation.seatReservations
+              .map((sr: any) => {
+                // Check if seat has valid rowLabel and columnNumber
+                if (sr.seat && sr.seat.rowLabel && sr.seat.columnNumber) {
+                  return `${sr.seat.rowLabel}${sr.seat.columnNumber}`;
+                }
+                return null;
+              })
+              .filter((seat: string | null) => seat !== null); // Fix: add type annotation
+
             this.seatsList = seats.join(', ');
+          } else {
+            this.seatsList = 'No seats information available';
           }
 
-          // Generar QR con el ID de reserva
+          // Generate QR with reservation ID
           this.generateQRCode(reservation.id.toString());
 
           return of(reservation);
@@ -341,25 +384,25 @@ export class PaymentSuccessComponent implements OnInit {
           this.loading = false;
         },
         error: (err) => {
-          console.error('Error cargando los detalles de la reserva', err);
+          console.error('Error loading reservation details', err);
           this.loading = false;
           this.error = true;
 
           if (err.status === 404) {
             this.errorMessage =
-              'No se encontró la reserva asociada a esta sesión de pago. Es posible que el pago se haya procesado correctamente pero los detalles no estén disponibles en este momento.';
+              'No reservation was found associated with this payment session. The payment may have been processed correctly but the details are not available at this time.';
           } else if (err.status === 401 || err.status === 403) {
             this.errorMessage =
-              'No tienes permiso para acceder a esta reserva. Por favor, asegúrate de haber iniciado sesión con la cuenta correcta.';
+              'You do not have permission to access this reservation. Please make sure you are logged in with the correct account.';
           } else if (err.status === 0) {
             this.errorMessage =
-              'No se pudo conectar al servidor. Por favor, verifica tu conexión a internet.';
+              'Could not connect to the server. Please check your internet connection.';
           } else {
             this.errorMessage =
-              'Error al cargar los detalles de la reserva. Por favor, verifica en "Mis Reservas" o revisa tu correo electrónico donde también hemos enviado tu entrada.';
+              'Error loading reservation details. Please check "My Reservations" or check your email where we have also sent your ticket.';
           }
 
-          this.snackBar.open('Error al cargar la entrada', 'Cerrar', {
+          this.snackBar.open('Error loading ticket', 'Close', {
             duration: 5000,
           });
         },
@@ -367,7 +410,7 @@ export class PaymentSuccessComponent implements OnInit {
   }
 
   generateQRCode(data: string): void {
-    // Generar un QR local usando una API pública
+    // Generate a local QR using a public API
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
       data
     )}`;

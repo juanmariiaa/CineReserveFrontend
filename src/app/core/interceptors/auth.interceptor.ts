@@ -4,7 +4,7 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
-  HttpErrorResponse
+  HttpErrorResponse,
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -15,25 +15,29 @@ import { Router } from '@angular/router';
 export class AuthInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService, private router: Router) {}
 
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+  intercept(
+    request: HttpRequest<unknown>,
+    next: HttpHandler
+  ): Observable<HttpEvent<unknown>> {
     const token = this.authService.getToken();
-    
+
     if (token) {
       request = request.clone({
         setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
     }
-  
+
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           // Check if this is a login request - if so, don't redirect
-          const isLoginRequest = request.url.includes('/auth/signin') || 
-                                request.url.includes('/auth/google') || 
-                                request.url.includes('/auth/signup');
-          
+          const isLoginRequest =
+            request.url.includes('/auth/signin') ||
+            request.url.includes('/auth/google') ||
+            request.url.includes('/auth/signup');
+
           if (!isLoginRequest) {
             console.log('No autorizado: Sesión expirada o token inválido');
             this.authService.logout();

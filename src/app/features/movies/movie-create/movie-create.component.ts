@@ -96,7 +96,7 @@ import { Subject, of } from 'rxjs';
       .movie-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        border-color: #00b020;
+        border-color: #ff6b6b;
       }
 
       .poster-container {

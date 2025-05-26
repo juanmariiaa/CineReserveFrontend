@@ -39,7 +39,7 @@ body {
 .mat-mdc-raised-button.mat-accent,
 .mat-mdc-button.mat-accent,
 .mat-mdc-outlined-button.mat-accent {
-  background-color: #00b020 !important;
+  background-color: #ff6b6b !important;
   color: #ffffff !important;
 }
 
@@ -68,7 +68,7 @@ body {
 }
 
 .mat-mdc-menu-item:hover:not([disabled]) {
-  background-color: rgba(0, 176, 32, 0.2) !important;
+  background-color: rgba(255, 107, 107, 0.2) !important;
 }
 
 .mat-mdc-form-field-label {
@@ -118,7 +118,7 @@ body {
 }
 
 .mat-mdc-tab.mat-mdc-tab-active {
-  color: #00b020 !important;
+  color: #ff6b6b !important;
 }
 
 .mat-mdc-tab-body-content {
@@ -145,7 +145,7 @@ body {
 }
 
 a {
-  color: #00b020;
+  color: #ff6b6b;
   text-decoration: none;
 }
 
@@ -154,7 +154,7 @@ a:hover {
 }
 
 .mat-primary .mat-mdc-pseudo-checkbox-checked {
-  background-color: #00b020 !important;
+  background-color: #ff6b6b !important;
 }
 
 /* Asegurar que los textos en componentes de formulario sean blancos */
@@ -202,9 +202,20 @@ a:hover {
   color: white !important;
 }
 
+/* Warning snackbar styling */
+.warning-snackbar {
+  background-color: #ff9800 !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.warning-snackbar .mat-simple-snackbar-action {
+  color: white !important;
+}
+
 /* Critical fixes for dropdown menus and select panels */
-.mat-mdc-select-panel, 
-.mdc-menu-surface.mat-mdc-select-panel, 
+.mat-mdc-select-panel,
+.mdc-menu-surface.mat-mdc-select-panel,
 div.cdk-overlay-pane div.mat-mdc-select-panel,
 div.mat-mdc-select-panel {
   background-color: #202020 !important;
@@ -236,11 +247,11 @@ div.mat-mdc-select-panel {
 /* Specific styles for all dropdown options */
 .mat-mdc-option:hover:not(.mat-mdc-option-disabled),
 .mat-mdc-option.mat-mdc-option-active {
-  background-color: rgba(0, 176, 32, 0.2) !important;
+  background-color: rgba(255, 107, 107, 0.2) !important;
 }
 
 .mat-mdc-option.mat-mdc-option-selected {
-  background-color: rgba(0, 176, 32, 0.3) !important;
+  background-color: rgba(255, 107, 107, 0.3) !important;
   color: #ffffff !important;
 }
 

@@ -70,13 +70,13 @@ import { MatDividerModule } from '@angular/material/divider';
         margin-bottom: 20px;
         gap: 10px;
       }
-      
+
       .back-button {
         background-color: #444444 !important;
         color: white !important;
         transition: background-color 0.3s ease;
       }
-      
+
       .back-button:hover {
         background-color: #555555 !important;
       }
@@ -108,7 +108,7 @@ import { MatDividerModule } from '@angular/material/divider';
 
       .capacity-display h3 {
         margin: 0;
-        color: #00b020;
+        color: #ff6b6b;
       }
 
       .room-preview {
@@ -147,7 +147,11 @@ import { MatDividerModule } from '@angular/material/divider';
         left: 0;
         right: 0;
         height: 15px;
-        background: linear-gradient(to bottom, rgba(255, 107, 107, 0.2), transparent);
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 107, 107, 0.2),
+          transparent
+        );
       }
 
       .screen-text {
@@ -277,7 +281,7 @@ import { MatDividerModule } from '@angular/material/divider';
 
       /* Botón de crear sala */
       .create-room-btn {
-        background-color: #00b020 !important;
+        background-color: #ff6b6b !important;
         color: #ffffff !important;
         font-weight: 500;
         letter-spacing: 0.5px;
@@ -287,13 +291,13 @@ import { MatDividerModule } from '@angular/material/divider';
       }
 
       .create-room-btn:hover {
-        background-color: #00c02a !important;
+        background-color: #ff7c7c !important;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
         transform: translateY(-2px);
       }
 
       .create-room-btn:disabled {
-        background-color: rgba(0, 176, 32, 0.5) !important;
+        background-color: rgba(255, 107, 107, 0.5) !important;
         color: rgba(255, 255, 255, 0.7) !important;
         box-shadow: none;
         transform: none;
@@ -388,7 +392,7 @@ import { MatDividerModule } from '@angular/material/divider';
           .mdc-text-field--disabled
         ).mdc-text-field--focused
         .mdc-notched-outline__trailing {
-        border-color: #00b020 !important;
+        border-color: #ff6b6b !important;
       }
     `,
   ],
@@ -452,7 +456,7 @@ export class RoomCreateComponent {
           isAisleLeft,
         });
       }
-      
+
       this.previewSeats.push(rowSeats);
     }
   }

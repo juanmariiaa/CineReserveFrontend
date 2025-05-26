@@ -81,13 +81,13 @@ import { MatBadgeModule } from '@angular/material/badge';
         margin-bottom: 20px;
         gap: 10px;
       }
-      
+
       .back-button {
         background-color: #444444 !important;
         color: white !important;
         transition: background-color 0.3s ease;
       }
-      
+
       .back-button:hover {
         background-color: #555555 !important;
       }
@@ -99,23 +99,23 @@ import { MatBadgeModule } from '@angular/material/badge';
         overflow: hidden;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
-      
+
       .cancel-button {
         background-color: #ff6b6b !important;
         color: white !important;
         transition: background-color 0.3s ease;
         padding: 0 12px;
       }
-      
+
       .cancel-button:hover {
         background-color: #ff5252 !important;
       }
-      
+
       .cancel-button:disabled {
         background-color: rgba(255, 107, 107, 0.5) !important;
         color: rgba(255, 255, 255, 0.5) !important;
       }
-      
+
       .status-filter-container {
         display: flex;
         align-items: center;
@@ -123,13 +123,13 @@ import { MatBadgeModule } from '@angular/material/badge';
         flex-wrap: wrap;
         gap: 10px;
       }
-      
+
       .filter-label {
         font-weight: 500;
         margin-right: 8px;
         color: #ffffff;
       }
-      
+
       .status-pending {
         color: #000000;
         font-weight: 500;
@@ -137,15 +137,15 @@ import { MatBadgeModule } from '@angular/material/badge';
         border-radius: 4px;
         background-color: #ffc107;
       }
-      
+
       .status-confirmed {
         color: #ffffff;
         font-weight: 500;
         padding: 4px 8px;
         border-radius: 4px;
-        background-color: #4caf50;
+        background-color: #ff6b6b;
       }
-      
+
       .status-cancelled {
         color: #ffffff;
         font-weight: 500;
@@ -153,7 +153,7 @@ import { MatBadgeModule } from '@angular/material/badge';
         border-radius: 4px;
         background-color: #f44336;
       }
-      
+
       .status-completed {
         color: #ffffff;
         font-weight: 500;
@@ -186,7 +186,7 @@ import { MatBadgeModule } from '@angular/material/badge';
       }
 
       .seats-count {
-        background-color: rgba(0, 176, 32, 0.2);
+        background-color: rgba(255, 107, 107, 0.2);
         color: #ffffff;
         padding: 3px 8px;
         border-radius: 12px;
@@ -206,7 +206,7 @@ import { MatBadgeModule } from '@angular/material/badge';
       }
 
       .status-confirmed {
-        background-color: #00b020;
+        background-color: #ff6b6b;
       }
 
       .status-completed {
@@ -313,7 +313,7 @@ export class ReservationManagementComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.loadReservations();
   }
-  
+
   ngAfterViewInit(): void {
     // Set up sorting and pagination after the view is initialized
     this.dataSource.paginator = this.paginator;

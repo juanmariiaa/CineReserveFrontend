@@ -26,7 +26,7 @@ import {
   transition,
   query,
   stagger,
-  keyframes
+  keyframes,
 } from '@angular/animations';
 import {
   ScreeningService,
@@ -84,56 +84,71 @@ import { AuthService } from '../../core/services/auth.service';
     ]),
     trigger('staggerList', [
       transition('* => *', [
-        query(':enter', [
-          style({ opacity: 0, transform: 'translateY(20px)' }),
-          stagger('100ms', [
-            animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
-          ])
-        ], { optional: true })
-      ])
+        query(
+          ':enter',
+          [
+            style({ opacity: 0, transform: 'translateY(20px)' }),
+            stagger('100ms', [
+              animate(
+                '400ms ease-out',
+                style({ opacity: 1, transform: 'translateY(0)' })
+              ),
+            ]),
+          ],
+          { optional: true }
+        ),
+      ]),
     ]),
     trigger('calendarDateAnimation', [
       transition(':enter', [
         style({ opacity: 0, transform: 'scale(0.9)' }),
-        animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+        animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
       ]),
       transition(':leave', [
-        animate('300ms ease-in', style({ opacity: 0, transform: 'scale(0.9)' }))
-      ])
+        animate(
+          '300ms ease-in',
+          style({ opacity: 0, transform: 'scale(0.9)' })
+        ),
+      ]),
     ]),
     trigger('pulseAnimation', [
       state('active', style({ transform: 'scale(1)' })),
       transition('* => active', [
-        animate('300ms ease-in-out', keyframes([
-          style({ transform: 'scale(1)', offset: 0 }),
-          style({ transform: 'scale(1.1)', offset: 0.5 }),
-          style({ transform: 'scale(1)', offset: 1 })
-        ]))
-      ])
+        animate(
+          '300ms ease-in-out',
+          keyframes([
+            style({ transform: 'scale(1)', offset: 0 }),
+            style({ transform: 'scale(1.1)', offset: 0.5 }),
+            style({ transform: 'scale(1)', offset: 1 }),
+          ])
+        ),
+      ]),
     ]),
     trigger('carouselAnimation', [
       transition('* => *', [
-        query(':enter', [
-          style({ opacity: 0 }),
-          stagger(100, [
-            animate('600ms ease', style({ opacity: 1 }))
-          ])
-        ], { optional: true })
-      ])
+        query(
+          ':enter',
+          [
+            style({ opacity: 0 }),
+            stagger(100, [animate('600ms ease', style({ opacity: 1 }))]),
+          ],
+          { optional: true }
+        ),
+      ]),
     ]),
     trigger('backdropAnimation', [
       transition(':enter', [
         style({ opacity: 0, transform: 'scale(1.05)' }),
-        animate('700ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
-      ])
+        animate('700ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
+      ]),
     ]),
     trigger('screeningTimeAnimation', [
       transition(':enter', [
         style({ opacity: 0, height: 0, overflow: 'hidden' }),
-        animate('300ms ease-out', style({ opacity: 1, height: '*' }))
-      ])
-    ])
-  ]
+        animate('300ms ease-out', style({ opacity: 1, height: '*' })),
+      ]),
+    ]),
+  ],
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoggedIn = false;
@@ -287,15 +302,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadScreeningsForDate(date: Date): void {
-    this.selectedDate = date;
     this.loadingScreenings = true;
-    this.moviesWithScreenings = [];
-
-    // Show loading state for a minimum time to allow animations to be visible
-    const loadingStartTime = new Date().getTime();
-    const minimumLoadingTime = 600; // ms
-
     const formattedDate = this.formatDateForApi(date);
+    const loadingStartTime = new Date().getTime();
+    const minimumLoadingTime = 800; // ms
 
     const subscription = this.screeningService
       .getScreeningsByDate(formattedDate)
@@ -305,11 +315,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             // Ensure minimum loading time for UI smoothness
             const currentTime = new Date().getTime();
             const elapsedTime = currentTime - loadingStartTime;
-            
+
             if (elapsedTime < minimumLoadingTime) {
               setTimeout(() => {
-            this.moviesWithScreenings = [];
-            this.loadingScreenings = false;
+                this.moviesWithScreenings = [];
+                this.loadingScreenings = false;
               }, minimumLoadingTime - elapsedTime);
             } else {
               this.moviesWithScreenings = [];
@@ -318,22 +328,38 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             return;
           }
 
+          // Get current date and time for filtering past screenings
+          const now = new Date();
+
           // Filter screenings to ensure they match the selected date in local time
+          // AND ensure the screening time is after the current time
           const filteredScreenings = screenings.filter((screening) => {
             if (!screening.startTime) return false;
 
             const screeningDate = new Date(screening.startTime);
-            return this.isSameDay(screeningDate, date);
+
+            // Check if it's the same day
+            const isSameDay = this.isSameDay(screeningDate, date);
+
+            // Only include screenings that haven't started yet
+            const isAfterCurrentTime = screeningDate > now;
+
+            // For today, only show future screenings
+            // For other days, show all screenings for that day
+            return (
+              isSameDay &&
+              (this.isSameDay(date, now) ? isAfterCurrentTime : true)
+            );
           });
 
           if (filteredScreenings.length === 0) {
             const currentTime = new Date().getTime();
             const elapsedTime = currentTime - loadingStartTime;
-            
+
             if (elapsedTime < minimumLoadingTime) {
               setTimeout(() => {
-            this.moviesWithScreenings = [];
-            this.loadingScreenings = false;
+                this.moviesWithScreenings = [];
+                this.loadingScreenings = false;
               }, minimumLoadingTime - elapsedTime);
             } else {
               this.moviesWithScreenings = [];
@@ -377,7 +403,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                   (s) => {
                     // Handle case where room is a number instead of an object
                     let roomNumber = 0;
-                    
+
                     if (s.room !== null && typeof s.room === 'number') {
                       // If room is a number, use it directly
                       roomNumber = s.room;
@@ -388,7 +414,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                       // Fallback to roomId if available
                       roomNumber = s.roomId;
                     }
-                    
+
                     return {
                       screeningId: s.id!,
                       time: this.formatTime(s.startTime),
@@ -413,10 +439,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
               // Ensure minimum loading time for UI smoothness
               const currentTime = new Date().getTime();
               const elapsedTime = currentTime - loadingStartTime;
-              
+
               if (elapsedTime < minimumLoadingTime) {
                 setTimeout(() => {
-              this.loadingScreenings = false;
+                  this.loadingScreenings = false;
                 }, minimumLoadingTime - elapsedTime);
               } else {
                 this.loadingScreenings = false;
@@ -425,7 +451,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             error: (error) => {
               console.error('Error loading movies:', error);
               setTimeout(() => {
-              this.loadingScreenings = false;
+                this.loadingScreenings = false;
               }, Math.max(0, minimumLoadingTime - (new Date().getTime() - loadingStartTime)));
             },
           });
@@ -442,7 +468,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           );
           setTimeout(() => {
-          this.loadingScreenings = false;
+            this.loadingScreenings = false;
           }, Math.max(0, minimumLoadingTime - (new Date().getTime() - loadingStartTime)));
         },
       });
@@ -456,7 +482,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.selectedDate && this.isSameDay(this.selectedDate, date)) {
         return;
       }
-      
+
       this.selectedDate = new Date(date);
       this.loadScreeningsForDate(this.selectedDate);
 
@@ -602,16 +628,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       // Use smooth scrolling for better UX
       container.scrollTo({
         left: Math.max(0, scrollLeft),
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
-      
+
       this.updateScrollButtonsState();
     }
   }
 
   loadFeaturedMovies(): void {
     this.loadingFeaturedMovies = true;
-    
+
     // Show loading state for a minimum time to allow animations to be visible
     const loadingStartTime = new Date().getTime();
     const minimumLoadingTime = 800; // ms
@@ -643,10 +669,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         if (movieIdsWithFutureScreenings.size === 0) {
           const currentTime = new Date().getTime();
           const elapsedTime = currentTime - loadingStartTime;
-          
+
           if (elapsedTime < minimumLoadingTime) {
             setTimeout(() => {
-          this.loadingFeaturedMovies = false;
+              this.loadingFeaturedMovies = false;
             }, minimumLoadingTime - elapsedTime);
           } else {
             this.loadingFeaturedMovies = false;
@@ -692,10 +718,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             // Ensure minimum loading time for UI smoothness
             const currentTime = new Date().getTime();
             const elapsedTime = currentTime - loadingStartTime;
-            
+
             if (elapsedTime < minimumLoadingTime) {
               setTimeout(() => {
-            this.loadingFeaturedMovies = false;
+                this.loadingFeaturedMovies = false;
               }, minimumLoadingTime - elapsedTime);
             } else {
               this.loadingFeaturedMovies = false;
@@ -704,7 +730,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           error: (error) => {
             console.error('Error loading movies:', error);
             setTimeout(() => {
-            this.loadingFeaturedMovies = false;
+              this.loadingFeaturedMovies = false;
             }, Math.max(0, minimumLoadingTime - (new Date().getTime() - loadingStartTime)));
           },
         });
@@ -712,7 +738,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (error) => {
         console.error('Error loading screenings:', error);
         setTimeout(() => {
-        this.loadingFeaturedMovies = false;
+          this.loadingFeaturedMovies = false;
         }, Math.max(0, minimumLoadingTime - (new Date().getTime() - loadingStartTime)));
       },
     });
@@ -740,5 +766,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   navigateToMovieDetail(movieId: number): void {
     this.router.navigate(['/movies', movieId]);
+  }
+
+  getCurrentDate(): Date {
+    return new Date();
   }
 }

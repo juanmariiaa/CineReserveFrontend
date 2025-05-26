@@ -26,6 +26,8 @@ import { ReservationService } from '../../../core/services/reservation.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { TicketDialogComponent } from './ticket-dialog/ticket-dialog.component';
 
 @Component({
   selector: 'app-user-reservations',
@@ -45,7 +47,6 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
     MatSortModule,
     MatPaginatorModule,
     NavbarComponent,
-    DatePipe,
   ],
   animations: [
     trigger('fadeIn', [
@@ -124,7 +125,8 @@ export class UserReservationsComponent implements OnInit {
     private authService: AuthService,
     private snackBar: MatSnackBar,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -248,8 +250,10 @@ export class UserReservationsComponent implements OnInit {
 
   isTicketAvailable(reservation: any): boolean {
     return (
-      reservation.status === 'CONFIRMED' &&
-      !this.isPastReservation(reservation.screening.startTime)
+      (reservation.status === 'CONFIRMED' ||
+        reservation.status === 'COMPLETED') &&
+      new Date(reservation.screening.startTime) >
+        new Date(new Date().getTime() - 3 * 60 * 60 * 1000)
     );
   }
 
@@ -304,15 +308,47 @@ export class UserReservationsComponent implements OnInit {
     }
   }
 
+  viewTicket(reservation: any): void {
+    // Generate QR code for the reservation
+    const qrData = reservation.id.toString();
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+      qrData
+    )}`;
+
+    const safeQrUrl = this.sanitizer.bypassSecurityTrustUrl(qrApiUrl);
+
+    // Create seat list string
+    let seatsList = '';
+    if (
+      reservation.seatReservations &&
+      reservation.seatReservations.length > 0
+    ) {
+      const seats = reservation.seatReservations
+        .map((sr: any) => {
+          if (sr.seat && sr.seat.rowLabel && sr.seat.columnNumber) {
+            return `${sr.seat.rowLabel}${sr.seat.columnNumber}`;
+          }
+          return null;
+        })
+        .filter((seat: string | null) => seat !== null);
+
+      seatsList = seats.join(', ');
+    } else {
+      seatsList = 'No seats information available';
+    }
+
+    // Open dialog with ticket details
+    this.dialog.open(TicketDialogComponent, {
+      width: '600px',
+      data: {
+        reservation: reservation,
+        qrImageUrl: safeQrUrl,
+        seatsList: seatsList,
+      },
+    });
+  }
+
   downloadTicket(reservation: any): void {
-    // This is a placeholder for ticket download functionality
-    // In a real app, you would implement a PDF generation service
-    this.snackBar.open(
-      'Ticket download functionality will be implemented soon!',
-      'Close',
-      {
-        duration: 3000,
-      }
-    );
+    this.viewTicket(reservation);
   }
 }

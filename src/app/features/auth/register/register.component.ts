@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -22,7 +27,7 @@ import { AuthService } from '../../../core/services/auth.service';
     MatButtonModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    RouterLink
+    RouterLink,
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
@@ -43,7 +48,7 @@ export class RegisterComponent {
       email: ['', [Validators.required, Validators.email]],
       username: ['', Validators.required],
       phoneNumber: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
@@ -52,34 +57,39 @@ export class RegisterComponent {
       this.isLoading = true;
       const userData = {
         ...this.registerForm.value,
-        roles: ['user'] // Default role for new users
+        roles: ['user'], // Default role for new users
       };
 
       this.authService.register(userData).subscribe({
         next: () => {
           this.isLoading = false;
-          this.snackBar.open('Registration successful. You can now log in.', 'Close', {
-            duration: 5000
-          });
+          this.snackBar.open(
+            'Registration successful. You can now log in.',
+            'Close',
+            {
+              duration: 5000,
+            }
+          );
           this.router.navigate(['/login']);
         },
         error: (error) => {
           this.isLoading = false;
           let errorMsg = 'Registration error';
-          
+
           if (error.error && error.error.message) {
             errorMsg = error.error.message;
           } else if (error.status === 0) {
-            errorMsg = 'Could not connect to server. Please check your connection or if the server is active.';
+            errorMsg =
+              'Could not connect to server. Please check your connection or if the server is active.';
           } else if (error.status === 400) {
             errorMsg = 'Username or email is already in use';
           }
-          
+
           this.snackBar.open('Error: ' + errorMsg, 'Close', {
-            duration: 5000
+            duration: 5000,
           });
-        }
+        },
       });
     }
   }
-} 
+}

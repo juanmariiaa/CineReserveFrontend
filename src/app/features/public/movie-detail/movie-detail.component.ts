@@ -45,7 +45,10 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
     trigger('slideUp', [
       transition(':enter', [
         style({ transform: 'translateY(20px)', opacity: 0 }),
-        animate('500ms ease-out', style({ transform: 'translateY(0)', opacity: 1 })),
+        animate(
+          '500ms ease-out',
+          style({ transform: 'translateY(0)', opacity: 1 })
+        ),
       ]),
     ]),
   ],
@@ -196,7 +199,10 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
         color: #ffffff !important;
       }
 
-      ::ng-deep .mat-mdc-chip-set .mat-mdc-chip .mdc-evolution-chip__text-label {
+      ::ng-deep
+        .mat-mdc-chip-set
+        .mat-mdc-chip
+        .mdc-evolution-chip__text-label {
         color: #ffffff !important;
       }
 
@@ -254,17 +260,20 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
         color: rgba(255, 255, 255, 0.9);
       }
 
-      .crew-item, .fact-item {
+      .crew-item,
+      .fact-item {
         margin-bottom: 20px;
       }
 
-      .crew-item h3, .fact-item h3 {
+      .crew-item h3,
+      .fact-item h3 {
         font-size: 1.1rem;
         margin-bottom: 8px;
         color: #ff6b6b;
       }
 
-      .crew-item p, .fact-item p {
+      .crew-item p,
+      .fact-item p {
         color: rgba(255, 255, 255, 0.9);
         line-height: 1.5;
       }
@@ -305,11 +314,20 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       }
 
+      .no-screenings.warning {
+        border-left: 4px solid #ff6b6b;
+        background-color: rgba(255, 107, 107, 0.1);
+      }
+
       .no-screenings mat-icon {
         font-size: 48px;
         height: 48px;
         width: 48px;
         color: rgba(255, 255, 255, 0.5);
+      }
+
+      .no-screenings.warning mat-icon {
+        color: #ff6b6b;
       }
 
       .screening-date-group {
@@ -476,6 +494,7 @@ export class PublicMovieDetailComponent implements OnInit {
   loading = true;
   isLoggedIn = false;
   hasScreenings = false;
+  hasFutureScreenings = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -516,8 +535,33 @@ export class PublicMovieDetailComponent implements OnInit {
         // Load screenings for this movie
         this.screeningService.getScreeningsByMovie(movieId).subscribe({
           next: (screenings) => {
+            // Get current date and time
+            const now = new Date();
+
+            // Store all screenings
             this.screenings = screenings;
             this.hasScreenings = screenings.length > 0;
+
+            // Check if there are any future screenings
+            const futureScreenings = screenings.filter((screening) => {
+              const screeningDate = new Date(screening.startTime);
+              return screeningDate > now;
+            });
+
+            this.hasFutureScreenings = futureScreenings.length > 0;
+
+            // If there are no future screenings, show a warning message
+            if (this.hasScreenings && !this.hasFutureScreenings) {
+              this.snackBar.open(
+                'There are no upcoming screenings for this movie.',
+                'Close',
+                {
+                  duration: 7000,
+                  panelClass: ['warning-snackbar'],
+                }
+              );
+            }
+
             this.loading = false;
           },
           error: (error: any) => {
@@ -576,22 +620,41 @@ export class PublicMovieDetailComponent implements OnInit {
 
   // Get unique dates from screenings
   getUniqueDates(): string[] {
-    const dates = this.screenings.map(screening => {
+    const now = new Date();
+
+    // Filter out screenings that have already passed
+    const futureScreenings = this.screenings.filter((screening) => {
+      const screeningTime = new Date(screening.startTime);
+      return screeningTime > now;
+    });
+
+    const dates = futureScreenings.map((screening) => {
       const date = new Date(screening.startTime);
       return date.toISOString().split('T')[0]; // Get only date part
     });
-    
+
     // Remove duplicates
     return [...new Set(dates)].sort();
   }
 
   // Get screenings for a specific date
   getScreeningsByDate(date: string): Screening[] {
-    return this.screenings.filter(screening => {
-      const screeningDate = new Date(screening.startTime);
-      return screeningDate.toISOString().split('T')[0] === date;
-    }).sort((a, b) => {
-      return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
-    });
+    const now = new Date();
+
+    return this.screenings
+      .filter((screening) => {
+        const screeningDate = new Date(screening.startTime);
+        const screeningDateStr = screeningDate.toISOString().split('T')[0];
+
+        // Filter out past screenings
+        const isFutureScreening = screeningDate > now;
+
+        return screeningDateStr === date && isFutureScreening;
+      })
+      .sort((a, b) => {
+        return (
+          new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+        );
+      });
   }
 }

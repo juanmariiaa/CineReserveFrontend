@@ -74,9 +74,9 @@ export const routes: Routes = [
   {
     path: 'payment/success',
     loadComponent: () =>
-      import('./features/payment/payment-success/payment-success.component').then(
-        (c) => c.PaymentSuccessComponent
-      ),
+      import(
+        './features/payment/payment-success/payment-success.component'
+      ).then((c) => c.PaymentSuccessComponent),
     canActivate: [authGuard],
   },
   {
