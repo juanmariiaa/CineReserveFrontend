@@ -13,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatSliderModule } from '@angular/material/slider';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -56,6 +57,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
     MatTableModule,
     MatChipsModule,
     MatBadgeModule,
+    MatSliderModule,
   ],
   template: `
     <div class="reservation-container">
@@ -122,7 +124,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
                 </div>
               </mat-card>
 
-              <!-- Seat Selection Area -->
+              <!-- Seat Selection Area with Zoom Controls -->
               <mat-card class="seat-selection-card">
                 <mat-card-header>
                   <mat-card-title>
@@ -133,6 +135,20 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
                   </mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
+                  <!-- Zoom Controls -->
+                  <div class="zoom-controls">
+                    <button mat-mini-fab color="primary" (click)="zoomOut()" [disabled]="zoomLevel <= minZoom">
+                      <mat-icon>zoom_out</mat-icon>
+                    </button>
+                    <span class="zoom-level">{{ (zoomLevel * 100).toFixed(0) }}%</span>
+                    <button mat-mini-fab color="primary" (click)="zoomIn()" [disabled]="zoomLevel >= maxZoom">
+                      <mat-icon>zoom_in</mat-icon>
+                    </button>
+                    <button mat-mini-fab color="basic" (click)="resetZoom()" matTooltip="Reset Zoom">
+                      <mat-icon>zoom_in_map</mat-icon>
+                    </button>
+                  </div>
+
                   <div class="screen-area">
                     <div class="screen">
                       <div class="screen-label">SCREEN</div>
@@ -144,20 +160,25 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
                     <p>No seats available for this screening.</p>
                   </div>
 
-                  <div *ngIf="seats.length > 0" class="seats-container">
-                    <div class="seat-row" *ngFor="let row of seatRows">
-                      <div class="row-label">{{ row }}</div>
-                      <div class="seats">
-                        <div
-                          *ngFor="let seat of getSeatsForRow(row)"
-                          class="seat"
-                          [class.unavailable]="!seat.available"
-                          [class.selected]="isSelected(seat)"
-                          (click)="toggleSeatSelection(seat)"
-                          [matTooltip]="'Row ' + seat.row + ', Seat ' + seat.number"
-                          matTooltipPosition="above"
-                        >
-                          {{ seat.number }}
+                  <!-- Fixed size seating chart with zoom and pan capability -->
+                  <div class="seats-container-wrapper">
+                    <div *ngIf="seats.length > 0" 
+                         class="seats-container" 
+                         [style.transform]="'scale(' + zoomLevel + ')'">
+                      <div class="seat-row" *ngFor="let row of seatRows">
+                        <div class="row-label">{{ row }}</div>
+                        <div class="seats">
+                          <div
+                            *ngFor="let seat of getSeatsForRow(row)"
+                            class="seat"
+                            [class.unavailable]="!seat.available"
+                            [class.selected]="isSelected(seat)"
+                            (click)="toggleSeatSelection(seat)"
+                            [matTooltip]="'Row ' + seat.row + ', Seat ' + seat.number"
+                            matTooltipPosition="above"
+                          >
+                            {{ seat.number }}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -300,7 +321,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         max-width: 1600px;
         margin: 0 auto;
         width: 95%;
-        box-sizing: border-box; /* Include padding in width calculation */
+        box-sizing: border-box;
       }
 
       .content.loading {
@@ -442,6 +463,30 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         margin-left: 10px;
       }
 
+      /* Zoom Controls */
+      .zoom-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: rgba(32, 32, 32, 0.2);
+        border-radius: 50px;
+        width: fit-content;
+        margin: 0 auto 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .zoom-level {
+        font-size: 0.9rem;
+        font-weight: 500;
+        min-width: 60px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
       .screen-area {
         margin: 30px 0 50px;
         position: relative;
@@ -503,50 +548,72 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         color: #ff6b6b;
       }
 
-      .seats-container {
-        margin: 0 auto;
+      /* Fixed size seating chart with zoom and scroll */
+      .seats-container-wrapper {
+        overflow: auto;
+        width: 100%;
+        max-height: 500px;
         display: flex;
-        flex-direction: column;
-        gap: 12px;
         justify-content: center;
-        max-width: 800px;
+        padding: 20px 0;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .seats-container {
         padding: 20px;
+        display: table; /* Using table display for consistent layout */
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: #2a2922;
+        transform-origin: top center;
+        transition: transform 0.3s ease;
         border-radius: 10px;
-        background-color: rgba(32, 32, 32, 0.2);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.05);
       }
 
       .seat-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        justify-content: center;
+        display: table-row;
       }
 
       .row-label {
+        display: table-cell;
         width: 30px;
+        height: 30px;
+        vertical-align: middle;
         text-align: center;
         font-weight: 500;
         color: #ffffff;
-        opacity: 0.8;
+        padding: 0 10px 0 5px;
+      }
+
+      .row-label:after {
+        content: '';
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        background-color: rgba(255, 107, 107, 0.2);
+        border-radius: 50%;
+        position: absolute;
+        z-index: -1;
+        left: 8px;
+        transform: translateY(-12px);
       }
 
       .seats {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        justify-content: center;
+        display: table-cell;
+        padding: 5px 0;
+        white-space: nowrap;
       }
 
       .seat {
+        display: inline-block;
         width: 35px;
         height: 35px;
         background-color: rgba(60, 59, 52, 0.8);
         border-radius: 6px 6px 2px 2px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        text-align: center;
+        line-height: 35px;
         font-size: 12px;
         font-weight: 500;
         cursor: pointer;
@@ -556,17 +623,18 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         user-select: none;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         position: relative;
+        margin: 0 5px;
       }
 
       .seat.available:hover {
         background-color: rgba(255, 107, 107, 0.5);
-        transform: translateY(-3px) scale(1.1);
+        transform: translateY(-3px);
         box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
         z-index: 2;
       }
 
       .seat.unavailable {
-        background-color: #2a2922;
+        background-color: #1a1914;
         color: rgba(255, 255, 255, 0.3);
         cursor: not-allowed;
         opacity: 0.5;
@@ -577,7 +645,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         background-color: #ff6b6b;
         color: #ffffff;
         font-weight: bold;
-        transform: translateY(-3px) scale(1.1);
+        transform: translateY(-3px);
         border-bottom-color: #e55a5a;
         box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
         z-index: 2;
@@ -614,7 +682,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
       }
 
       .seat-sample.unavailable {
-        background-color: #2a2922;
+        background-color: #1a1914;
         opacity: 0.5;
         border-bottom: 2px solid #35342e;
       }
@@ -737,12 +805,6 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
           display: block;
         }
 
-        .seat {
-          width: 30px;
-          height: 30px;
-          font-size: 11px;
-        }
-
         .movie-info {
           flex-direction: column;
           gap: 15px;
@@ -752,10 +814,6 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
           width: 100%;
           height: 200px;
           margin: 0 auto;
-        }
-
-        .seats-container {
-          padding: 10px;
         }
 
         .mobile-actions {
@@ -796,6 +854,12 @@ export class ReservationComponent implements OnInit {
   isAdmin = false;
   username = '';
   loginForm: FormGroup;
+
+  // Zoom control properties
+  zoomLevel: number = 1;
+  minZoom: number = 0.6;
+  maxZoom: number = 1.5;
+  zoomStep: number = 0.1;
 
   constructor(
     private route: ActivatedRoute,
@@ -1005,6 +1069,23 @@ export class ReservationComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit',
     }).format(date);
+  }
+
+  // Zoom control methods
+  zoomIn(): void {
+    if (this.zoomLevel < this.maxZoom) {
+      this.zoomLevel = Math.min(this.maxZoom, this.zoomLevel + this.zoomStep);
+    }
+  }
+
+  zoomOut(): void {
+    if (this.zoomLevel > this.minZoom) {
+      this.zoomLevel = Math.max(this.minZoom, this.zoomLevel - this.zoomStep);
+    }
+  }
+
+  resetZoom(): void {
+    this.zoomLevel = 1;
   }
 
   confirmReservation(): void {
