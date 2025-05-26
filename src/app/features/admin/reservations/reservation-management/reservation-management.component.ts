@@ -46,14 +46,23 @@ import { MatBadgeModule } from '@angular/material/badge';
   ],
   template: `
     <div class="reservation-management-container">
-      <div class="page-header">
-        <h1>Reservation Management</h1>
-        <button mat-raised-button color="accent" routerLink="/admin/dashboard">
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">Reservation Management</h1>
+      </div>
+      
+      <div class="action-bar">
+        <div></div> <!-- Empty div to push the button to the right -->
+        <button
+          mat-raised-button
+          class="back-button"
+          routerLink="/admin/dashboard"
+        >
           <mat-icon>arrow_back</mat-icon> Back to Dashboard
         </button>
       </div>
 
-      <mat-card>
+      <mat-card class="table-card">
         <mat-card-content>
           <div *ngIf="loading" class="loading-spinner">
             <mat-spinner></mat-spinner>
@@ -71,18 +80,7 @@ import { MatBadgeModule } from '@angular/material/badge';
               <mat-icon matSuffix>search</mat-icon>
             </mat-form-field>
 
-            <div class="status-filters">
-              <mat-chip-listbox [multiple]="true" (change)="filterByStatus()">
-                <mat-chip-option
-                  *ngFor="let status of statusOptions"
-                  [value]="status.value"
-                  [selected]="status.selected"
-                  [color]="status.color"
-                >
-                  {{ status.label }}
-                </mat-chip-option>
-              </mat-chip-listbox>
-            </div>
+            <!-- Status filters removed as requested -->
 
             <div class="table-container">
               <table
@@ -162,12 +160,7 @@ import { MatBadgeModule } from '@angular/material/badge';
                     Status
                   </th>
                   <td mat-cell *matCellDef="let reservation">
-                    <span
-                      class="status-chip"
-                      [ngClass]="getStatusClass(reservation.status)"
-                    >
-                      {{ getStatusLabel(reservation.status) }}
-                    </span>
+                    {{ getStatusLabel(reservation.status) }}
                   </td>
                 </ng-container>
 
@@ -176,34 +169,16 @@ import { MatBadgeModule } from '@angular/material/badge';
                   <th mat-header-cell *matHeaderCellDef>Actions</th>
                   <td mat-cell *matCellDef="let reservation">
                     <button
-                      mat-icon-button
-                      color="primary"
-                      matTooltip="View details"
-                    >
-                      <mat-icon>visibility</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      color="accent"
-                      matTooltip="Edit seats"
-                      [disabled]="
-                        reservation.status === ReservationStatus.CANCELLED ||
-                        reservation.status === ReservationStatus.COMPLETED
-                      "
-                    >
-                      <mat-icon>event_seat</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
+                      mat-raised-button
                       color="warn"
                       (click)="confirmCancel(reservation)"
-                      matTooltip="Cancel reservation"
+                      class="cancel-button"
                       [disabled]="
                         reservation.status === ReservationStatus.CANCELLED ||
                         reservation.status === ReservationStatus.COMPLETED
                       "
                     >
-                      <mat-icon>cancel</mat-icon>
+                      <mat-icon>cancel</mat-icon> Cancel
                     </button>
                   </td>
                 </ng-container>
@@ -237,20 +212,70 @@ import { MatBadgeModule } from '@angular/material/badge';
       .reservation-management-container {
         padding: 20px;
         color: #ffffff;
-        background-color: #181818;
+        background-color: transparent;
         min-height: 100vh;
       }
 
-      .page-header {
+      .dashboard-title-container {
         display: flex;
-        justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
       }
 
-      h1 {
+      .dashboard-title-marker {
+        width: 5px;
+        height: 30px;
+        background-color: #ff6b6b;
+        margin-right: 10px;
+        border-radius: 3px;
+      }
+
+      .dashboard-title {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 500;
         color: #ffffff;
-        margin-bottom: 0;
+      }
+
+      .action-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        gap: 10px;
+      }
+      
+      .back-button {
+        background-color: #444444 !important;
+        color: white !important;
+        transition: background-color 0.3s ease;
+      }
+      
+      .back-button:hover {
+        background-color: #555555 !important;
+      }
+
+      .table-card {
+        border-radius: 8px;
+        background-color: #222222;
+        margin-bottom: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+      
+      .cancel-button {
+        background-color: #ff6b6b !important;
+        color: white !important;
+        transition: background-color 0.3s ease;
+        padding: 0 12px;
+      }
+      
+      .cancel-button:hover {
+        background-color: #ff5252 !important;
+      }
+      
+      .cancel-button:disabled {
+        background-color: rgba(255, 107, 107, 0.5) !important;
+        color: rgba(255, 255, 255, 0.5) !important;
       }
 
       .loading-spinner {

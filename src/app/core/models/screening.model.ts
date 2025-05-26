@@ -20,6 +20,7 @@ export interface ScreeningBasicDTO {
     id: number;
     movieId: number;
     movieTitle: string;
+    moviePosterUrl?: string;
     roomId: number;
     roomNumber: number;
     startTime: string;

@@ -38,15 +38,24 @@ import { MatDividerModule } from '@angular/material/divider';
     MatDividerModule,
   ],
   template: `
-    <div class="room-create-container">
-      <div class="page-header">
-        <h1>Create New Room</h1>
-        <button mat-raised-button color="accent" routerLink="/admin/rooms">
+    <div class="screening-management-container">
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">Create New Room</h1>
+      </div>
+      
+      <div class="action-bar">
+        <div></div> <!-- Empty div to push the button to the right -->
+        <button
+          mat-raised-button
+          class="back-button"
+          routerLink="/admin/rooms"
+        >
           <mat-icon>arrow_back</mat-icon> Back to List
         </button>
       </div>
 
-      <mat-card>
+      <mat-card class="table-card">
         <mat-card-content>
           <form [formGroup]="roomForm" (ngSubmit)="onSubmit()">
             <div class="form-row">
@@ -103,38 +112,56 @@ import { MatDividerModule } from '@angular/material/divider';
 
             <div class="room-preview">
               <h3>Room Preview</h3>
-              <div class="screen">SCREEN</div>
-              <div
-                class="seats-grid"
-                [style.grid-template-columns]="gridTemplateColumns"
-              >
-                <div
-                  *ngFor="let seat of previewSeats"
-                  class="seat"
-                  [class.aisle-right]="seat.isAisleRight"
-                  [class.aisle-left]="seat.isAisleLeft"
-                >
-                  {{ seat.label }}
+              <div class="screen-container">
+                <div class="screen">
+                  <div class="screen-text">SCREEN</div>
+                </div>
+              </div>
+              
+              <div class="seats-container">
+                <div class="row" *ngFor="let row of previewSeats; let rowIndex = index">
+                  <div class="row-label">{{row[0]?.row}}</div>
+                  <div class="seats-row">
+                    <div *ngFor="let seat of row" 
+                         class="seat"
+                         [class.aisle-right]="seat.isAisleRight"
+                         [class.aisle-left]="seat.isAisleLeft"
+                    >
+                      {{seat.number}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="seat-legend">
+                <div class="legend-item">
+                  <div class="seat-sample regular"></div>
+                  <span>Regular seat</span>
+                </div>
+                <div class="legend-item">
+                  <div class="seat-sample aisle"></div>
+                  <span>Aisle seat</span>
                 </div>
               </div>
             </div>
 
             <div class="form-actions">
               <button
-                type="button"
-                mat-button
-                color="warn"
-                (click)="resetForm()"
-              >
-                Reset
-              </button>
-              <button
-                type="submit"
                 mat-raised-button
-                class="create-room-btn"
+                class="accent-bg"
+                type="submit"
                 [disabled]="roomForm.invalid || saving"
               >
-                <mat-icon>save</mat-icon> Create Room
+                <mat-icon>save</mat-icon>
+                {{ saving ? 'Saving...' : 'Save Room' }}
+              </button>
+              <button
+                mat-raised-button
+                type="button"
+                (click)="resetForm()"
+                [disabled]="saving"
+              >
+                <mat-icon>refresh</mat-icon> Reset
               </button>
             </div>
           </form>
@@ -144,25 +171,51 @@ import { MatDividerModule } from '@angular/material/divider';
   `,
   styles: [
     `
-      .room-create-container {
+      .screening-management-container {
         padding: 20px;
-        color: #ffffff;
-        background-color: #181818;
-        min-height: 100vh;
       }
 
-      .page-header {
+      .dashboard-title-container {
         display: flex;
-        justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
       }
 
-      h1,
-      h2,
-      h3,
-      p {
-        color: #ffffff;
+      .dashboard-title-marker {
+        width: 5px;
+        height: 30px;
+        background-color: #ff6b6b;
+        margin-right: 10px;
+        border-radius: 3px;
+      }
+
+      .dashboard-title {
+        font-size: 24px;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      .action-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        gap: 10px;
+      }
+      
+      .back-button {
+        background-color: #444444 !important;
+        color: white !important;
+        transition: background-color 0.3s ease;
+      }
+      
+      .back-button:hover {
+        background-color: #555555 !important;
+      }
+
+      .table-card {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
 
       .form-row {
@@ -192,52 +245,158 @@ import { MatDividerModule } from '@angular/material/divider';
       .room-preview {
         margin: 20px 0;
         padding: 20px;
-        background-color: #222222;
-        border-radius: 4px;
-        border: 1px solid #3a3a3a;
+        border-radius: 8px;
+        background-color: #1a1a1a;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       }
 
-      .room-preview h3 {
-        margin-top: 0;
-        text-align: center;
-        color: #ffffff;
+      .screen-container {
+        margin: 0 0 40px;
+        position: relative;
+        perspective: 500px;
       }
 
       .screen {
-        background-color: #333333;
-        padding: 10px;
-        text-align: center;
-        margin-bottom: 20px;
-        border-radius: 4px;
-        font-weight: bold;
-        color: #ffffff;
+        width: 90%;
+        height: 50px;
+        background: linear-gradient(180deg, #333333, #222222);
+        margin: 0 auto;
+        border-radius: 4px 4px 0 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        transform: rotateX(-20deg);
+        border-bottom: 2px solid #ff6b6b;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
       }
 
-      .seats-grid {
-        display: grid;
-        gap: 5px;
+      .screen:after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 0;
+        right: 0;
+        height: 15px;
+        background: linear-gradient(to bottom, rgba(255, 107, 107, 0.2), transparent);
+      }
+
+      .screen-text {
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        font-size: 14px;
+      }
+
+      .seats-container {
+        width: 100%;
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 20px 0;
+        background-color: #222222;
+        border-radius: 8px;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        width: 100%;
         justify-content: center;
+        gap: 10px;
+      }
+
+      .row-label {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(255, 107, 107, 0.2);
+        color: #ffffff;
+        border-radius: 50%;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      .seats-row {
+        display: flex;
+        gap: 8px;
       }
 
       .seat {
         width: 30px;
         height: 30px;
-        background-color: #2c2c2c;
+        background-color: #444444;
+        border-radius: 4px 4px 10px 10px;
+        text-align: center;
+        line-height: 30px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #ffffff;
+        border-bottom: 4px solid #333333;
+        user-select: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .seat:hover {
+        background-color: #ff6b6b;
+        border-bottom-color: #e55a5a;
+        transform: translateY(-2px);
+      }
+
+      .aisle-right {
+        margin-right: 12px;
+        background-color: #555555;
+        border-bottom-color: #444444;
+      }
+
+      .aisle-left {
+        margin-left: 12px;
+        background-color: #555555;
+        border-bottom-color: #444444;
+      }
+
+      .seat-legend {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin: 20px 0 10px;
+        padding: 12px;
+        background-color: #2a2a2a;
+        border-radius: 4px;
+        border: 1px solid #333333;
+      }
+
+      .legend-item {
         display: flex;
         align-items: center;
-        justify-content: center;
-        border-radius: 4px;
-        font-size: 12px;
+        gap: 8px;
         color: #ffffff;
-        border: 1px solid #3a3a3a;
       }
 
-      .seat.aisle-right {
-        margin-right: 15px;
+      .seat-sample {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px 4px 8px 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
 
-      .seat.aisle-left {
-        margin-left: 15px;
+      .seat-sample.regular {
+        background-color: #444444;
+        border-bottom: 3px solid #333333;
+      }
+
+      .seat-sample.aisle {
+        background-color: #555555;
+        border-bottom: 3px solid #444444;
       }
 
       .form-actions {
@@ -404,23 +563,28 @@ export class RoomCreateComponent {
     const columns = this.roomForm.get('columns')?.value || 0;
 
     this.previewSeats = [];
-    this.gridTemplateColumns = `repeat(${columns}, 30px)`;
 
-    // Generate preview seats
+    // Generate rows of seats
     for (let i = 0; i < rows; i++) {
       const rowLabel = String.fromCharCode(65 + i); // A, B, C, ...
+      const rowSeats = [];
 
       for (let j = 0; j < columns; j++) {
         const seatNumber = j + 1;
-        const isAisleRight = (j + 1) % 5 === 0 && j < columns - 1;
-        const isAisleLeft = j % 5 === 0 && j > 0;
+        // Create aisles every 4 seats for better layout
+        const isAisleRight = (j + 1) % 4 === 0 && j < columns - 1;
+        const isAisleLeft = j % 4 === 0 && j > 0;
 
-        this.previewSeats.push({
+        rowSeats.push({
+          row: rowLabel,
+          number: seatNumber,
           label: `${rowLabel}${seatNumber}`,
           isAisleRight,
           isAisleLeft,
         });
       }
+      
+      this.previewSeats.push(rowSeats);
     }
   }
 

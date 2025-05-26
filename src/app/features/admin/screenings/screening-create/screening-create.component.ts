@@ -46,21 +46,25 @@ import { Observable, map, startWith } from 'rxjs';
   ],
   template: `
     <div class="screening-create-container">
-      <div class="page-header">
-        <h1>{{ isEditMode ? 'Edit Screening' : 'Schedule New Screening' }}</h1>
-        <button mat-raised-button color="accent" routerLink="/admin/screenings">
-          <mat-icon>arrow_back</mat-icon> Back to List
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">{{ isEditMode ? 'Edit Screening' : 'Schedule New Screening' }}</h1>
+      </div>
+
+      <div class="action-bar">
+        <button mat-raised-button routerLink="/admin/screenings">
+          <mat-icon>arrow_back</mat-icon> Back to Screenings
         </button>
       </div>
 
       <div *ngIf="loading" class="loading-spinner">
-        <mat-spinner></mat-spinner>
+        <mat-spinner class="accent-spinner"></mat-spinner>
       </div>
 
-      <mat-card *ngIf="!loading">
+      <mat-card *ngIf="!loading" class="form-card">
         <mat-card-content>
           <form [formGroup]="screeningForm" (ngSubmit)="onSubmit()">
-            <!-- Movie Selection -->
+            <!-- Movie Selection with Autocomplete -->
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Movie</mat-label>
               <input
@@ -68,7 +72,7 @@ import { Observable, map, startWith } from 'rxjs';
                 matInput
                 formControlName="movieTitle"
                 [matAutocomplete]="autoMovie"
-                placeholder="Search movie..."
+                placeholder="Search for a movie..."
               >
               <mat-autocomplete #autoMovie="matAutocomplete" [displayWith]="displayMovieTitle">
                 <mat-option *ngFor="let movie of filteredMovies | async" [value]="movie">
@@ -82,7 +86,7 @@ import { Observable, map, startWith } from 'rxjs';
                 </mat-option>
               </mat-autocomplete>
               <mat-error *ngIf="screeningForm.get('movieTitle')?.hasError('required')">
-                Select a movie
+                Movie selection is required
               </mat-error>
             </mat-form-field>
 
@@ -95,7 +99,7 @@ import { Observable, map, startWith } from 'rxjs';
                 </mat-option>
               </mat-select>
               <mat-error *ngIf="screeningForm.get('roomId')?.hasError('required')">
-                Select a room
+                Room selection is required
               </mat-error>
             </mat-form-field>
 
@@ -103,89 +107,61 @@ import { Observable, map, startWith } from 'rxjs';
               <!-- Date Selection -->
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Date</mat-label>
-                <input
-                  matInput
-                  [matDatepicker]="picker"
-                  formControlName="date"
-                  [min]="minDate"
-                >
+                <input matInput [matDatepicker]="picker" formControlName="date" [min]="minDate">
                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
                 <mat-error *ngIf="screeningForm.get('date')?.hasError('required')">
-                  Select a date
+                  Date is required
                 </mat-error>
               </mat-form-field>
 
               <!-- Time Selection -->
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Time</mat-label>
-                <input
-                  matInput
-                  type="time"
-                  formControlName="time"
-                >
+                <input matInput type="time" formControlName="time">
                 <mat-error *ngIf="screeningForm.get('time')?.hasError('required')">
-                  Select a time
+                  Time is required
                 </mat-error>
               </mat-form-field>
             </div>
 
-            <!-- Price -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Price</mat-label>
-              <input
-                matInput
-                type="number"
-                formControlName="ticketPrice"
-                min="0"
-                step="0.01"
-              >
-              <span matSuffix>€</span>
-              <mat-error *ngIf="screeningForm.get('ticketPrice')?.hasError('required')">
-                Price is required
-              </mat-error>
-              <mat-error *ngIf="screeningForm.get('ticketPrice')?.hasError('min')">
-                Price cannot be negative
-              </mat-error>
-            </mat-form-field>
-
-            <mat-divider class="divider"></mat-divider>
-
-            <h3>Additional Options</h3>
-
             <div class="form-row">
+              <!-- Language -->
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Language</mat-label>
-                <input matInput formControlName="language">
+                <input matInput formControlName="language" placeholder="e.g., English, Spanish, etc.">
               </mat-form-field>
 
+              <!-- Format -->
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Format</mat-label>
                 <mat-select formControlName="format">
                   <mat-option value="Digital">Digital</mat-option>
                   <mat-option value="IMAX">IMAX</mat-option>
-                  <mat-option value="35mm">35mm</mat-option>
-                  <mat-option value="70mm">70mm</mat-option>
+                  <mat-option value="35mm">35mm Film</mat-option>
+                  <mat-option value="70mm">70mm Film</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
 
-            <div class="checkbox-row">
-              <mat-checkbox formControlName="is3D">3D</mat-checkbox>
-              <mat-checkbox formControlName="hasSubtitles">Subtitles</mat-checkbox>
+            <div class="feature-options">
+              <h3>Additional Features</h3>
+              <div class="checkbox-row">
+                <!-- 3D Checkbox -->
+                <mat-checkbox formControlName="is3D" color="accent">3D Screening</mat-checkbox>
+
+                <!-- Subtitles Checkbox -->
+                <mat-checkbox formControlName="hasSubtitles" color="accent">With Subtitles</mat-checkbox>
+              </div>
             </div>
 
             <div class="form-actions">
-              <button type="button" mat-button color="warn" (click)="resetForm()">
-                Reset
+              <button mat-button type="button" (click)="resetForm()" [disabled]="saving">
+                Reset Form
               </button>
-              <button
-                type="submit"
-                mat-raised-button
-                color="primary"
-                [disabled]="screeningForm.invalid || saving"
-              >
-                <mat-icon>save</mat-icon> {{ isEditMode ? 'Update Screening' : 'Schedule Screening' }}
+              <button mat-raised-button class="accent-bg" type="submit" [disabled]="screeningForm.invalid || saving">
+                {{ isEditMode ? 'Update' : 'Schedule' }} Screening
+                <mat-spinner *ngIf="saving" diameter="20" class="button-spinner"></mat-spinner>
               </button>
             </div>
           </form>
@@ -195,26 +171,58 @@ import { Observable, map, startWith } from 'rxjs';
   `,
   styles: [`
     .screening-create-container {
-      padding: 20px;
-      color: #FFFFFF;
-      background-color: #181818;
+      width: 100%;
+      color: #ffffff;
+      background-color: transparent;
     }
 
-    .page-header {
+    .dashboard-title-container {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
-    h1, h2, h3, p {
-      color: #FFFFFF;
+    .dashboard-title-marker {
+      width: 5px;
+      height: 30px;
+      background-color: #ff6b6b;
+      margin-right: 10px;
+    }
+
+    .dashboard-title {
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 500;
+      margin: 0;
+    }
+    
+    .action-bar {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-bottom: 20px;
     }
 
     .loading-spinner {
       display: flex;
       justify-content: center;
-      padding: 50px 0;
+      padding: 50px;
+    }
+    
+    .accent-spinner ::ng-deep circle {
+      stroke: #ff6b6b !important;
+    }
+    
+    .button-spinner {
+      display: inline-block;
+      margin-left: 8px;
+    }
+    
+    .form-card {
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: #333333 !important;
+      margin-bottom: 20px;
     }
 
     .form-row {
@@ -232,15 +240,25 @@ import { Observable, map, startWith } from 'rxjs';
       margin-bottom: 16px;
     }
 
-    .divider {
-      margin: 24px 0;
-      border-color: #3a3a3a;
+    .feature-options {
+      background-color: rgba(255, 107, 107, 0.1);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .feature-options h3 {
+      color: #ffffff;
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 16px;
+      font-weight: 500;
     }
 
     .checkbox-row {
       display: flex;
-      gap: 20px;
-      margin-bottom: 16px;
+      gap: 16px;
+      margin-bottom: 10px;
     }
 
     .form-actions {
@@ -260,7 +278,7 @@ import { Observable, map, startWith } from 'rxjs';
       width: 30px;
       height: 45px;
       object-fit: cover;
-      border-radius: 2px;
+      border-radius: 3px;
     }
 
     .no-poster {
@@ -269,63 +287,74 @@ import { Observable, map, startWith } from 'rxjs';
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #333333;
-      border-radius: 2px;
-      color: #FFFFFF;
+      background-color: #444444;
+      border-radius: 3px;
+    }
+    
+    .accent-bg {
+      background-color: #ff6b6b !important;
+      color: white !important;
     }
 
-    ::ng-deep .mat-card {
-      background-color: #222222;
-      color: #FFFFFF;
-      border: 1px solid #3a3a3a;
+    ::ng-deep .mat-mdc-card {
+      background-color: #333333 !important;
+      color: #ffffff !important;
     }
 
-    ::ng-deep .mat-form-field-label {
+    ::ng-deep .mat-mdc-form-field-label {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    ::ng-deep .mat-mdc-input-element {
+      color: #ffffff !important;
+    }
+
+    ::ng-deep .mat-mdc-form-field-infix input, 
+    ::ng-deep .mat-mdc-form-field-infix textarea {
+      color: #ffffff !important;
+    }
+
+    ::ng-deep .mat-mdc-icon {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    ::ng-deep .mat-mdc-raised-button:not(.accent-bg) {
+      background-color: #444444 !important;
+      color: #ffffff !important;
+    }
+
+    ::ng-deep .mat-mdc-button {
       color: rgba(255, 255, 255, 0.7) !important;
     }
 
-    ::ng-deep .mat-form-field-outline {
-      color: rgba(255, 255, 255, 0.3) !important;
-    }
-
-    ::ng-deep .mat-form-field-infix input, 
-    ::ng-deep .mat-form-field-infix textarea {
-      color: #FFFFFF !important;
-    }
-
-    ::ng-deep .mat-select-value {
-      color: #FFFFFF !important;
-    }
-
-    ::ng-deep .mat-option {
-      color: #FFFFFF !important;
-      background-color: #222222 !important;
-    }
-
-    ::ng-deep .mat-option:hover:not(.mat-option-disabled) {
-      background-color: #2a2a2a !important;
-    }
-
-    ::ng-deep .mat-autocomplete-panel {
-      background-color: #222222 !important;
-      border: 1px solid #3a3a3a !important;
-    }
-
-    ::ng-deep .mat-checkbox-label {
-      color: #FFFFFF !important;
-    }
-
-    ::ng-deep .mat-checkbox-checked .mat-checkbox-background {
-      background-color: #00B020 !important;
-    }
-
-    ::ng-deep .mat-datepicker-toggle {
+    ::ng-deep .mat-mdc-datepicker-toggle {
       color: rgba(255, 255, 255, 0.7) !important;
     }
 
+    ::ng-deep .mat-mdc-checkbox .mdc-checkbox .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background {
+      background-color: #ff6b6b !important;
+      border-color: #ff6b6b !important;
+    }
+    
+    ::ng-deep .mat-mdc-checkbox .mdc-checkbox .mdc-checkbox__native-control:enabled ~ .mdc-checkbox__background {
+      border-color: rgba(255, 255, 255, 0.7) !important;
+    }
+    
     ::ng-deep .mat-calendar {
-      background-color: #222222 !important;
-      color: #FFFFFF !important;
+      background-color: #333333 !important;
+      color: #ffffff !important;
+    }
+    
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .checkbox-row {
+        flex-direction: column;
+        gap: 8px;
+      }
     }
 
     ::ng-deep .mat-calendar-body-selected {
@@ -396,7 +425,6 @@ export class ScreeningCreateComponent implements OnInit {
       roomId: ['', Validators.required],
       date: ['', Validators.required],
       time: ['', Validators.required],
-      ticketPrice: [10.0, [Validators.required, Validators.min(0)]],
       is3D: [false],
       hasSubtitles: [false],
       language: ['English'],
@@ -458,24 +486,30 @@ export class ScreeningCreateComponent implements OnInit {
   }
 
   populateForm(screening: Screening): void {
-    // Find the movie object from the movies array
+    // Find the movie in the movies array by ID
     const movie = this.movies.find(m => m.id === screening.movieId);
+    
+    if (!movie) {
+      console.error('Movie not found for screening:', screening);
+      this.snackBar.open('Error: Movie not found for this screening', 'Close', {
+        duration: 5000
+      });
+      return;
+    }
 
-    // Parse the date and time from the startTime
-    // Convert the string date to a Date object properly
-    const startDate = new Date(screening.startTime);
+    // Format the date and time for the form
+    const screeningDate = new Date(screening.startTime);
+    const date = screeningDate;
+    const hours = String(screeningDate.getHours()).padStart(2, '0');
+    const minutes = String(screeningDate.getMinutes()).padStart(2, '0');
+    const time = `${hours}:${minutes}`;
 
-    // Extract hours and minutes directly from the Date object
-    const hours = startDate.getHours().toString().padStart(2, '0');
-    const minutes = startDate.getMinutes().toString().padStart(2, '0');
-    const timeString = `${hours}:${minutes}`;
-
+    // Populate the form with existing values
     this.screeningForm.patchValue({
-      movieTitle: movie || '',
+      movieTitle: movie,
       roomId: screening.roomId,
-      date: startDate,
-      time: timeString,
-      ticketPrice: screening.ticketPrice,
+      date: date,
+      time: time,
       is3D: screening.is3D || false,
       hasSubtitles: screening.hasSubtitles || false,
       language: screening.language || 'English',
@@ -559,7 +593,6 @@ export class ScreeningCreateComponent implements OnInit {
       movieId,
       roomId: formValue.roomId,
       startTime: localISOString,
-      ticketPrice: formValue.ticketPrice,
       is3D: formValue.is3D,
       hasSubtitles: formValue.hasSubtitles,
       language: formValue.language,

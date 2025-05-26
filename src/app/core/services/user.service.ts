@@ -30,6 +30,10 @@ export class UserService {
     return this.http.put<User>(`${environment.apiUrl}/users/${id}/roles`, { roles });
   }
 
+  giveAdminRole(id: number): Observable<User> {
+    return this.http.put<User>(`${environment.apiUrl}/users/${id}/admin`, {});
+  }
+
   activateUser(id: number): Observable<User> {
     return this.http.put<User>(`${environment.apiUrl}/users/${id}/activate`, {});
   }

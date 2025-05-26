@@ -41,30 +41,31 @@ import { MatChipsModule } from '@angular/material/chips';
   ],
   template: `
     <div class="screening-management-container">
-      <div class="page-header">
-        <h1>Screening Management</h1>
-        <div class="header-actions">
-          <button
-            mat-raised-button
-            color="primary"
-            routerLink="/admin/screenings/create"
-          >
-            <mat-icon>add</mat-icon> Schedule Screening
-          </button>
-          <button
-            mat-raised-button
-            color="accent"
-            routerLink="/admin/dashboard"
-          >
-            <mat-icon>arrow_back</mat-icon> Back to Dashboard
-          </button>
-        </div>
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">Screening Management</h1>
       </div>
 
-      <mat-card>
+      <div class="action-bar">
+        <button
+          mat-raised-button
+          class="accent-bg"
+          routerLink="/admin/screenings/create"
+        >
+          <mat-icon>add</mat-icon> Schedule Screening
+        </button>
+        <button
+          mat-raised-button
+          routerLink="/admin/dashboard"
+        >
+          <mat-icon>arrow_back</mat-icon> Back to Dashboard
+        </button>
+      </div>
+
+      <mat-card class="table-card">
         <mat-card-content>
           <div *ngIf="loading" class="loading-spinner">
-            <mat-spinner></mat-spinner>
+            <mat-spinner class="accent-spinner"></mat-spinner>
           </div>
 
           <div *ngIf="!loading">
@@ -91,6 +92,24 @@ import { MatChipsModule } from '@angular/material/chips';
                   <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
                   <td mat-cell *matCellDef="let screening">
                     {{ screening.id }}
+                  </td>
+                </ng-container>
+
+                <!-- Poster Column -->
+                <ng-container matColumnDef="poster">
+                  <th mat-header-cell *matHeaderCellDef>Poster</th>
+                  <td mat-cell *matCellDef="let screening">
+                    <div class="poster-container">
+                      <img 
+                        *ngIf="screening.moviePosterUrl" 
+                        [src]="screening.moviePosterUrl" 
+                        alt="{{ screening.movieTitle }} poster"
+                        class="movie-poster"
+                      />
+                      <div *ngIf="!screening.moviePosterUrl" class="no-poster">
+                        <mat-icon>image_not_supported</mat-icon>
+                      </div>
+                    </div>
                   </td>
                 </ng-container>
 
@@ -134,20 +153,20 @@ import { MatChipsModule } from '@angular/material/chips';
                   </th>
                   <td mat-cell *matCellDef="let screening">
                     {{ screening.startTime | date : 'h:mm a' }}
-                    <div class="screening-badges">
-                      <span *ngIf="screening.is3D" class="badge badge-3d">3D</span>
-                      <span *ngIf="screening.hasSubtitles" class="badge badge-sub">SUB</span>
-                    </div>
                   </td>
                 </ng-container>
 
-                <!-- Price Column -->
-                <ng-container matColumnDef="price">
+                <!-- Format Column -->
+                <ng-container matColumnDef="format">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    Price
+                    Format
                   </th>
                   <td mat-cell *matCellDef="let screening">
-                    €{{ screening.ticketPrice }}
+                    <div class="format-badges">
+                      <span class="format-badge">{{ screening.format || 'Digital' }}</span>
+                      <span class="format-badge" *ngIf="screening.is3D">3D</span>
+                      <span class="format-badge" *ngIf="screening.hasSubtitles">Subtitles</span>
+                    </div>
                   </td>
                 </ng-container>
 
@@ -202,33 +221,52 @@ import { MatChipsModule } from '@angular/material/chips';
   styles: [
     `
       .screening-management-container {
-        padding: 20px;
+        width: 100%;
         color: #ffffff;
-        background-color: #181818;
-        min-height: 100vh;
+        background-color: transparent;
       }
 
-      .page-header {
+      .dashboard-title-container {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
       }
 
-      h1 {
+      .dashboard-title-marker {
+        width: 5px;
+        height: 30px;
+        background-color: #ff6b6b;
+        margin-right: 10px;
+      }
+
+      .dashboard-title {
         color: #ffffff;
+        font-size: 24px;
+        font-weight: 500;
         margin: 0;
       }
 
-      .header-actions {
+      .action-bar {
         display: flex;
         gap: 10px;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+      }
+
+      .table-card {
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #333333 !important;
       }
 
       .loading-spinner {
         display: flex;
         justify-content: center;
         padding: 30px;
+      }
+
+      .accent-spinner ::ng-deep circle {
+        stroke: #ff6b6b !important;
       }
 
       .filter-field {
@@ -249,31 +287,58 @@ import { MatChipsModule } from '@angular/material/chips';
         align-items: center;
         gap: 10px;
       }
-
-      .movie-info span {
-        color: #ffffff;
+    
+      .poster-container {
+        width: 60px;
+        height: 90px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        border-radius: 4px;
+        background-color: #333;
+        margin: 8px auto;
       }
-
+    
       .movie-poster {
-        width: 40px;
-        height: 60px;
+        width: 100%;
+        height: 100%;
         object-fit: cover;
         border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
 
       .no-poster {
-        width: 40px;
-        height: 60px;
         display: flex;
-        align-items: center;
         justify-content: center;
-        background-color: #333333;
-        border-radius: 4px;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        color: #666;
+      }
+
+      .format-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .format-badge {
+        font-size: 11px;
+        padding: 3px 6px;
+        border-radius: 12px;
+        background-color: rgba(255, 107, 107, 0.2);
+        color: #ff6b6b;
+      }
+
+      .accent-bg {
+        background-color: #ff6b6b !important;
+        color: white !important;
       }
 
       /* Ensure Angular Material components have proper text color */
       ::ng-deep .mat-mdc-card {
-        background-color: #222222 !important;
+        background-color: #333333 !important;
         color: #ffffff !important;
       }
 
@@ -305,11 +370,39 @@ import { MatChipsModule } from '@angular/material/chips';
 
       ::ng-deep .mat-mdc-table .mat-mdc-header-cell {
         color: rgba(255, 255, 255, 0.87) !important;
-        background-color: #202020 !important;
+        background-color: #2c2c2c !important;
       }
 
       ::ng-deep .mat-mdc-table .mat-mdc-cell {
         color: #ffffff !important;
+      }
+
+      ::ng-deep .mat-mdc-raised-button:not(.accent-bg) {
+        background-color: #444444 !important;
+        color: #ffffff !important;
+      }
+
+      ::ng-deep .mat-mdc-paginator {
+        background-color: #2c2c2c !important;
+      }
+
+      ::ng-deep .mat-mdc-icon-button {
+        color: rgba(255, 255, 255, 0.7) !important;
+      }
+
+      ::ng-deep .mat-mdc-icon-button:disabled {
+        color: rgba(255, 255, 255, 0.3) !important;
+      }
+
+      @media (max-width: 768px) {
+        .action-bar {
+          flex-direction: column;
+          align-items: flex-end;
+        }
+
+        .action-bar button {
+          width: auto;
+        }
       }
     `,
   ],
@@ -317,7 +410,7 @@ import { MatChipsModule } from '@angular/material/chips';
 export class ScreeningManagementComponent implements OnInit, AfterViewInit {
   screenings: ScreeningBasicDTO[] = [];
   loading = true;
-  displayedColumns: string[] = ['id', 'movie', 'room', 'date', 'time', 'price', 'actions'];
+  displayedColumns: string[] = ['id', 'poster', 'movie', 'room', 'date', 'time', 'format', 'actions'];
   dataSource = new MatTableDataSource<ScreeningBasicDTO>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;

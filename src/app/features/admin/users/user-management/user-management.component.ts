@@ -45,94 +45,120 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     MatSlideToggleModule
   ],
   template: `
-    <div class="user-management-container">
-      <div class="page-header">
-        <h1>User Management</h1>
-        <button mat-raised-button color="accent" routerLink="/admin/dashboard">
+    <div class="screening-management-container">
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">User Management</h1>
+      </div>
+
+      <div class="action-bar">
+        <div></div> <!-- Empty div to push the button to the right -->
+        <button
+          mat-raised-button
+          class="back-button"
+          routerLink="/admin/dashboard"
+        >
           <mat-icon>arrow_back</mat-icon> Back to Dashboard
         </button>
       </div>
 
-      <mat-card>
+      <mat-card class="table-card">
         <mat-card-content>
           <div *ngIf="loading" class="loading-spinner">
-            <mat-spinner></mat-spinner>
+            <mat-spinner class="accent-spinner"></mat-spinner>
           </div>
 
           <div *ngIf="!loading">
             <mat-form-field appearance="outline" class="filter-field">
-              <mat-label>Filter users</mat-label>
-              <input matInput (keyup)="applyFilter($event)" placeholder="Name, email, role..." #input>
+              <mat-label>Filter Users</mat-label>
+              <input
+                matInput
+                (keyup)="applyFilter($event)"
+                placeholder="Name, email, role..."
+                #input
+              />
               <mat-icon matSuffix>search</mat-icon>
             </mat-form-field>
 
             <div class="table-container">
-              <table mat-table [dataSource]="dataSource" matSort class="user-table">
+              <table
+                mat-table
+                [dataSource]="dataSource"
+                matSort
+                class="user-table"
+              >
                 <!-- ID Column -->
                 <ng-container matColumnDef="id">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
-                  <td mat-cell *matCellDef="let user"> {{user.id}} </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+                  <td mat-cell *matCellDef="let user">
+                    {{ user.id }}
+                  </td>
                 </ng-container>
 
                 <!-- Username Column -->
                 <ng-container matColumnDef="username">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Username </th>
-                  <td mat-cell *matCellDef="let user"> {{user.username}} </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Username</th>
+                  <td mat-cell *matCellDef="let user">
+                    {{ user.username }}
+                  </td>
                 </ng-container>
 
                 <!-- Email Column -->
                 <ng-container matColumnDef="email">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
-                  <td mat-cell *matCellDef="let user"> {{user.email}} </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+                  <td mat-cell *matCellDef="let user">
+                    {{ user.email }}
+                  </td>
                 </ng-container>
 
                 <!-- Name Column -->
                 <ng-container matColumnDef="name">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
-                  <td mat-cell *matCellDef="let user"> {{user.firstName}} {{user.lastName}} </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+                  <td mat-cell *matCellDef="let user">
+                    {{ user.firstName }} {{ user.lastName }}
+                  </td>
                 </ng-container>
 
                 <!-- Roles Column -->
                 <ng-container matColumnDef="roles">
-                  <th mat-header-cell *matHeaderCellDef> Roles </th>
+                  <th mat-header-cell *matHeaderCellDef>Roles</th>
                   <td mat-cell *matCellDef="let user">
                     <div class="role-chips">
-                      <span *ngFor="let role of user.roles" class="role-chip"
-                            [ngClass]="{'admin-role': role === 'ROLE_ADMIN', 'user-role': role === 'ROLE_USER'}">
-                        {{ role === 'ROLE_ADMIN' ? 'Admin' : 'User' }}
+                      <span class="role-chip" *ngFor="let role of user.roles">
+                        {{ role.name ? (role.name === 'ROLE_ADMIN' ? 'Admin' : role.name === 'ROLE_USER' ? 'User' : role.name) : (role === 'ROLE_ADMIN' ? 'Admin' : role === 'ROLE_USER' ? 'User' : role) }}
                       </span>
                     </div>
                   </td>
                 </ng-container>
 
-                <!-- Status Column -->
-                <ng-container matColumnDef="status">
-                  <th mat-header-cell *matHeaderCellDef> Status </th>
-                  <td mat-cell *matCellDef="let user">
-                    <mat-slide-toggle
-                      [checked]="user.isActive"
-                      (change)="toggleUserStatus(user)"
-                      [disabled]="isCurrentUser(user)">
-                    </mat-slide-toggle>
-                  </td>
-                </ng-container>
-
                 <!-- Actions Column -->
                 <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef> Actions </th>
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
                   <td mat-cell *matCellDef="let user">
-                    <button mat-icon-button color="primary" (click)="viewUserDetails(user)" matTooltip="View details">
+                    <button 
+                      mat-icon-button 
+                      class="action-button"
+                      matTooltip="View Details" 
+                      (click)="viewUserDetails(user)"
+                    >
                       <mat-icon>visibility</mat-icon>
                     </button>
-                    <button mat-icon-button color="accent" (click)="editUserRoles(user)" matTooltip="Edit roles">
+                    <button 
+                      mat-icon-button 
+                      class="action-button"
+                      matTooltip="Give Admin Role" 
+                      (click)="giveUserAdminRole(user)" 
+                      [disabled]="isCurrentUser(user) || hasAdminRole(user)"
+                    >
                       <mat-icon>admin_panel_settings</mat-icon>
                     </button>
-                    <button
-                      mat-icon-button
-                      color="warn"
-                      (click)="confirmDelete(user)"
-                      matTooltip="Delete user"
-                      [disabled]="isCurrentUser(user)">
+                    <button 
+                      mat-icon-button 
+                      class="action-button"
+                      matTooltip="Delete User" 
+                      (click)="confirmDelete(user)" 
+                      [disabled]="isCurrentUser(user)"
+                    >
                       <mat-icon>delete</mat-icon>
                     </button>
                   </td>
@@ -154,54 +180,66 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     </div>
   `,
   styles: [`
-    .user-management-container {
+    .screening-management-container {
       padding: 20px;
-      color: #FFFFFF;
     }
 
-    .page-header {
+    .dashboard-title-container {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
     }
 
-    h1 {
-      color: #FFFFFF;
+    .dashboard-title-marker {
+      width: 5px;
+      height: 30px;
+      background-color: #ff6b6b;
+      margin-right: 10px;
+      border-radius: 3px;
+    }
+
+    .dashboard-title {
+      font-size: 24px;
+      font-weight: 500;
       margin: 0;
+    }
+
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+      
+    .back-button {
+      background-color: #444444 !important;
+      color: white !important;
+      transition: background-color 0.3s ease;
+    }
+      
+    .back-button:hover {
+      background-color: #555555 !important;
+    }
+
+    .table-card {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .loading-spinner {
       display: flex;
       justify-content: center;
-      padding: 50px 0;
+      padding: 30px;
+    }
+
+    .accent-spinner ::ng-deep circle {
+      stroke: #ff6b6b !important;
     }
 
     .filter-field {
       width: 100%;
       margin-bottom: 20px;
-    }
-
-    ::ng-deep .mat-form-field-label {
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
-
-    ::ng-deep .mat-form-field-outline {
-      color: rgba(255, 255, 255, 0.3) !important;
-    }
-
-    ::ng-deep .mat-form-field-infix input {
-      color: #FFFFFF !important;
-    }
-
-    ::ng-deep .mat-icon {
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    ::ng-deep .mat-card {
-      background-color: #222222;
-      color: #FFFFFF;
-      border: 1px solid #3a3a3a;
     }
 
     .table-container {
@@ -210,40 +248,12 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
     .user-table {
       width: 100%;
-      background-color: transparent;
-    }
-
-    ::ng-deep .mat-table {
-      background-color: transparent !important;
-    }
-
-    ::ng-deep .mat-header-cell {
-      color: rgba(255, 255, 255, 0.9) !important;
-      font-weight: 500;
-      background-color: #1a1a1a;
-    }
-
-    ::ng-deep .mat-cell {
       color: rgba(255, 255, 255, 0.7) !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
-
-    ::ng-deep .mat-row:hover {
-      background-color: rgba(255, 255, 255, 0.05);
-    }
-
-    ::ng-deep .mat-paginator {
-      background-color: transparent;
-      color: #FFFFFF;
-    }
-
-    ::ng-deep .mat-paginator-page-size-label, 
-    ::ng-deep .mat-paginator-range-label {
-      color: rgba(255, 255, 255, 0.7);
     }
 
     .role-chips {
       display: flex;
+      flex-wrap: wrap;
       gap: 5px;
     }
 
@@ -251,59 +261,33 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
       padding: 4px 8px;
       border-radius: 16px;
       font-size: 12px;
+      background-color: #ff6b6b;
+      color: white;
       font-weight: 500;
     }
 
-    .admin-role {
-      background-color: rgba(0, 176, 32, 0.2);
-      color: #00B020;
-      border: 1px solid rgba(0, 176, 32, 0.4);
+    .view-button {
+      color: #ff6b6b;
     }
 
-    .user-role {
-      background-color: rgba(255, 255, 255, 0.1);
-      color: #FFFFFF;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    .admin-button {
+      color: #ff6b6b;
     }
 
-    ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
-      background-color: rgba(0, 176, 32, 0.3);
+    .delete-button {
+      color: #ff6b6b;
     }
 
-    ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
-      background-color: #00B020;
-    }
-
-    ::ng-deep .mat-raised-button.mat-primary {
-      background-color: #00B020;
-    }
-
-    ::ng-deep .mat-raised-button.mat-accent {
-      background-color: #2c2c2c;
-      color: #FFFFFF;
-    }
-
-    ::ng-deep .mat-icon-button {
-      color: #FFFFFF;
-    }
-
-    ::ng-deep .mat-icon-button.mat-primary {
-      color: #00B020;
-    }
-
-    ::ng-deep .mat-icon-button.mat-accent {
-      color: #00B020;
-    }
-
-    ::ng-deep .mat-icon-button.mat-warn {
-      color: #f44336;
+    ::ng-deep .mat-raised-button {
+      background-color: #ff6b6b;
+      color: white;
     }
   `]
 })
 export class UserManagementComponent implements OnInit {
   users: User[] = [];
   loading = true;
-  displayedColumns: string[] = ['id', 'username', 'email', 'name', 'roles', 'status', 'actions'];
+  displayedColumns: string[] = ['id', 'username', 'email', 'name', 'roles', 'actions'];
   dataSource: any;
   currentUserId: number = 0; // Replace this with value from AuthService
 
@@ -366,7 +350,43 @@ export class UserManagementComponent implements OnInit {
   }
 
   viewUserDetails(user: User): void {
-    alert(`User Details:\n\nID: ${user.id}\nEmail: ${user.email}\nName: ${user.firstName} ${user.lastName}\nRoles: ${user.roles.join(', ')}`);
+    const roleLabels = user.roles.map(role => {
+      if (typeof role === 'object' && role.name) {
+        if (role.name === 'ROLE_ADMIN') return 'Admin';
+        if (role.name === 'ROLE_USER') return 'User';
+        return role.name;
+      } else {
+        if (role === 'ROLE_ADMIN') return 'Admin';
+        if (role === 'ROLE_USER') return 'User';
+        return role;
+      }
+    }).join(', ');
+    
+    alert(`User Details:\n\nID: ${user.id}\nEmail: ${user.email}\nName: ${user.firstName} ${user.lastName}\nRoles: ${roleLabels}`);
+  }
+  
+  hasAdminRole(user: User): boolean {
+    return user.roles.some(role => 
+      (typeof role === 'object' && role.name === 'ROLE_ADMIN') || role === 'ROLE_ADMIN'
+    );
+  }
+  
+  giveUserAdminRole(user: User): void {
+    if (confirm(`Are you sure you want to give ${user.username} admin privileges?`)) {
+      this.userService.giveAdminRole(user.id).subscribe({
+        next: () => {
+          this.snackBar.open(`Admin role granted to ${user.username}`, 'Close', {
+            duration: 3000
+          });
+          this.loadUsers();
+        },
+        error: (error) => {
+          this.snackBar.open('Error granting admin role: ' + error.message, 'Close', {
+            duration: 5000
+          });
+        }
+      });
+    }
   }
 
   editUserRoles(user: User): void {

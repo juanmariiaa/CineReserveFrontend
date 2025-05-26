@@ -38,26 +38,41 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatTooltipModule
   ],
   template: `
-    <div class="room-management-container">
-      <div class="page-header">
-        <h1>Room Management</h1>
-        <div class="header-actions">
-          <button mat-raised-button color="primary" routerLink="/admin/rooms/create">
-            <mat-icon>add</mat-icon> Add Room
-          </button>
-          <button mat-raised-button color="warn" (click)="confirmDeleteLastRoom()">
-            <mat-icon>delete</mat-icon> Delete Last Room
-          </button>
-          <button mat-raised-button color="accent" routerLink="/admin/dashboard">
-            <mat-icon>arrow_back</mat-icon> Back to Dashboard
-          </button>
-        </div>
+    <div class="screening-management-container">
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">Room Management</h1>
       </div>
 
-      <mat-card>
+      <div class="action-bar">
+        <div class="action-buttons">
+          <button
+            mat-raised-button
+            class="accent-bg"
+            routerLink="/admin/rooms/create"
+          >
+            <mat-icon>add</mat-icon> Add Room
+          </button>
+          <button
+            mat-raised-button
+            class="delete-button"
+            (click)="confirmDeleteLastRoom()"
+          >
+            <mat-icon>delete</mat-icon> Delete Last Room
+          </button>
+        </div>
+        <button
+          mat-raised-button
+          routerLink="/admin/dashboard"
+        >
+          <mat-icon>arrow_back</mat-icon> Back to Dashboard
+        </button>
+      </div>
+
+      <mat-card class="table-card">
         <mat-card-content>
           <div *ngIf="loading" class="loading-spinner">
-            <mat-spinner></mat-spinner>
+            <mat-spinner class="accent-spinner"></mat-spinner>
           </div>
 
           <div *ngIf="!loading">
@@ -68,39 +83,65 @@ import { MatTooltipModule } from '@angular/material/tooltip';
             </mat-form-field>
 
             <div class="table-container">
-              <table mat-table [dataSource]="dataSource" matSort class="room-table">
+              <table
+                mat-table
+                [dataSource]="dataSource"
+                matSort
+                class="room-table"
+              >
                 <!-- ID Column -->
                 <ng-container matColumnDef="id">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
-                  <td mat-cell *matCellDef="let room"> {{room.id}} </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+                  <td mat-cell *matCellDef="let room">
+                    {{ room.id }}
+                  </td>
                 </ng-container>
 
                 <!-- Number Column -->
                 <ng-container matColumnDef="number">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Number </th>
-                  <td mat-cell *matCellDef="let room"> {{room.number}} </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Number</th>
+                  <td mat-cell *matCellDef="let room">
+                    {{ room.number }}
+                  </td>
                 </ng-container>
 
                 <!-- Capacity Column -->
                 <ng-container matColumnDef="capacity">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Capacity </th>
-                  <td mat-cell *matCellDef="let room"> {{room.capacity}} seats </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Capacity</th>
+                  <td mat-cell *matCellDef="let room">
+                    {{ room.capacity }} seats
+                  </td>
                 </ng-container>
 
                 <!-- Type Column -->
                 <ng-container matColumnDef="type">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
-                  <td mat-cell *matCellDef="let room"> {{room.roomType || 'Standard'}} </td>
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+                  <td mat-cell *matCellDef="let room">
+                    {{ room.roomType || 'Standard' }}
+                  </td>
                 </ng-container>
 
-
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let room">
+                    <button 
+                      mat-icon-button 
+                      class="action-button"
+                      matTooltip="Delete Room" 
+                      (click)="confirmDelete(room)"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
+                </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
                 <!-- Row shown when there is no matching data. -->
                 <tr class="mat-row" *matNoDataRow>
-                  <td class="mat-cell" colspan="6">No rooms found matching "{{input.value}}"</td>
+                  <td class="mat-cell" colspan="5">No rooms found matching "{{input.value}}"</td>
                 </tr>
               </table>
 
@@ -112,59 +153,61 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     </div>
   `,
   styles: [`
-    .room-management-container {
+    .screening-management-container {
       padding: 20px;
-      color: #FFFFFF;
     }
 
-    .page-header {
+    .dashboard-title-container {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
     }
 
-    h1 {
-      color: #FFFFFF;
+    .dashboard-title-marker {
+      width: 5px;
+      height: 30px;
+      background-color: #ff6b6b;
+      margin-right: 10px;
+      border-radius: 3px;
+    }
+
+    .dashboard-title {
+      font-size: 24px;
+      font-weight: 500;
       margin: 0;
     }
 
-    .header-actions {
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    .action-buttons {
       display: flex;
       gap: 10px;
+    }
+
+    .table-card {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .loading-spinner {
       display: flex;
       justify-content: center;
-      padding: 50px 0;
+      padding: 30px;
+    }
+
+    .accent-spinner ::ng-deep circle {
+      stroke: #ff6b6b !important;
     }
 
     .filter-field {
       width: 100%;
       margin-bottom: 20px;
-    }
-
-    ::ng-deep .mat-form-field-label {
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
-
-    ::ng-deep .mat-form-field-outline {
-      color: rgba(255, 255, 255, 0.3) !important;
-    }
-
-    ::ng-deep .mat-form-field-infix input {
-      color: #FFFFFF !important;
-    }
-
-    ::ng-deep .mat-icon {
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    ::ng-deep .mat-card {
-      background-color: #222222;
-      color: #FFFFFF;
-      border: 1px solid #3a3a3a;
     }
 
     .table-container {
@@ -173,61 +216,98 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
     .room-table {
       width: 100%;
-      background-color: transparent;
     }
 
-    ::ng-deep .mat-table {
-      background-color: transparent !important;
+    .action-button {
+      color: #ff6b6b;
     }
 
-    ::ng-deep .mat-header-cell {
-      color: rgba(255, 255, 255, 0.9) !important;
-      font-weight: 500;
-      background-color: #1a1a1a;
+    .delete-button {
+      background-color: #f44336 !important;
+      color: white !important;
     }
 
-    ::ng-deep .mat-cell {
+    .accent-bg {
+      background-color: #ff6b6b !important;
+      color: white !important;
+    }
+
+    ::ng-deep .mat-mdc-form-field-focus-overlay {
+      background-color: rgba(255, 255, 255, 0.04);
+    }
+
+    ::ng-deep .mat-mdc-text-field-wrapper {
+      background-color: rgba(255, 255, 255, 0.04) !important;
+    }
+
+    ::ng-deep .mat-mdc-form-field-label {
       color: rgba(255, 255, 255, 0.7) !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
 
-    ::ng-deep .mat-row:hover {
-      background-color: rgba(255, 255, 255, 0.05);
+    ::ng-deep .mat-mdc-input-element {
+      color: #ffffff !important;
     }
 
-    ::ng-deep .mat-paginator {
-      background-color: transparent;
-      color: #FFFFFF;
+    ::ng-deep .mat-mdc-card-content {
+      color: #ffffff !important;
     }
 
-    ::ng-deep .mat-paginator-page-size-label, 
-    ::ng-deep .mat-paginator-range-label {
-      color: rgba(255, 255, 255, 0.7);
+    ::ng-deep .mat-sort-header-content {
+      color: #ffffff !important;
     }
 
-    ::ng-deep .mat-raised-button.mat-primary {
-      background-color: #00B020;
+    ::ng-deep .mat-mdc-paginator-range-label,
+    ::ng-deep .mat-mdc-paginator-page-size-label {
+      color: #ffffff !important;
     }
 
-    ::ng-deep .mat-raised-button.mat-accent {
-      background-color: #2c2c2c;
-      color: #FFFFFF;
+    ::ng-deep .mat-mdc-select-value,
+    ::ng-deep .mat-mdc-select-arrow {
+      color: #ffffff !important;
     }
 
-    ::ng-deep .mat-raised-button.mat-warn {
-      background-color: #f44336;
-      color: #FFFFFF;
+    ::ng-deep .mat-mdc-table .mat-mdc-header-cell {
+      color: rgba(255, 255, 255, 0.87) !important;
+      background-color: #2c2c2c !important;
     }
 
-    ::ng-deep .mat-icon-button {
-      color: #FFFFFF;
+    ::ng-deep .mat-mdc-table .mat-mdc-cell {
+      color: #ffffff !important;
+    }
+
+    ::ng-deep .mat-mdc-raised-button:not(.accent-bg):not(.delete-button) {
+      background-color: #444444 !important;
+      color: #ffffff !important;
+    }
+
+    ::ng-deep .mat-mdc-paginator {
+      background-color: #2c2c2c !important;
+    }
+
+    ::ng-deep .mat-mdc-icon-button {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    ::ng-deep .mat-mdc-icon-button:disabled {
+      color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    @media (max-width: 768px) {
+      .action-bar {
+        flex-direction: column;
+        align-items: flex-end;
+      }
+
+      .action-bar button {
+        width: auto;
+      }
     }
   `]
 })
 export class RoomManagementComponent implements OnInit {
   rooms: Room[] = [];
   loading = true;
-  displayedColumns: string[] = ['id', 'number', 'capacity', 'type'];
+  displayedColumns: string[] = ['id', 'number', 'capacity', 'type', 'actions'];
   dataSource: any;
 
   constructor(
