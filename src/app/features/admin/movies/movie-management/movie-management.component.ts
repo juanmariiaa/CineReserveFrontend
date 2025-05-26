@@ -35,30 +35,31 @@ import { FormsModule } from '@angular/forms';
   ],
   template: `
     <div class="movie-management-container">
-      <div class="page-header">
-        <h1>Movie Management</h1>
-        <div class="header-actions">
-          <button
-            mat-raised-button
-            color="primary"
-            routerLink="/admin/movies/add"
-          >
-            <mat-icon>add</mat-icon> Add Movie
-          </button>
-          <button
-            mat-raised-button
-            color="accent"
-            routerLink="/admin/dashboard"
-          >
-            <mat-icon>arrow_back</mat-icon> Back to Dashboard
-          </button>
-        </div>
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">Movie Management</h1>
       </div>
 
-      <mat-card>
+      <div class="action-bar">
+        <button
+          mat-raised-button
+          class="accent-bg"
+          routerLink="/admin/movies/add"
+        >
+          <mat-icon>add</mat-icon> Add Movie
+        </button>
+        <button
+          mat-raised-button
+          routerLink="/admin/dashboard"
+        >
+          <mat-icon>arrow_back</mat-icon> Back to Dashboard
+        </button>
+      </div>
+
+      <mat-card class="table-card">
         <mat-card-content>
           <div *ngIf="loading" class="loading-spinner">
-            <mat-spinner></mat-spinner>
+            <mat-spinner class="accent-spinner"></mat-spinner>
           </div>
 
           <div *ngIf="!loading">
@@ -202,33 +203,51 @@ import { FormsModule } from '@angular/forms';
   styles: [
     `
       .movie-management-container {
-        padding: 20px;
+        width: 100%;
         color: #ffffff;
-        background-color: #181818;
-        min-height: 100vh;
       }
 
-      .page-header {
+      .dashboard-title-container {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
       }
 
-      h1 {
+      .dashboard-title-marker {
+        width: 5px;
+        height: 30px;
+        background-color: #ff6b6b;
+        margin-right: 10px;
+      }
+
+      .dashboard-title {
         color: #ffffff;
+        font-size: 24px;
+        font-weight: 500;
         margin: 0;
       }
 
-      .header-actions {
+      .action-bar {
         display: flex;
         gap: 10px;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+      }
+
+      .table-card {
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #333333 !important;
       }
 
       .loading-spinner {
         display: flex;
         justify-content: center;
         padding: 30px;
+      }
+
+      .accent-spinner ::ng-deep circle {
+        stroke: #ff6b6b !important;
       }
 
       .filter-field {
@@ -257,20 +276,25 @@ import { FormsModule } from '@angular/forms';
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: #333333;
+        background-color: #444444;
         border-radius: 4px;
       }
 
       .star-icon {
-        color: #00b020 !important;
+        color: #ff6b6b !important;
         font-size: 18px;
         height: 18px;
         width: 18px;
       }
 
+      .accent-bg {
+        background-color: #ff6b6b !important;
+        color: white !important;
+      }
+
       /* Ensure Angular Material components have proper text color */
       ::ng-deep .mat-mdc-card {
-        background-color: #222222 !important;
+        background-color: #333333 !important;
         color: #ffffff !important;
       }
 
@@ -302,11 +326,39 @@ import { FormsModule } from '@angular/forms';
 
       ::ng-deep .mat-mdc-table .mat-mdc-header-cell {
         color: rgba(255, 255, 255, 0.87) !important;
-        background-color: #202020 !important;
+        background-color: #2c2c2c !important;
       }
 
       ::ng-deep .mat-mdc-table .mat-mdc-cell {
         color: #ffffff !important;
+      }
+
+      ::ng-deep .mat-mdc-raised-button:not(.accent-bg) {
+        background-color: #444444 !important;
+        color: #ffffff !important;
+      }
+
+      ::ng-deep .mat-mdc-paginator {
+        background-color: #2c2c2c !important;
+      }
+
+      ::ng-deep .mat-mdc-icon-button {
+        color: rgba(255, 255, 255, 0.7) !important;
+      }
+
+      ::ng-deep .mat-mdc-icon-button:disabled {
+        color: rgba(255, 255, 255, 0.3) !important;
+      }
+
+      @media (max-width: 768px) {
+        .action-bar {
+          flex-direction: column;
+          align-items: flex-end;
+        }
+
+        .action-bar button {
+          width: auto;
+        }
       }
     `,
   ],

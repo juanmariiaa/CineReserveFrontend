@@ -39,15 +39,19 @@ import { MatNativeDateModule } from '@angular/material/core';
   ],
   template: `
     <div class="movie-edit-container">
-      <div class="page-header">
-        <h1>Editar Película</h1>
-        <button mat-raised-button color="accent" routerLink="/admin/movies">
-          <mat-icon>arrow_back</mat-icon> Volver a la lista
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">Edit Movie</h1>
+      </div>
+
+      <div class="action-bar">
+        <button mat-raised-button routerLink="/admin/movies">
+          <mat-icon>arrow_back</mat-icon> Back to Movie List
         </button>
       </div>
 
       <div *ngIf="loading" class="loading-spinner">
-        <mat-spinner></mat-spinner>
+        <mat-spinner class="accent-spinner"></mat-spinner>
       </div>
 
       <div *ngIf="!loading && movie">
@@ -57,83 +61,84 @@ import { MatNativeDateModule } from '@angular/material/core';
           </div>
           <div class="movie-info">
             <h2>{{ movie.title }}</h2>
-            <p *ngIf="movie.releaseDate">Fecha de estreno: {{ movie.releaseDate | date }}</p>
+            <p *ngIf="movie.releaseDate">Release date: {{ movie.releaseDate | date }}</p>
             <p *ngIf="movie.tmdbId">TMDB ID: {{ movie.tmdbId }}</p>
           </div>
         </div>
 
-        <mat-card>
+        <mat-card class="form-card">
           <mat-card-content>
             <form [formGroup]="movieForm" (ngSubmit)="onSubmit()">
               <div class="form-row">
                 <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Título</mat-label>
+                  <mat-label>Title</mat-label>
                   <input matInput formControlName="title" required>
                   <mat-error *ngIf="movieForm.get('title')?.hasError('required')">
-                    El título es obligatorio
+                    Title is required
                   </mat-error>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Duración (minutos)</mat-label>
+                  <mat-label>Duration (minutes)</mat-label>
                   <input matInput type="number" formControlName="durationMinutes">
                 </mat-form-field>
               </div>
 
               <div class="form-row">
                 <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Fecha de estreno</mat-label>
+                  <mat-label>Release date</mat-label>
                   <input matInput formControlName="releaseDate" [matDatepicker]="picker">
                   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                   <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Idioma</mat-label>
+                  <mat-label>Language</mat-label>
                   <input matInput formControlName="language">
                 </mat-form-field>
               </div>
 
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Descripción</mat-label>
+                <mat-label>Description</mat-label>
                 <textarea matInput formControlName="description" rows="5"></textarea>
               </mat-form-field>
 
               <div class="form-row">
                 <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Director</mat-label>
-                  <input matInput formControlName="director">
+                  <mat-label>Poster URL</mat-label>
+                  <input matInput formControlName="posterUrl">
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Calificación</mat-label>
-                  <input matInput formControlName="rating">
+                  <mat-label>Backdrop URL</mat-label>
+                  <input matInput formControlName="backdropUrl">
                 </mat-form-field>
               </div>
 
               <div class="form-row">
                 <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>URL del Poster</mat-label>
-                  <input matInput formControlName="posterUrl">
+                  <mat-label>Rating</mat-label>
+                  <input matInput formControlName="rating">
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>URL del Backdrop</mat-label>
-                  <input matInput formControlName="backdropUrl">
+                  <mat-label>Director</mat-label>
+                  <input matInput formControlName="director">
                 </mat-form-field>
               </div>
 
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>URL del Trailer</mat-label>
+                <mat-label>Trailer URL</mat-label>
                 <input matInput formControlName="trailerUrl">
               </mat-form-field>
 
               <div class="form-actions">
-                <button type="button" mat-button color="warn" (click)="resetForm()">
-                  Restablecer
+                <button mat-button type="button" (click)="resetForm()" [disabled]="saving">
+                  Cancel Changes
                 </button>
-                <button type="submit" mat-raised-button color="primary" [disabled]="movieForm.invalid || saving">
-                  <mat-icon>save</mat-icon> Guardar cambios
+                <button mat-raised-button class="accent-bg" type="submit" [disabled]="movieForm.invalid || saving">
+                  <mat-icon>save</mat-icon> Save
+                  <mat-spinner *ngIf="saving" diameter="20" class="button-spinner"></mat-spinner>
                 </button>
               </div>
             </form>
@@ -153,47 +158,95 @@ import { MatNativeDateModule } from '@angular/material/core';
   `,
   styles: [`
     .movie-edit-container {
-      padding: 20px;
-      color: #FFFFFF;
-      background-color: #181818;
+      width: 100%;
+      color: #ffffff;
+      background-color: transparent;
     }
 
-    .page-header {
+    .dashboard-title-container {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
-    h1, h2, h3, p {
-      color: #FFFFFF;
+    .dashboard-title-marker {
+      width: 5px;
+      height: 30px;
+      background-color: #ff6b6b;
+      margin-right: 10px;
+    }
+
+    .dashboard-title {
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 500;
+      margin: 0;
+    }
+    
+    .action-bar {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-bottom: 20px;
     }
 
     .loading-spinner {
       display: flex;
       justify-content: center;
-      padding: 50px 0;
+      padding: 50px;
+    }
+    
+    .accent-spinner ::ng-deep circle {
+      stroke: #ff6b6b !important;
+    }
+    
+    .button-spinner {
+      display: inline-block;
+      margin-left: 8px;
     }
 
     .movie-header {
       display: flex;
       gap: 20px;
       margin-bottom: 20px;
-      align-items: flex-start;
+      background-color: #333333;
+      border-radius: 8px;
+      padding: 20px;
     }
 
     .movie-poster-container {
-      flex-shrink: 0;
+      width: 120px;
+      height: 180px;
+      overflow: hidden;
+      border-radius: 4px;
     }
 
     .movie-poster {
-      width: 150px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .movie-info {
-      flex-grow: 1;
+      flex: 1;
+    }
+    
+    .movie-info h2 {
+      color: #ffffff;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    
+    .movie-info p {
+      color: rgba(255, 255, 255, 0.7);
+      margin: 5px 0;
+    }
+    
+    .form-card {
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: #333333 !important;
+      margin-bottom: 20px;
     }
 
     .form-row {
@@ -221,6 +274,8 @@ import { MatNativeDateModule } from '@angular/material/core';
     .not-found {
       text-align: center;
       padding: 50px 0;
+      background-color: #333333;
+      border-radius: 8px;
     }
 
     .not-found mat-icon {
@@ -228,47 +283,54 @@ import { MatNativeDateModule } from '@angular/material/core';
       height: 48px;
       width: 48px;
       margin-bottom: 16px;
-      color: #FFFFFF;
+      color: #ffffff;
+    }
+    
+    .accent-bg {
+      background-color: #ff6b6b !important;
+      color: white !important;
     }
 
-    ::ng-deep .mat-card {
-      background-color: #222222;
-      color: #FFFFFF;
-      border: 1px solid #3a3a3a;
+    ::ng-deep .mat-mdc-card {
+      background-color: #333333 !important;
+      color: #ffffff !important;
     }
 
-    ::ng-deep .mat-form-field-label {
-      color: rgba(255, 255, 255, 0.7) !important;
+    ::ng-deep .mat-mdc-form-field-label {
+      color: rgba(255, 255, 255, 0.6) !important;
     }
 
-    ::ng-deep .mat-form-field-outline {
-      color: rgba(255, 255, 255, 0.3) !important;
+    ::ng-deep .mat-mdc-input-element {
+      color: #ffffff !important;
     }
 
-    ::ng-deep .mat-form-field-infix input, 
-    ::ng-deep .mat-form-field-infix textarea {
-      color: #FFFFFF !important;
+    ::ng-deep .mat-mdc-form-field-infix input, 
+    ::ng-deep .mat-mdc-form-field-infix textarea {
+      color: #ffffff !important;
     }
 
-    ::ng-deep .mat-icon {
+    ::ng-deep .mat-mdc-icon {
       color: rgba(255, 255, 255, 0.7);
     }
 
-    ::ng-deep .mat-raised-button.mat-primary {
-      background-color: #00B020;
+    ::ng-deep .mat-mdc-raised-button:not(.accent-bg) {
+      background-color: #444444 !important;
+      color: #ffffff !important;
     }
 
-    ::ng-deep .mat-raised-button.mat-accent {
-      background-color: #2c2c2c;
-      color: #FFFFFF;
-    }
-
-    ::ng-deep .mat-button.mat-warn {
-      color: #f44336;
-    }
-
-    ::ng-deep .mat-datepicker-toggle {
+    ::ng-deep .mat-mdc-button {
       color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    ::ng-deep .mat-mdc-datepicker-toggle {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+    
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
     }
   `]
 })

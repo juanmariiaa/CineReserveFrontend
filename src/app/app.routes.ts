@@ -70,5 +70,22 @@ export const routes: Routes = [
       ),
     canActivate: [authGuard],
   },
+  // Payment routes
+  {
+    path: 'payment/success',
+    loadComponent: () =>
+      import('./features/payment/payment-success/payment-success.component').then(
+        (c) => c.PaymentSuccessComponent
+      ),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'payment/cancel',
+    loadComponent: () =>
+      import('./features/payment/payment-cancel/payment-cancel.component').then(
+        (c) => c.PaymentCancelComponent
+      ),
+    canActivate: [authGuard],
+  },
   ...ADMIN_ROUTES,
 ];

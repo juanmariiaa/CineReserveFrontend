@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -14,6 +14,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { Subscription, interval } from 'rxjs';
+import { CheckoutSessionResponse } from '../../core/services/reservation.service';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -36,6 +39,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
   selector: 'app-reservation',
   standalone: true,
   imports: [
+    MatProgressBarModule,
     CommonModule,
     RouterLink,
     MatCardModule,
@@ -82,14 +86,26 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
         <ng-container *ngIf="!loading && screening">
           <div class="reservation-layout">
             <!-- Main content area -->
-            <div class="reservation-main">
+            <div class="reservation-summary">
+              <!-- Reservation Timeout Progress -->                
+              <div *ngIf="reservationTimeoutProgress > 0 && !reservationConfirmed" class="timeout-container">
+                <div class="timeout-header">
+                  <mat-icon color="warn">timer</mat-icon>
+                  <span>Reservation will expire in {{ formatTimeRemaining() }}</span>
+                </div>
+                <mat-progress-bar 
+                  [value]="reservationTimeoutProgress" 
+                  color="warn" 
+                  mode="determinate">
+                </mat-progress-bar>
+              </div>
               <!-- Movie Info Bar -->
               <mat-card class="info-bar">
                 <div class="movie-info">
                   <div class="movie-poster" *ngIf="screening.movie?.posterUrl">
                     <img
-                      [src]="screening.movie?.posterUrl"
-                      alt="{{ screening.movie?.title }} poster"
+                      [src]="screening.movie ? screening.movie.posterUrl : ''"
+                      alt="{{ screening.movie ? screening.movie.title : '' }} poster"
                     />
                   </div>
                   <div class="movie-details">
@@ -234,7 +250,7 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
                       <!-- Price Column -->
                       <ng-container matColumnDef="price">
                         <th mat-header-cell *matHeaderCellDef>Price</th>
-                        <td mat-cell *matCellDef="let seat">{{ screening?.ticketPrice | currency: 'EUR' }}</td>
+                        <td mat-cell *matCellDef="let seat">{{ screening ? (screening.ticketPrice | currency: 'EUR') : '' }}</td>
                       </ng-container>
                       
                       <!-- Remove Column -->
@@ -274,12 +290,12 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
                   </button>
                   <button
                     mat-raised-button
-                    color="accent"
-                    class="confirm-button"
+                    color="primary"
                     [disabled]="selectedSeats.length === 0 || reserving"
                     (click)="confirmReservation()"
                   >
-                    <mat-icon>check_circle</mat-icon> Confirm Reservation
+                    <span *ngIf="!reserving">Confirm Reservation</span>
+                    <mat-spinner *ngIf="reserving" diameter="24"></mat-spinner>
                   </button>
                 </mat-card-actions>
               </mat-card>
@@ -839,10 +855,27 @@ import { NavbarComponent } from '../shared/navbar/navbar.component';
       .summary-card {
         animation: fadeIn 0.4s ease;
       }
+
+      .timeout-container {
+        margin-bottom: 16px;
+        padding: 12px;
+        background-color: rgba(255, 0, 0, 0.05);
+        border-radius: 4px;
+      }
+      
+      .timeout-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      
+      .timeout-header mat-icon {
+        margin-right: 8px;
+      }
     `,
   ],
 })
-export class ReservationComponent implements OnInit {
+export class ReservationComponent implements OnInit, OnDestroy {
   screeningId: number | null = null;
   screening: Screening | null = null;
   seats: any[] = [];
@@ -851,6 +884,22 @@ export class ReservationComponent implements OnInit {
   reserving = false;
   seatRows: string[] = [];
   isLoggedIn = false;
+  
+  // Reservation timeout properties
+  reservationTimeoutMinutes = 15; // Match the backend timeout (ReservationCleanupService)
+  reservationTimeoutProgress = 0;
+  reservationTimeoutSubscription: Subscription | null = null;
+  reservationStartTime: Date | null = null;
+  reservationId: number | null = null;
+  reservationConfirmed = false;
+  
+  // Payment properties
+  processingPayment = false;
+  
+  // Subscription management
+  currentUserSubscription: Subscription | null = null;
+  paramMapSubscription: Subscription | null = null;
+  seatRefreshSubscription: Subscription | null = null;
   isAdmin = false;
   username = '';
   loginForm: FormGroup;
@@ -880,15 +929,18 @@ export class ReservationComponent implements OnInit {
     this.updateAuthStatus();
 
     // Subscribe to auth changes
-    this.authService.currentUser$.subscribe((user) => {
+    this.currentUserSubscription = this.authService.currentUser$.subscribe((user) => {
       this.updateAuthStatus();
     });
 
-    this.route.paramMap.subscribe((params) => {
+    this.paramMapSubscription = this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.screeningId = +id;
         this.loadScreeningData();
+        
+        // Start periodic seat refresh (every 15 seconds) to ensure we have latest seat availability
+        this.startSeatRefresh();
         
         // Pre-select 4 seats for the example (shown in the image)
         // This is just for the example display
@@ -903,6 +955,127 @@ export class ReservationComponent implements OnInit {
         }
       } else {
         this.router.navigate(['/']);
+      }
+    });
+  }
+  
+  ngOnDestroy(): void {
+    // Clean up all subscriptions when component is destroyed
+    if (this.reservationTimeoutSubscription) {
+      this.reservationTimeoutSubscription.unsubscribe();
+    }
+    
+    if (this.currentUserSubscription) {
+      this.currentUserSubscription.unsubscribe();
+    }
+    
+    if (this.paramMapSubscription) {
+      this.paramMapSubscription.unsubscribe();
+    }
+    
+    if (this.seatRefreshSubscription) {
+      this.seatRefreshSubscription.unsubscribe();
+    }
+  }
+  
+  // Start the countdown timer for reservation timeout
+  startReservationTimeout(): void {
+    this.reservationStartTime = new Date();
+    const timeoutMs = this.reservationTimeoutMinutes * 60 * 1000;
+    
+    // Update progress every second
+    this.reservationTimeoutSubscription = interval(1000).subscribe(() => {
+      if (!this.reservationStartTime) return;
+      
+      const elapsedMs = new Date().getTime() - this.reservationStartTime.getTime();
+      this.reservationTimeoutProgress = Math.min(100, (elapsedMs / timeoutMs) * 100);
+      
+      // If timeout reached, handle expiration
+      if (this.reservationTimeoutProgress >= 100) {
+        this.handleReservationExpired();
+      }
+    });
+  }
+  
+  // Format the remaining time as MM:SS
+  formatTimeRemaining(): string {
+    if (!this.reservationStartTime) return '00:00';
+    
+    const elapsedMs = new Date().getTime() - this.reservationStartTime.getTime();
+    const remainingMs = (this.reservationTimeoutMinutes * 60 * 1000) - elapsedMs;
+    
+    if (remainingMs <= 0) return '00:00';
+    
+    const minutes = Math.floor(remainingMs / 60000);
+    const seconds = Math.floor((remainingMs % 60000) / 1000);
+    
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+  
+  // Handle expired reservation
+  handleReservationExpired(): void {
+    if (this.reservationTimeoutSubscription) {
+      this.reservationTimeoutSubscription.unsubscribe();
+      this.reservationTimeoutSubscription = null;
+    }
+    
+    this.snackBar.open('Your reservation has expired.', 'Close', {
+      duration: 5000,
+    });
+    
+    // Navigate back to home or screening selection
+    this.router.navigate(['/']);
+  }
+  
+  // Proceed to Stripe payment
+  proceedToPayment(): void {
+    if (!this.reservationId) return;
+    
+    this.processingPayment = true;
+    
+    // Generate success and cancel URLs
+    const baseUrl = window.location.origin;
+    const successUrl = `${baseUrl}/payment/success`;
+    const cancelUrl = `${baseUrl}/payment/cancel`;
+    
+    this.reservationService.createCheckoutSession(this.reservationId, successUrl, cancelUrl)
+      .subscribe({
+        next: (response: CheckoutSessionResponse) => {
+          // Redirect to Stripe checkout
+          window.location.href = response.checkoutUrl;
+        },
+        error: (error) => {
+          console.error('Error creating checkout session:', error);
+          this.processingPayment = false;
+          
+          let errorMessage = 'Could not process payment. Please try again.';
+          if (error.error && error.error.error) {
+            errorMessage = error.error.error;
+          }
+          
+          this.snackBar.open(errorMessage, 'Close', {
+            duration: 5000,
+          });
+        }
+      });
+  }
+  
+  // Cancel the current reservation
+  cancelReservation(): void {
+    if (!this.reservationId) return;
+    
+    this.reservationService.cancelReservation(this.reservationId).subscribe({
+      next: () => {
+        this.snackBar.open('Reservation cancelled.', 'Close', {
+          duration: 5000,
+        });
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        console.error('Error cancelling reservation:', error);
+        this.snackBar.open('Could not cancel reservation.', 'Close', {
+          duration: 5000,
+        });
       }
     });
   }
@@ -999,7 +1172,9 @@ export class ReservationComponent implements OnInit {
   loadSeats(): void {
     if (!this.screeningId) return;
 
-    this.reservationService.getScreeningSeats(this.screeningId).subscribe({
+    // Force a fresh request by adding a timestamp to bypass any caching
+    const timestamp = new Date().getTime();
+    this.reservationService.getScreeningSeats(this.screeningId, timestamp).subscribe({
       next: (seats) => {
         this.seats = seats.map((seat) => ({
           ...seat,
@@ -1026,6 +1201,44 @@ export class ReservationComponent implements OnInit {
         });
         this.loading = false;
       },
+    });
+  }
+  
+  // Refresh seat data to ensure we have the latest availability
+  refreshSeats(): void {
+    if (!this.screeningId) return;
+    
+    // Keep track of currently selected seats
+    const selectedSeatIds = this.selectedSeats.map(seat => seat.id);
+    
+    // Force a fresh request by adding a timestamp to bypass any caching
+    const timestamp = new Date().getTime();
+    this.reservationService.getScreeningSeats(this.screeningId, timestamp).subscribe({
+      next: (seats) => {
+        this.seats = seats.map((seat) => ({
+          ...seat,
+          available: seat.status !== 'RESERVED',
+        }));
+        
+        // Maintain selection for seats that are still available
+        this.selectedSeats = this.seats.filter(seat => 
+          seat.available && selectedSeatIds.includes(seat.id)
+        );
+        
+        // Log seat availability for debugging
+        console.log(`Refreshed seats: ${this.seats.filter(s => s.available).length} available out of ${this.seats.length}`);
+      },
+      error: (error) => {
+        console.error('Error refreshing seats:', error);
+      }
+    });
+  }
+  
+  // Start periodic seat refresh to ensure we always have the latest availability
+  startSeatRefresh(): void {
+    // Refresh seats every 15 seconds
+    this.seatRefreshSubscription = interval(15000).subscribe(() => {
+      this.refreshSeats();
     });
   }
 
@@ -1111,12 +1324,48 @@ export class ReservationComponent implements OnInit {
       seatIds: this.selectedSeats.map((seat) => seat.id),
     };
 
+    // Generate success and cancel URLs for Stripe
+    const baseUrl = window.location.origin;
+    const successUrl = `${baseUrl}/payment/success`;
+    const cancelUrl = `${baseUrl}/payment/cancel`;
+
+    // First create the reservation, then immediately create a checkout session
     this.reservationService.createReservation(reservationData).subscribe({
       next: (result) => {
-        this.snackBar.open('Reservation successful!', 'Close', {
-          duration: 5000,
-        });
-        this.router.navigate(['/']);
+        this.reservationId = result.id;
+        
+        // Start the reservation timeout countdown
+        this.startReservationTimeout();
+        
+        // Immediately proceed to Stripe checkout
+        if (this.reservationId === null) {
+          this.reserving = false;
+          this.snackBar.open('Error: Reservation ID is missing', 'Close', {
+            duration: 5000,
+          });
+          return;
+        }
+        
+        this.reservationService.createCheckoutSession(this.reservationId, successUrl, cancelUrl)
+          .subscribe({
+            next: (response) => {
+              // Redirect to Stripe checkout page
+              window.location.href = response.checkoutUrl;
+            },
+            error: (error) => {
+              console.error('Error creating checkout session:', error);
+              this.reserving = false;
+              
+              let errorMessage = 'Could not process payment. Please try again.';
+              if (error.error && error.error.error) {
+                errorMessage = error.error.error;
+              }
+              
+              this.snackBar.open(errorMessage, 'Close', {
+                duration: 5000,
+              });
+            }
+          });
       },
       error: (error) => {
         console.error('Error making reservation:', error);

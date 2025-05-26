@@ -40,104 +40,108 @@ import { Subject, of } from 'rxjs';
   ],
   template: `
     <div class="movie-create-container">
-      <div class="page-header">
-        <h1>Añadir película</h1>
-        <button mat-raised-button color="accent" routerLink="/admin/movies">
+      <div class="dashboard-title-container">
+        <div class="dashboard-title-marker"></div>
+        <h1 class="dashboard-title">Add Movie</h1>
+      </div>
+      
+      <div class="action-bar">
+        <button mat-raised-button class="accent-bg" routerLink="/admin/movies">
           <mat-icon>arrow_back</mat-icon> Back to Movie Management
         </button>
       </div>
 
-      <mat-card>
+      <mat-card class="search-card">
         <mat-card-content>
           <form [formGroup]="searchForm" class="search-form">
             <mat-form-field appearance="outline" class="search-field">
-              <mat-label>Buscar película</mat-label>
+              <mat-label>Search for a movie</mat-label>
               <input
                 matInput
                 formControlName="searchTerm"
-                placeholder="Título de la película"
+                placeholder="Movie title"
               />
               <mat-icon matSuffix>search</mat-icon>
             </mat-form-field>
           </form>
 
           <div *ngIf="searching" class="loading-spinner">
-            <mat-spinner diameter="40"></mat-spinner>
+            <mat-spinner diameter="40" class="accent-spinner"></mat-spinner>
           </div>
 
-          <div *ngIf="searchResults.length > 0" class="search-results-grid">
-            <mat-card *ngFor="let movie of searchResults" class="movie-card">
-              <div class="poster-container">
-                <img
-                  *ngIf="getPosterPath(movie)"
-                  [src]="getPosterPath(movie)"
-                  [alt]="movie.title"
-                  class="movie-poster"
-                />
-                <div *ngIf="!getPosterPath(movie)" class="no-poster">
-                  <mat-icon>movie</mat-icon>
-                </div>
-              </div>
-
-              <mat-card-content class="movie-card-content">
-                <h3 class="movie-title">{{ movie.title }}</h3>
-
-                <div class="movie-metadata">
-                  <span *ngIf="movie.releaseDate" class="release-date">
-                    <mat-icon class="meta-icon">calendar_today</mat-icon>
-                    {{ movie.releaseDate | date : 'yyyy' }}
-                  </span>
-
-                  <span *ngIf="movie.voteAverage" class="vote-average">
-                    <mat-icon class="meta-icon star-icon">star</mat-icon>
-                    {{ movie.voteAverage }} / 10
-                  </span>
-                </div>
-
-                <p *ngIf="movie.overview" class="movie-overview">
-                  {{ movie.overview }}
-                </p>
-              </mat-card-content>
-
-              <mat-card-actions align="end">
-                <button
-                  mat-raised-button
-                  color="primary"
-                  (click)="importMovie(movie.id)"
-                >
-                  <mat-icon>add</mat-icon> Importar
-                </button>
-              </mat-card-actions>
-            </mat-card>
-          </div>
-
-          <div
-            *ngIf="
-              !searching &&
-              searchResults.length === 0 &&
-              searchForm.get('searchTerm')?.value
-            "
-            class="no-results"
-          >
+          <div *ngIf="!searching && searchResults.length === 0 && searchForm.get('searchTerm')?.value" class="no-results">
             <mat-icon>search_off</mat-icon>
-            <p>No se encontraron resultados</p>
-          </div>
-
-          <div *ngIf="importing" class="importing-spinner">
-            <mat-spinner></mat-spinner>
-            <p>Importando película...</p>
+            <p>No results found for your search</p>
           </div>
         </mat-card-content>
       </mat-card>
+
+      <div *ngIf="searchResults.length > 0" class="search-results-grid">
+        <mat-card *ngFor="let movie of searchResults" class="movie-card">
+          <div class="poster-container">
+            <img
+              *ngIf="getPosterPath(movie)"
+              [src]="getPosterPath(movie)"
+              [alt]="movie.title"
+              class="movie-poster"
+            />
+            <div *ngIf="!getPosterPath(movie)" class="no-poster">
+              <mat-icon>movie</mat-icon>
+            </div>
+          </div>
+
+          <mat-card-content class="movie-card-content">
+            <h3 class="movie-title">{{ movie.title }}</h3>
+
+            <div class="movie-metadata">
+              <span *ngIf="movie.releaseDate" class="release-date">
+                <mat-icon class="meta-icon">calendar_today</mat-icon>
+                {{ movie.releaseDate | date : 'yyyy' }}
+              </span>
+
+              <span *ngIf="movie.voteAverage" class="vote-average">
+                <mat-icon class="meta-icon star-icon">star</mat-icon>
+                {{ movie.voteAverage }} / 10
+              </span>
+            </div>
+
+            <div class="genres-container" *ngIf="movie['genreIds'] && movie['genreIds'].length > 0">
+              <span class="genre-chip" *ngFor="let genreId of movie['genreIds'].slice(0, 3)">
+                {{ getGenreName(genreId) }}
+              </span>
+            </div>
+
+            <p *ngIf="movie.overview" class="movie-overview">
+              {{ movie.overview | slice:0:150 }}{{ movie.overview.length > 150 ? '...' : '' }}
+            </p>
+          </mat-card-content>
+
+          <mat-card-actions align="end">
+            <button
+              mat-raised-button
+              class="accent-bg"
+              [disabled]="importing"
+              (click)="importMovie(movie.id)"
+            >
+              <mat-icon>add</mat-icon> Import
+              <mat-spinner *ngIf="importing" diameter="20" class="button-spinner"></mat-spinner>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+
+      <div *ngIf="importing" class="importing-spinner">
+        <mat-spinner class="accent-spinner"></mat-spinner>
+        <p>Importing movie...</p>
+      </div>
     </div>
   `,
   styles: [
     `
       .movie-create-container {
-        padding: 20px;
-        background-color: #181818;
-        min-height: 100vh;
+        width: 100%;
         color: #ffffff;
+        background-color: transparent;
       }
 
       .page-header {
@@ -195,10 +199,6 @@ import { Subject, of } from 'rxjs';
       .poster-container {
         height: 300px;
         overflow: hidden;
-        background-color: #181818;
-        display: flex;
-        justify-content: center;
-        align-items: center;
       }
 
       .movie-poster {
@@ -208,131 +208,97 @@ import { Subject, of } from 'rxjs';
       }
 
       .no-poster {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
         height: 100%;
-        background-color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #444444;
       }
 
       .no-poster mat-icon {
-        font-size: 64px;
-        width: 64px;
-        height: 64px;
-        color: #555;
+        font-size: 48px;
+        height: 48px;
+        width: 48px;
       }
 
       .movie-card-content {
-        flex-grow: 1;
+        flex: 1;
         padding: 16px;
       }
 
       .movie-title {
-        margin: 0 0 8px;
+        margin: 0 0 10px 0;
         font-size: 18px;
         font-weight: 500;
-        line-height: 1.4;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        color: #ffffff;
+        line-height: 1.3;
       }
 
       .movie-metadata {
         display: flex;
-        align-items: center;
         gap: 16px;
-        margin-bottom: 12px;
-        color: #ccc;
+        margin-bottom: 10px;
+        color: rgba(255, 255, 255, 0.7);
         font-size: 14px;
       }
 
       .meta-icon {
         font-size: 16px;
-        width: 16px;
         height: 16px;
+        width: 16px;
         vertical-align: middle;
         margin-right: 4px;
       }
 
       .star-icon {
-        color: gold;
+        color: #ff6b6b !important;
+      }
+
+      .genres-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .genre-chip {
+        background-color: rgba(255, 107, 107, 0.2);
+        color: #ff6b6b;
+        padding: 4px 8px;
+        border-radius: 16px;
+        font-size: 12px;
       }
 
       .movie-overview {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        line-height: 1.5;
         font-size: 14px;
-        color: #aaa;
-        margin-bottom: 12px;
-        height: 63px; /* Approximately 3 lines */
-      }
-
-      .genre-chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 10px;
-      }
-
-      .genre-chips .mat-mdc-chip {
-        font-size: 12px;
-        min-height: 24px;
-      }
-
-      .no-results {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 30px;
-        color: #888;
-      }
-
-      .no-results mat-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
-        margin-bottom: 16px;
-      }
-
-      /* Estilos para componentes de Angular Material */
-      ::ng-deep .mat-mdc-card {
-        background-color: #222222 !important;
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .mat-mdc-form-field-label {
-        color: rgba(255, 255, 255, 0.6) !important;
-      }
-
-      ::ng-deep .mat-mdc-input-element {
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .mat-mdc-card-content {
-        color: #ffffff !important;
-      }
-
-      ::ng-deep .mat-form-field-outline {
-        color: rgba(255, 255, 255, 0.3) !important;
-      }
-
-      ::ng-deep .mat-icon {
         color: rgba(255, 255, 255, 0.7);
+        margin: 0;
+        line-height: 1.5;
       }
 
-      ::ng-deep .mat-raised-button.mat-primary {
-        background-color: #00b020;
+      .accent-bg {
+        background-color: #ff6b6b !important;
+        color: white !important;
       }
 
-      ::ng-deep .mat-raised-button.mat-accent {
-        background-color: #2c2c2c;
-        color: #ffffff;
+      .accent-spinner ::ng-deep circle {
+        stroke: #ff6b6b !important;
+      }
+
+      .button-spinner {
+        display: inline-block;
+        margin-left: 8px;
+      }
+
+      @media (max-width: 768px) {
+        .search-results-grid {
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+      }
+
+      @media (max-width: 480px) {
+        .search-results-grid {
+          grid-template-columns: 1fr;
+        }
       }
     `,
   ],
