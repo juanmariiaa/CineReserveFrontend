@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ReservationService } from '../../../../core/services/reservation.service';
@@ -11,9 +11,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTableModule } from '@angular/material/table';
-import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
@@ -80,7 +80,19 @@ import { MatBadgeModule } from '@angular/material/badge';
               <mat-icon matSuffix>search</mat-icon>
             </mat-form-field>
 
-            <!-- Status filters removed as requested -->
+            <div class="status-filter-container">
+              <span class="filter-label">Filter by status:</span>
+              <mat-chip-listbox aria-label="Status selection" multiple>
+                <mat-chip-option 
+                  *ngFor="let option of statusOptions"
+                  [selected]="option.selected"
+                  [color]="option.color"
+                  (selectionChange)="toggleStatusFilter(option)"
+                >
+                  {{ option.label }}
+                </mat-chip-option>
+              </mat-chip-listbox>
+            </div>
 
             <div class="table-container">
               <table
@@ -160,7 +172,9 @@ import { MatBadgeModule } from '@angular/material/badge';
                     Status
                   </th>
                   <td mat-cell *matCellDef="let reservation">
-                    {{ getStatusLabel(reservation.status) }}
+                    <span [ngClass]="getStatusClass(reservation.status)">
+                      {{ getStatusLabel(reservation.status) }}
+                    </span>
                   </td>
                 </ng-container>
 
@@ -188,8 +202,8 @@ import { MatBadgeModule } from '@angular/material/badge';
                   mat-row
                   *matRowDef="let row; columns: displayedColumns"
                 ></tr>
-
-                <!-- No data row -->
+                
+                <!-- Row shown when there is no matching data. -->
                 <tr class="mat-row" *matNoDataRow>
                   <td class="mat-cell" colspan="8">
                     No reservations found matching "{{ input.value }}"
@@ -276,6 +290,52 @@ import { MatBadgeModule } from '@angular/material/badge';
       .cancel-button:disabled {
         background-color: rgba(255, 107, 107, 0.5) !important;
         color: rgba(255, 255, 255, 0.5) !important;
+      }
+      
+      .status-filter-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .filter-label {
+        font-weight: 500;
+        margin-right: 8px;
+        color: #ffffff;
+      }
+      
+      .status-pending {
+        color: #000000;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 4px;
+        background-color: #ffc107;
+      }
+      
+      .status-confirmed {
+        color: #ffffff;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 4px;
+        background-color: #4caf50;
+      }
+      
+      .status-cancelled {
+        color: #ffffff;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 4px;
+        background-color: #f44336;
+      }
+      
+      .status-completed {
+        color: #ffffff;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 4px;
+        background-color: #3f51b5;
       }
 
       .loading-spinner {
@@ -375,7 +435,9 @@ import { MatBadgeModule } from '@angular/material/badge';
     `,
   ],
 })
-export class ReservationManagementComponent implements OnInit {
+export class ReservationManagementComponent implements OnInit, AfterViewInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
   reservations: Reservation[] = [];
   loading = true;
   displayedColumns: string[] = [
@@ -388,7 +450,7 @@ export class ReservationManagementComponent implements OnInit {
     'status',
     'actions',
   ];
-  dataSource: any;
+  dataSource = new MatTableDataSource<Reservation>([]);
   ReservationStatus = ReservationStatus;
 
   statusOptions = [
@@ -407,7 +469,7 @@ export class ReservationManagementComponent implements OnInit {
     {
       value: ReservationStatus.CANCELLED,
       label: 'Cancelled',
-      selected: false,
+      selected: true,
       color: 'warn',
     },
     {
@@ -427,13 +489,19 @@ export class ReservationManagementComponent implements OnInit {
   ngOnInit(): void {
     this.loadReservations();
   }
+  
+  ngAfterViewInit(): void {
+    // Set up sorting and pagination after the view is initialized
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
 
   loadReservations(): void {
     this.loading = true;
     this.reservationService.getAllReservations().subscribe({
       next: (data) => {
         this.reservations = data;
-        this.dataSource = this.reservations;
+        this.dataSource = new MatTableDataSource(this.reservations);
         this.filterByStatus();
         this.loading = false;
       },
@@ -455,15 +523,20 @@ export class ReservationManagementComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
+  toggleStatusFilter(option: any): void {
+    option.selected = !option.selected;
+    this.filterByStatus();
+  }
+
   filterByStatus(): void {
     const selectedStatuses = this.statusOptions
       .filter((option) => option.selected)
       .map((option) => option.value);
 
     if (selectedStatuses.length === 0) {
-      this.dataSource = this.reservations;
+      this.dataSource.data = this.reservations;
     } else {
-      this.dataSource = this.reservations.filter((reservation) =>
+      this.dataSource.data = this.reservations.filter((reservation) =>
         selectedStatuses.includes(reservation.status)
       );
     }
