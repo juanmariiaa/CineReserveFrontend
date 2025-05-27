@@ -198,6 +198,17 @@ a:hover {
   font-weight: 500 !important;
 }
 
+/* Info snackbar styling */
+.info-snackbar {
+  background-color: #2196f3 !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.info-snackbar .mat-mdc-snack-bar-action {
+  color: white !important;
+}
+
 .error-snackbar .mat-simple-snackbar-action {
   color: white !important;
 }

@@ -10,20 +10,6 @@ export const routes: Routes = [
       import('./features/home/home.component').then((c) => c.HomeComponent),
   },
   {
-    path: 'login',
-    loadComponent: () =>
-      import('./features/auth/login/login.component').then(
-        (c) => c.LoginComponent
-      ),
-  },
-  {
-    path: 'register',
-    loadComponent: () =>
-      import('./features/auth/register/register.component').then(
-        (c) => c.RegisterComponent
-      ),
-  },
-  {
     path: 'not-allowed',
     loadComponent: () =>
       import('./features/shared/not-allowed/not-allowed.component').then(
@@ -88,4 +74,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   ...ADMIN_ROUTES,
+  // Wildcard route - debe ir al final
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./features/shared/not-found/not-found.component').then(
+        (c) => c.NotFoundComponent
+      ),
+  },
 ];

@@ -1,0 +1,199 @@
+.not-found-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #181818 0%, #2c2c2c 100%);
+}
+
+.not-found-card {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  background-color: #202020 !important;
+  border: 1px solid rgba(255, 107, 107, 0.1);
+}
+
+mat-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.not-found-icon {
+  font-size: 64px;
+  height: 64px;
+  width: 64px;
+  color: #ff6b6b;
+  animation: float 3s ease-in-out infinite;
+}
+
+.error-code {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #ff6b6b;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.header-content {
+  text-align: center;
+}
+
+mat-card-title {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+mat-card-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7) !important;
+  margin-bottom: 0;
+}
+
+mat-card-content {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  color: rgba(255, 255, 255, 0.8);
+
+  p {
+    margin-bottom: 1.5rem;
+  }
+}
+
+.suggestions {
+  text-align: left;
+  background-color: rgba(255, 107, 107, 0.05);
+  border-left: 4px solid #ff6b6b;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+
+  h4 {
+    color: #ff6b6b;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.5rem;
+
+    li {
+      margin-bottom: 0.5rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+}
+
+mat-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  padding-top: 1rem;
+
+  button {
+    min-width: 140px;
+    height: 48px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    }
+
+    mat-icon {
+      margin-right: 0.5rem;
+    }
+
+    // Estilo específico para el botón Browse Movies
+    &.browse-movies-btn {
+      background-color: #4caf50 !important; // Verde
+      color: #ffffff !important;
+      border: 2px solid #4caf50;
+
+      &:hover {
+        background-color: #45a049 !important;
+        border-color: #45a049;
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+      }
+
+      mat-icon {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px #ff6b6b, 0 0 10px #ff6b6b, 0 0 15px #ff6b6b;
+  }
+  to {
+    text-shadow: 0 0 10px #ff6b6b, 0 0 20px #ff6b6b, 0 0 30px #ff6b6b;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .not-found-container {
+    padding: 1rem;
+  }
+
+  .not-found-card {
+    padding: 1.5rem;
+  }
+
+  .error-code {
+    font-size: 3rem;
+  }
+
+  .not-found-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+  }
+
+  mat-card-title {
+    font-size: 1.5rem;
+  }
+
+  mat-card-actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  }
+}

@@ -1,15 +1,55 @@
 <div class="not-allowed-container">
-      <mat-card class="not-allowed-card">
-        <mat-card-header>
-          <mat-icon color="warn" class="not-allowed-icon">block</mat-icon>
-          <mat-card-title>Access Denied</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p>You do not have permission to access this section.</p>
-          <p>This area is reserved for administrators only.</p>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button color="primary" routerLink="/">Return to Home Page</button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
+  <mat-card class="not-allowed-card">
+    <mat-card-header>
+      <div class="icon-container">
+        <mat-icon class="not-allowed-icon">security</mat-icon>
+        <span class="error-code">403</span>
+      </div>
+      <div class="header-content">
+        <mat-card-title>Access Denied</mat-card-title>
+        <mat-card-subtitle
+          >You don't have permission to access this area</mat-card-subtitle
+        >
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="warning-message">
+        <mat-icon class="warning-icon">warning</mat-icon>
+        <p>This section is restricted to administrators only.</p>
+      </div>
+
+      <div class="info-section">
+        <h4>Why am I seeing this?</h4>
+        <ul>
+          <li>You need administrator privileges to access this area</li>
+          <li>Your current account doesn't have the required permissions</li>
+          <li>This page contains sensitive administrative functions</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h4>Need access?</h4>
+        <p>
+          If you believe you should have access to this area, please contact
+          your system administrator.
+        </p>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button color="primary" routerLink="/">
+        <mat-icon>home</mat-icon>
+        Go Home
+      </button>
+      <button mat-raised-button color="accent" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Go Back
+      </button>
+      <button mat-raised-button class="contact-btn" (click)="openContactInfo()">
+        <mat-icon>support_agent</mat-icon>
+        Contact Support
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

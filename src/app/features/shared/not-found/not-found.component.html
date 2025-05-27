@@ -1,0 +1,45 @@
+<div class="not-found-container">
+  <mat-card class="not-found-card">
+    <mat-card-header>
+      <div class="icon-container">
+        <mat-icon class="not-found-icon">search_off</mat-icon>
+        <span class="error-code">404</span>
+      </div>
+      <div class="header-content">
+        <mat-card-title>Page Not Found</mat-card-title>
+        <mat-card-subtitle
+          >Oops! It seems like this page doesn't exist</mat-card-subtitle
+        >
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        The page you are looking for could not be found. It may have been moved,
+        deleted, or you may have entered an incorrect URL.
+      </p>
+      <div class="suggestions">
+        <h4>What can you do?</h4>
+        <ul>
+          <li>Check that the URL is spelled correctly</li>
+          <li>Go back to the previous page</li>
+          <li>Go to the home page</li>
+          <li>Explore our movie catalog</li>
+        </ul>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" routerLink="/">
+        <mat-icon>home</mat-icon>
+        Go Home
+      </button>
+      <button mat-raised-button color="accent" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Go Back
+      </button>
+      <button mat-raised-button routerLink="/movies" class="browse-movies-btn">
+        <mat-icon>movie</mat-icon>
+        Browse Movies
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
