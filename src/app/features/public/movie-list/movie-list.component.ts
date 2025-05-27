@@ -2,25 +2,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormControl, FormGroup } from '@angular/forms';
 import {
   debounceTime,
@@ -38,27 +23,18 @@ import { Movie, Genre } from '../../../core/models/movie.model';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { Screening } from '../../../core/models/screening.model';
 
+// Import the new components
+import { TrendingMoviesComponent } from './components/trending-movies/trending-movies.component';
+import {
+  MovieFiltersComponent,
+  FilterOptions,
+} from './components/movie-filters/movie-filters.component';
+import { MovieCardComponent } from './components/movie-card/movie-card.component';
+import { MovieWithNextScreening } from '../../../core/models/movie.model';
+
 interface MovieCategory {
   name: string;
   movies: Movie[];
-}
-
-interface MovieWithNextScreening extends Movie {
-  nextScreening?: {
-    date: Date;
-    formattedTime: string;
-    screeningId: number;
-  };
-  director?: string;
-  actors?: string;
-}
-
-interface FilterOptions {
-  genres: string[];
-  durations: { value: string; label: string; min: number; max: number }[];
-  ratings: string[];
-  timeFrames: { value: string; label: string }[];
-  sortOptions: { value: string; label: string }[];
 }
 
 @Component({
@@ -69,26 +45,14 @@ interface FilterOptions {
     RouterLink,
     FormsModule,
     ReactiveFormsModule,
-    MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatChipsModule,
-    MatBadgeModule,
-    MatTooltipModule,
-    MatDividerModule,
-    MatSliderModule,
-    MatTabsModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatRadioModule,
-    MatExpansionModule,
-    MatCheckboxModule,
     NavbarComponent,
+    TrendingMoviesComponent,
+    MovieFiltersComponent,
+    MovieCardComponent,
   ],
   templateUrl: './movie-list.component.html',
   styleUrls: ['./movie-list.component.scss'],

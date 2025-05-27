@@ -1,0 +1,117 @@
+<mat-card class="movie-card">
+  <div class="movie-poster" [routerLink]="['/movies', movie.id]">
+    <img
+      *ngIf="movie.posterUrl"
+      [src]="movie.posterUrl"
+      alt="{{ movie.title }} poster"
+    />
+    <div *ngIf="!movie.posterUrl" class="no-poster">
+      <mat-icon>movie</mat-icon>
+    </div>
+
+    <!-- Next screening badge -->
+    <div *ngIf="movie.nextScreening" class="next-screening-badge">
+      <span class="next-time">{{ movie.nextScreening.formattedTime }}</span>
+      <span class="next-label">Next Show</span>
+    </div>
+
+    <!-- Hover Quick Preview -->
+    <div class="movie-preview-overlay">
+      <div class="preview-content">
+        <h3 class="preview-title">{{ movie.title }}</h3>
+
+        <div class="preview-info">
+          <p *ngIf="movie.description" class="preview-synopsis">
+            {{ movie.description | slice : 0 : 150
+            }}{{ movie.description.length > 150 ? "..." : "" }}
+          </p>
+
+          <div *ngIf="movie.director" class="preview-meta">
+            <span class="preview-director"
+              ><strong>Director:</strong> {{ movie.director }}</span
+            >
+          </div>
+
+          <div *ngIf="movie.actors" class="preview-meta">
+            <span class="preview-cast"
+              ><strong>Cast:</strong> {{ movie.actors | slice : 0 : 80
+              }}{{ movie.actors.length > 80 ? "..." : "" }}</span
+            >
+          </div>
+        </div>
+
+        <div class="preview-actions">
+          <button
+            mat-stroked-button
+            color="primary"
+            [routerLink]="['/movies', movie.id]"
+          >
+            <mat-icon>info</mat-icon> Full Details
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="movie-content">
+    <mat-card-header>
+      <mat-card-title [routerLink]="['/movies', movie.id]">{{
+        movie.title
+      }}</mat-card-title>
+      <mat-card-subtitle
+        *ngIf="movie.nextScreening"
+        class="next-screening-subtitle"
+      >
+        <mat-icon>event_available</mat-icon>
+        Next: {{ formatDate(movie.nextScreening.date) }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="movie-meta-container">
+        <div class="movie-meta" *ngIf="movie.durationMinutes">
+          <mat-icon>schedule</mat-icon>
+          <span>{{ movie.durationMinutes }} min</span>
+        </div>
+        <div class="movie-meta" *ngIf="movie.rating">
+          <mat-icon>movie_filter</mat-icon>
+          <span>{{ movie.rating }}</span>
+        </div>
+        <div class="movie-meta" *ngIf="movie.voteAverage">
+          <mat-icon>star</mat-icon>
+          <span>{{ movie.voteAverage }}/10</span>
+        </div>
+      </div>
+
+      <div
+        class="movie-genres-container"
+        *ngIf="movie.genres && movie.genres.length > 0"
+      >
+        <mat-chip-set>
+          <mat-chip *ngFor="let genre of movie.genres.slice(0, 3)">
+            {{ genre.name }}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button
+        mat-stroked-button
+        color="primary"
+        [routerLink]="['/movies', movie.id]"
+      >
+        <mat-icon>calendar_today</mat-icon>Dates
+      </button>
+      <button
+        *ngIf="movie.nextScreening"
+        mat-raised-button
+        color="accent"
+        class="reserve-btn"
+        [routerLink]="['/reserve', movie.nextScreening.screeningId]"
+      >
+        <mat-icon>event_seat</mat-icon> Reserve
+      </button>
+    </mat-card-actions>
+  </div>
+</mat-card>

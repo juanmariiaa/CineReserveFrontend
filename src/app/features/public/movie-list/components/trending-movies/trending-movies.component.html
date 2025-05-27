@@ -1,0 +1,52 @@
+<div *ngIf="movies.length > 0" class="trending-section">
+  <div class="trending-header">
+    <h2 class="trending-title">
+      <mat-icon class="trending-icon">trending_up</mat-icon>
+      <span>Trending Now</span>
+    </h2>
+  </div>
+
+  <div class="trending-carousel">
+    <div class="trending-slide" *ngFor="let movie of movies">
+      <div
+        class="trending-backdrop"
+        [style.background-image]="'url(' + movie.backdropUrl + ')'"
+      >
+        <div class="trending-overlay">
+          <div class="trending-content">
+            <h3 class="trending-movie-title">{{ movie.title }}</h3>
+            <div class="trending-movie-meta">
+              <span *ngIf="movie.durationMinutes" class="trending-duration">
+                <mat-icon>schedule</mat-icon> {{ movie.durationMinutes }} min
+              </span>
+              <span *ngIf="movie.rating" class="trending-rating">
+                <mat-icon>star</mat-icon> {{ movie.rating }}
+              </span>
+            </div>
+            <div class="trending-movie-genres" *ngIf="movie.genres?.length">
+              {{ getGenresList(movie) }}
+            </div>
+            <div class="trending-actions">
+              <button
+                mat-raised-button
+                color="primary"
+                [routerLink]="['/movies', movie.id]"
+              >
+                <mat-icon>info</mat-icon> View Details
+              </button>
+              <button
+                *ngIf="movie.nextScreening"
+                mat-raised-button
+                color="accent"
+                class="reserve-btn"
+                [routerLink]="['/reserve', movie.nextScreening.screeningId]"
+              >
+                <mat-icon>event_seat</mat-icon> Reserve Seats
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

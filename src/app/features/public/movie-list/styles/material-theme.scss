@@ -1,0 +1,274 @@
+/* Dark theme overrides for Material Angular components */
+:host ::ng-deep {
+  /* Select panel styling */
+  .mat-mdc-select-panel,
+  .mdc-menu-surface.mat-mdc-select-panel {
+    background-color: #35342e !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+
+  /* Text inside options */
+  .mdc-list-item__primary-text {
+    color: white !important;
+  }
+
+  /* Option states */
+  .mat-mdc-option:hover:not(.mat-mdc-option-disabled),
+  .mat-mdc-option.mat-mdc-option-active {
+    background-color: rgba(255, 107, 107, 0.15) !important;
+  }
+
+  .mat-mdc-option.mat-mdc-option-selected {
+    background-color: rgba(255, 107, 107, 0.3) !important;
+  }
+
+  /* Form field styling */
+  .mat-mdc-text-field-wrapper {
+    background-color: transparent !important;
+  }
+
+  .mat-mdc-form-field-infix {
+    color: white !important;
+  }
+
+  /* Ensure the dialog container has the right background */
+  .mdc-dialog__surface {
+    background-color: #35342e !important;
+  }
+
+  /* Form field borders */
+  .mat-mdc-form-field-appearance-outline .mdc-notched-outline__leading,
+  .mat-mdc-form-field-appearance-outline .mdc-notched-outline__notch,
+  .mat-mdc-form-field-appearance-outline .mdc-notched-outline__trailing {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+  }
+
+  .mat-mdc-form-field-appearance-outline.mat-focused
+    .mdc-notched-outline__leading,
+  .mat-mdc-form-field-appearance-outline.mat-focused
+    .mdc-notched-outline__notch,
+  .mat-mdc-form-field-appearance-outline.mat-focused
+    .mdc-notched-outline__trailing {
+    border-color: #ff6b6b !important;
+  }
+
+  .mat-mdc-form-field-label {
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+
+  .mat-mdc-select-value-text,
+  .mat-mdc-select-placeholder {
+    color: white !important;
+  }
+
+  .mat-mdc-form-field.mat-focused .mat-mdc-form-field-label {
+    color: #ff6b6b !important;
+  }
+
+  .mat-mdc-input-element {
+    color: white !important;
+  }
+
+  /* Button styling */
+  .mat-mdc-raised-button.mat-accent {
+    background-color: #ff6b6b !important;
+    color: white !important;
+  }
+
+  .mat-mdc-raised-button.mat-accent:hover {
+    background-color: #ff5252 !important;
+  }
+
+  .mat-mdc-raised-button.mat-accent .mat-icon {
+    color: white !important;
+  }
+
+  /* Select panel advanced styling */
+  .cdk-overlay-container .cdk-overlay-pane .mat-mdc-select-panel,
+  .mat-mdc-select-panel,
+  .cdk-overlay-pane .mat-mdc-select-panel,
+  .mat-mdc-select-panel-wrap {
+    background-color: #35342e !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 8px !important;
+  }
+
+  .mat-mdc-option .mdc-list-item__primary-text,
+  .mat-mdc-option {
+    color: white !important;
+  }
+
+  /* Dialog styling */
+  .cdk-overlay-pane .mat-mdc-dialog-container .mdc-dialog__surface {
+    background-color: #35342e !important;
+    color: white !important;
+  }
+
+  .cdk-overlay-pane {
+    background-color: #35342e;
+  }
+
+  /* Chip styling */
+  .mat-mdc-chip.mat-mdc-standard-chip {
+    background-color: transparent !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+  }
+
+  .mat-mdc-chip.mat-mdc-standard-chip:hover {
+    background-color: transparent !important;
+  }
+
+  .mat-mdc-chip.mat-mdc-standard-chip .mat-mdc-chip-remove {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  .mat-mdc-chip.mat-mdc-standard-chip .mat-mdc-chip-remove:hover {
+    color: white !important;
+  }
+
+  /* Dialog container */
+  .mat-mdc-dialog-container {
+    background-color: #35342e !important;
+    color: white !important;
+    border-radius: 16px !important;
+  }
+
+  .mat-mdc-dialog-title {
+    color: white !important;
+  }
+
+  .mat-mdc-dialog-content {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  /* Snackbar styling */
+  .error-snackbar {
+    background: #541919 !important;
+    color: white !important;
+  }
+
+  .success-snackbar {
+    background: #1e5441 !important;
+    color: white !important;
+  }
+
+  /* Select arrow */
+  .mat-mdc-select-arrow {
+    color: #ff6b6b !important;
+  }
+
+  /* Checkbox styling */
+  .mat-mdc-checkbox .mdc-checkbox {
+    margin-right: 8px;
+  }
+
+  .mat-mdc-checkbox .mdc-checkbox__background {
+    border-color: rgba(255, 255, 255, 0.5) !important;
+  }
+
+  .mat-mdc-select-multiple .mat-mdc-select-value {
+    color: white !important;
+  }
+
+  .mat-mdc-select-panel
+    mat-option.mat-mdc-option-multiple
+    .mdc-checkbox__background {
+    border-color: rgba(255, 255, 255, 0.5) !important;
+  }
+
+  /* Scrollbar styling */
+  .mat-mdc-select-panel::-webkit-scrollbar {
+    width: 8px;
+    background-color: #35342e;
+  }
+
+  .mat-mdc-select-panel::-webkit-scrollbar-thumb {
+    background-color: #ff6b6b;
+    border-radius: 10px;
+  }
+
+  .mat-mdc-select-panel::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+
+  /* Form field prefix/suffix */
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-prefix,
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-suffix {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  /* Checkbox checked state */
+  .mat-mdc-checkbox
+    .mdc-checkbox
+    .mdc-checkbox__native-control:enabled:checked
+    ~ .mdc-checkbox__background,
+  .mat-mdc-checkbox
+    .mdc-checkbox
+    .mdc-checkbox__native-control:enabled:indeterminate
+    ~ .mdc-checkbox__background {
+    background-color: #ff6b6b !important;
+    border-color: #ff6b6b !important;
+  }
+
+  /* Expansion panel styling */
+  .mat-expansion-panel {
+    background-color: #35342e !important;
+    color: white !important;
+  }
+
+  .mat-expansion-panel-header {
+    padding: 0 16px;
+  }
+
+  .mat-expansion-panel-header-title {
+    color: white !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mat-expansion-panel-header-title mat-icon {
+    color: #ff6b6b !important;
+  }
+
+  .mat-expansion-indicator::after {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  /* Overlay backdrop */
+  .cdk-overlay-container .cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+    opacity: 0.85 !important;
+    background: #1a1a1a !important;
+  }
+
+  /* Menu surface styling */
+  .mdc-menu-surface.mat-mdc-select-panel {
+    background-color: #35342e !important;
+    color: white !important;
+  }
+
+  /* Updated chip styling to be more sober */
+  .mat-mdc-chip-set {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .mat-mdc-chip {
+    background-color: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    min-height: 24px !important;
+    font-size: 12px !important;
+    padding: 2px 8px !important;
+    transition: all 0.2s ease;
+  }
+
+  .mat-mdc-chip:hover {
+    border-color: rgba(255, 107, 107, 0.5) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+}

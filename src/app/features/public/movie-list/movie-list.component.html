@@ -1,269 +1,55 @@
 <div class="movie-list-page">
-      <app-navbar></app-navbar>
+  <app-navbar></app-navbar>
 
-      <div class="movie-list-container">
-        <!-- Page title and trending section -->
+  <div class="movie-list-container">
+    <!-- Page title -->
+    <div class="page-header">
+      <h1 class="page-title">Movies & Showtimes</h1>
+    </div>
 
+    <!-- Trending Movies Section -->
+    <app-trending-movies [movies]="trendingMovies" *ngIf="!loading">
+    </app-trending-movies>
 
-        <!-- Trending/Editor's Pick section -->
-        <div *ngIf="!loading && trendingMovies.length > 0" class="trending-section">
-          <div class="trending-header">
-            <h2 class="trending-title">
-              <mat-icon class="trending-icon">trending_up</mat-icon>
-              <span>Trending Now</span>
-            </h2>
-          </div>
-          
-          <div class="trending-carousel">
-            <div class="trending-slide" *ngFor="let movie of trendingMovies">
-              <div class="trending-backdrop" [style.background-image]="'url(' + movie.backdropUrl + ')'">
-                <div class="trending-overlay">
-                  <div class="trending-content">
-                    <h3 class="trending-movie-title">{{ movie.title }}</h3>
-                    <div class="trending-movie-meta">
-                      <span *ngIf="movie.durationMinutes" class="trending-duration">
-                        <mat-icon>schedule</mat-icon> {{ movie.durationMinutes }} min
-                      </span>
-                      <span *ngIf="movie.rating" class="trending-rating">
-                        <mat-icon>star</mat-icon> {{ movie.rating }}
-                      </span>
-                    </div>
-                    <div class="trending-movie-genres" *ngIf="movie.genres?.length">
-                      {{ getGenresList(movie) }}
-                    </div>
-                    <div class="trending-actions">
-                      <button mat-raised-button color="primary" [routerLink]="['/movies', movie.id]">
-                        <mat-icon>info</mat-icon> View Details
-                      </button>
-                      <button *ngIf="movie.nextScreening" 
-                              mat-raised-button 
-                              color="accent" 
-                              class="reserve-btn"
-                              [routerLink]="['/reserve', movie.nextScreening.screeningId]">
-                        <mat-icon>event_seat</mat-icon> Reserve Seats
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- Search and Filters Section -->
+    <app-movie-filters
+      [filterOptions]="filterOptions"
+      [searchControl]="searchControl"
+      [genreControl]="genreControl"
+      [durationControl]="durationControl"
+      [ratingControl]="ratingControl"
+      [timeFrameControl]="timeFrameControl"
+      [sortControl]="sortControl"
+      (resetFilters)="resetFilters()"
+    >
+    </app-movie-filters>
 
-        <!-- Search and filter section -->
-        <div class="search-filter-section">
-          <div class="search-container">
-            <mat-form-field appearance="outline" class="search-field">
-              <mat-label>Search movies</mat-label>
-              <input matInput [formControl]="searchControl" placeholder="Enter movie title">
-              <mat-icon matPrefix>search</mat-icon>
-              <button *ngIf="searchControl.value" matSuffix mat-icon-button aria-label="Clear" (click)="searchControl.setValue('')">
-                <mat-icon>close</mat-icon>
-              </button>
-            </mat-form-field>
-          </div>
-          
-          <mat-accordion class="filter-accordion" multi>
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  <mat-icon>filter_list</mat-icon> Filter & Sort Options
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-              
-              <div class="filters-container">
-                <div class="filter-row">
-                  <div class="filter-group">
-                    <label class="filter-label">Genre</label>
-                    <mat-form-field appearance="outline">
-                      <mat-label>Select genres</mat-label>
-                      <mat-select [formControl]="genreControl" multiple>
-                        <mat-option *ngFor="let genre of filterOptions.genres" [value]="genre">{{ genre }}</mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                  
-                  <div class="filter-group">
-                    <label class="filter-label">Duration</label>
-                    <mat-form-field appearance="outline">
-                      <mat-label>Movie length</mat-label>
-                      <mat-select [formControl]="durationControl">
-                        <mat-option [value]="''">Any duration</mat-option>
-                        <mat-option *ngFor="let duration of filterOptions.durations" [value]="duration.value">
-                          {{ duration.label }}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                  
-                  <div class="filter-group">
-                    <label class="filter-label">Rating</label>
-                    <mat-form-field appearance="outline">
-                      <mat-label>Age rating</mat-label>
-                      <mat-select [formControl]="ratingControl">
-                        <mat-option [value]="''">Any rating</mat-option>
-                        <mat-option *ngFor="let rating of filterOptions.ratings" [value]="rating">{{ rating }}</mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                </div>
-                
-                <div class="filter-row">
-                  <div class="filter-group">
-                    <label class="filter-label">Time Frame</label>
-                    <mat-form-field appearance="outline">
-                      <mat-label>Showing</mat-label>
-                      <mat-select [formControl]="timeFrameControl">
-                        <mat-option [value]="''">All screenings</mat-option>
-                        <mat-option *ngFor="let timeFrame of filterOptions.timeFrames" [value]="timeFrame.value">
-                          {{ timeFrame.label }}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                  
-                  <div class="filter-group">
-                    <label class="filter-label">Sort By</label>
-                    <mat-form-field appearance="outline">
-                      <mat-label>Sort movies</mat-label>
-                      <mat-select [formControl]="sortControl">
-                        <mat-option *ngFor="let sort of filterOptions.sortOptions" [value]="sort.value">
-                          {{ sort.label }}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                </div>
-                
-                <div class="filter-actions">
-                  <button mat-stroked-button color="primary" (click)="resetFilters()">
-                    <mat-icon>refresh</mat-icon> Reset Filters
-                  </button>
-                </div>
-              </div>
-            </mat-expansion-panel>
-          </mat-accordion>
-        </div>
+    <!-- Loading spinner -->
+    <div *ngIf="loading" class="loading-spinner">
+      <mat-spinner></mat-spinner>
+    </div>
 
-        <!-- Loading spinner -->
-        <div *ngIf="loading" class="loading-spinner">
-          <mat-spinner></mat-spinner>
-        </div>
+    <!-- No movies message -->
+    <div *ngIf="!loading && filteredMovies.length === 0" class="no-movies">
+      <p>
+        <mat-icon>movie_filter</mat-icon>
+        No movies found matching your criteria. Try adjusting your filters.
+      </p>
+      <button mat-raised-button color="accent" (click)="resetFilters()">
+        Reset All Filters
+      </button>
+    </div>
 
-        <!-- No movies message -->
-        <div *ngIf="!loading && filteredMovies.length === 0" class="no-movies">
-          <p>
-            <mat-icon>movie_filter</mat-icon>
-            No movies found matching your criteria. Try adjusting your filters.
-          </p>
-          <button mat-raised-button color="accent" (click)="resetFilters()">Reset All Filters</button>
-        </div>
-
-        <!-- Movies grid view -->
-        <div *ngIf="!loading && filteredMovies.length > 0" class="movies-grid-section">
-          <div class="movies-grid">
-            <div *ngFor="let movie of filteredMovies" class="movie-card-container">
-              <mat-card class="movie-card">
-                <div class="movie-poster" [routerLink]="['/movies', movie.id]">
-                  <img
-                    *ngIf="movie.posterUrl"
-                    [src]="movie.posterUrl"
-                    alt="{{ movie.title }} poster"
-                  />
-                  <div *ngIf="!movie.posterUrl" class="no-poster">
-                    <mat-icon>movie</mat-icon>
-                  </div>
-                  
-                  <!-- Next screening badge -->
-                  <div *ngIf="movie.nextScreening" class="next-screening-badge">
-                    <span class="next-time">{{ movie.nextScreening.formattedTime }}</span>
-                    <span class="next-label">Next Show</span>
-                </div>
-                  
-                  <!-- Hover Quick Preview -->
-                  <div class="movie-preview-overlay">
-                    <div class="preview-content">
-                      <h3 class="preview-title">{{ movie.title }}</h3>
-                      
-                      <div class="preview-info">
-                        <p *ngIf="movie.description" class="preview-synopsis">
-                          {{ movie.description | slice:0:150 }}{{ movie.description.length > 150 ? '...' : '' }}
-                        </p>
-                        
-                        <div *ngIf="movie.director" class="preview-meta">
-                          <span class="preview-director"><strong>Director:</strong> {{ movie.director }}</span>
-                </div>
-                        
-                        <div *ngIf="movie.actors" class="preview-meta">
-                          <span class="preview-cast"><strong>Cast:</strong> {{ movie.actors | slice:0:80 }}{{ movie.actors.length > 80 ? '...' : '' }}</span>
-          </div>
-        </div>
-
-                      <div class="preview-actions">
-                        <button mat-stroked-button color="primary" [routerLink]="['/movies', movie.id]">
-                          <mat-icon>info</mat-icon> Full Details
-                        </button>
-                    </div>
-                  </div>
-                  </div>
-                </div>
-                
-                  <div class="movie-content">
-                    <mat-card-header>
-                    <mat-card-title [routerLink]="['/movies', movie.id]">{{ movie.title }}</mat-card-title>
-                    <mat-card-subtitle *ngIf="movie.nextScreening" class="next-screening-subtitle">
-                      <mat-icon>event_available</mat-icon>
-                      Next: {{ formatDate(movie.nextScreening.date) }}
-                      </mat-card-subtitle>
-                    </mat-card-header>
-
-                    <mat-card-content>
-                    <div class="movie-meta-container">
-                      <div class="movie-meta" *ngIf="movie.durationMinutes">
-                        <mat-icon>schedule</mat-icon>
-                        <span>{{ movie.durationMinutes }} min</span>
-                      </div>
-                      <div class="movie-meta" *ngIf="movie.rating">
-                        <mat-icon>movie_filter</mat-icon>
-                        <span>{{ movie.rating }}</span>
-                      </div>
-                      <div class="movie-meta" *ngIf="movie.voteAverage">
-                        <mat-icon>star</mat-icon>
-                        <span>{{ movie.voteAverage }}/10</span>
-                      </div>
-                    </div>
-                    
-                    <div class="movie-genres-container" *ngIf="movie.genres && movie.genres.length > 0">
-                      <mat-chip-set>
-                        <mat-chip *ngFor="let genre of movie.genres.slice(0, 3)">
-                          {{ genre.name }}
-                        </mat-chip>
-                      </mat-chip-set>
-                    </div>
-                    </mat-card-content>
-
-                    <mat-card-actions>
-                      <button
-                      mat-stroked-button
-                        color="primary"
-                        [routerLink]="['/movies', movie.id]"
-                      >
-                      <mat-icon>calendar_today</mat-icon>Dates
-                    </button>
-                    <button
-                      *ngIf="movie.nextScreening"
-                      mat-raised-button
-                      color="accent"
-                      class="reserve-btn"
-                      [routerLink]="['/reserve', movie.nextScreening.screeningId]"
-                    >
-                      <mat-icon>event_seat</mat-icon> Reserve
-                      </button>
-                    </mat-card-actions>
-                  </div>
-                </mat-card>
-            </div>
-          </div>
+    <!-- Movies grid view -->
+    <div
+      *ngIf="!loading && filteredMovies.length > 0"
+      class="movies-grid-section"
+    >
+      <div class="movies-grid">
+        <div *ngFor="let movie of filteredMovies" class="movie-card-container">
+          <app-movie-card [movie]="movie"></app-movie-card>
         </div>
       </div>
     </div>
+  </div>
+</div>
