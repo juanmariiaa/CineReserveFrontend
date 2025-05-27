@@ -1,0 +1,302 @@
+/* Responsive styles for the carousel */
+@media (min-width: 1400px) {
+  .movie-title {
+    font-size: 72px;
+    max-width: 65%;
+  }
+
+  .movie-title::after {
+    width: 120px;
+    height: 6px;
+  }
+
+  .movie-info-overlay {
+    padding: 70px 100px;
+  }
+
+  .buy-tickets-btn {
+    font-size: 18px !important;
+    padding: 16px 32px !important;
+  }
+}
+
+@media (min-width: 1800px) {
+  .carousel-container {
+    height: 600px;
+  }
+
+  .movie-title {
+    font-size: 84px;
+    max-width: 60%;
+  }
+
+  .movie-title::after {
+    width: 140px;
+    height: 7px;
+  }
+
+  .movie-info-overlay {
+    padding: 80px 120px;
+  }
+
+  .buy-tickets-btn {
+    font-size: 20px !important;
+    padding: 18px 36px !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .movie-info-overlay {
+    padding: 50px 60px;
+  }
+
+  .movie-title {
+    font-size: 56px;
+    max-width: 80%;
+    padding-bottom: 12px;
+  }
+
+  .movie-title::after {
+    width: 90px;
+    height: 5px;
+  }
+}
+
+@media (max-width: 992px) {
+  .carousel-container {
+    height: 450px;
+  }
+
+  .movie-info-overlay {
+    padding: 40px 50px;
+  }
+
+  .movie-title {
+    font-size: 48px;
+    max-width: 85%;
+    padding-bottom: 10px;
+  }
+
+  .movie-title::after {
+    width: 80px;
+    height: 4px;
+  }
+
+  .nav-arrow {
+    width: 46px !important;
+    height: 46px !important;
+  }
+
+  .nav-arrow mat-icon {
+    font-size: 28px;
+    height: 28px;
+    width: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-container {
+    height: 400px;
+  }
+
+  .movie-info-overlay {
+    padding: 30px 40px;
+  }
+
+  .movie-title {
+    font-size: 40px;
+    max-width: 90%;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+  }
+
+  .movie-title::after {
+    width: 70px;
+    height: 4px;
+  }
+
+  .buy-tickets-btn {
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+  }
+
+  .nav-arrow {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .nav-arrow mat-icon {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+  }
+
+  .left-arrow {
+    left: 15px;
+  }
+
+  .right-arrow {
+    right: 15px;
+  }
+
+  .indicator {
+    width: 12px;
+    height: 12px;
+  }
+
+  .movies-container {
+    grid-template-columns: 1fr;
+  }
+
+  .movie-screening-info {
+    padding: 16px;
+  }
+
+  .screening-time-link {
+    padding: 16px;
+  }
+
+  .time-info {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+  }
+
+  .time-display {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ff6b6b;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel-container {
+    height: 350px;
+  }
+
+  .movie-info-overlay {
+    padding: 20px 30px;
+  }
+
+  .movie-title {
+    font-size: 36px;
+    max-width: 100%;
+    margin-bottom: 16px;
+    padding-bottom: 6px;
+  }
+
+  .movie-title::after {
+    width: 60px;
+    height: 3px;
+  }
+
+  .buy-tickets-btn {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
+
+  .nav-arrow {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .nav-arrow mat-icon {
+    font-size: 22px;
+    height: 22px;
+    width: 22px;
+  }
+
+  .left-arrow {
+    left: 10px;
+  }
+
+  .right-arrow {
+    right: 10px;
+  }
+
+  .carousel-controls {
+    bottom: 15px;
+  }
+
+  .indicator {
+    width: 10px;
+    height: 10px;
+  }
+
+  .movie-poster {
+    width: 80px;
+    height: 120px;
+    margin-right: 12px;
+  }
+
+  .time-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .time-display {
+    font-size: 16px;
+    font-weight: 700;
+    min-width: auto;
+    color: #ff6b6b;
+  }
+
+  .room-display {
+    flex: 0 1 auto;
+    font-size: 13px;
+    text-align: center;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .format-display {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: flex-end;
+    min-width: auto;
+  }
+
+  .tag {
+    padding: 1px 4px;
+    font-size: 10px;
+    margin-left: 2px;
+  }
+
+  .screening-time-link {
+    padding: 14px 12px;
+  }
+}
+
+@media (max-width: 370px) {
+  .time-info {
+    gap: 6px;
+  }
+
+  .time-display {
+    font-size: 15px;
+  }
+
+  .room-display {
+    font-size: 12px;
+  }
+
+  .format-display {
+    font-size: 11px;
+    gap: 2px;
+  }
+
+  .tag {
+    padding: 1px 3px;
+    font-size: 9px;
+  }
+}

@@ -1,0 +1,240 @@
+/* Screenings for Date */
+.screenings-for-date {
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+
+.date-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #ffffff;
+  position: relative;
+  padding-left: 12px;
+  border-left: 3px solid #ff6b6b;
+  animation: slideUpFadeIn 0.6s ease-out;
+}
+
+.date-heading mat-icon {
+  color: #ff6b6b;
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+  animation: pulse 2.5s infinite ease-in-out;
+}
+
+.date-heading::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  height: 1px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.movies-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+  margin-top: 15px;
+}
+
+.movie-screening-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #1e1e1c;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+  position: relative;
+  padding: 0;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.movie-screening-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.card-accent-top {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #ff6b6b, rgba(255, 107, 107, 0.5));
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  animation: fadeIn 0.8s ease;
+}
+
+.movie-screening-info {
+  display: flex;
+  padding: 20px;
+  position: relative;
+}
+
+.movie-poster {
+  width: 90px;
+  height: 135px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-right: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.movie-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.movie-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.movie-details .movie-title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: white;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.movie-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.movie-duration,
+.movie-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.movie-duration mat-icon,
+.movie-rating mat-icon {
+  color: #ff6b6b;
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
+}
+
+.movie-genres {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  margin-bottom: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.screening-time-slot {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.screening-time-link {
+  display: block;
+  padding: 14px 20px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.screening-time-link:hover {
+  background-color: rgba(255, 107, 107, 0.15);
+}
+
+.time-info {
+  display: flex;
+  align-items: center;
+}
+
+.time-display {
+  font-weight: 700;
+  font-size: 16px;
+  color: #ffffff;
+  min-width: 80px;
+}
+
+.room-display {
+  flex: 1;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  padding-left: 15px;
+  padding-right: 15px;
+  text-align: center;
+}
+
+.format-display {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+  justify-content: flex-end;
+}
+
+.tag {
+  background-color: #ff6b6b;
+  color: white;
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.no-data {
+  text-align: center;
+  padding: 30px;
+  background-color: #35342e;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.info-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+  margin: 20px 0;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #ff6b6b;
+
+  mat-icon {
+    color: #ff6b6b;
+    font-size: 36px;
+    height: 36px;
+    width: 36px;
+    margin-bottom: 15px;
+  }
+
+  p {
+    margin: 5px 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+}
