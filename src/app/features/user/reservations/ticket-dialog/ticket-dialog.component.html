@@ -1,0 +1,82 @@
+<div class="ticket-dialog">
+    <div class="ticket">
+      <div class="ticket-header">
+        <h1>CineReserve</h1>
+        <h2>Movie Ticket</h2>
+        <button
+          class="close-button"
+          mat-icon-button
+          (click)="close()"
+          aria-label="Close dialog"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="ticket-qr">
+        <img [src]="data.qrImageUrl" alt="QR Code" class="qr-code" />
+        <p class="reservation-id">
+          Reservation ID: {{ data.reservation?.id }}
+        </p>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="ticket-details">
+        <div class="detail-row">
+          <span class="label">Movie:</span>
+          <span class="value">{{
+            data.reservation?.screening?.movie?.title
+          }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Room:</span>
+          <span class="value"
+            >Room {{ data.reservation?.screening?.room?.number }}</span
+          >
+        </div>
+        <div class="detail-row">
+          <span class="label">Date:</span>
+          <span class="value">{{
+            data.reservation?.screening?.startTime | date : 'MM/dd/yyyy'
+          }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Time:</span>
+          <span class="value">{{
+            data.reservation?.screening?.startTime | date : 'HH:mm'
+          }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Seats:</span>
+          <span class="value">{{ data.seatsList }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Customer:</span>
+          <span class="value"
+            >{{ data.reservation?.user?.firstName }}
+            {{ data.reservation?.user?.lastName }}</span
+          >
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="ticket-footer">
+        <p>This ticket is valid only for the specified screening.</p>
+        <p>
+          Present it at the cinema entrance 15 minutes before the movie
+          starts.
+        </p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button mat-raised-button color="accent" (click)="printTicket()">
+        <mat-icon>print</mat-icon> Print Ticket
+      </button>
+      <button mat-raised-button color="primary" (click)="close()">
+        <mat-icon>close</mat-icon> Close
+      </button>
+    </div>
+  </div>
