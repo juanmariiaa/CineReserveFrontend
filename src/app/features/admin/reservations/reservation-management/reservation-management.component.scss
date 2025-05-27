@@ -81,36 +81,111 @@
   color: #ffffff;
 }
 
+.status-filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.status-filter-btn {
+  padding: 8px 16px !important;
+  border-radius: 16px !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+  border: 1px solid transparent !important;
+  transition: all 0.2s ease !important;
+  text-transform: none !important;
+  min-width: 110px !important;
+  height: 36px !important;
+
+  &.unselected {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.12) !important;
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+  }
+
+  &.selected.filter-pending {
+    background-color: #8b6f47 !important;
+    color: #fff4e6 !important;
+    border-color: #6b5538 !important;
+    box-shadow: 0 2px 6px rgba(139, 111, 71, 0.25) !important;
+
+    &:hover {
+      background-color: #7a6240 !important;
+    }
+  }
+
+  &.selected.filter-confirmed {
+    background-color: #5a7c42 !important;
+    color: #f0f8e8 !important;
+    border-color: #4a6b35 !important;
+    box-shadow: 0 2px 6px rgba(90, 124, 66, 0.25) !important;
+
+    &:hover {
+      background-color: #4f6b3a !important;
+    }
+  }
+
+  &.selected.filter-cancelled {
+    background-color: #8b5a5a !important;
+    color: #fdf0f0 !important;
+    border-color: #6b4545 !important;
+    box-shadow: 0 2px 6px rgba(139, 90, 90, 0.25) !important;
+
+    &:hover {
+      background-color: #7a5050 !important;
+    }
+  }
+}
+
 .status-pending {
-  color: #000000;
+  color: #fff4e6;
   font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background-color: #ffc107;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background-color: #8b6f47;
+  border: 1px solid #6b5538;
+  text-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
 }
 
 .status-confirmed {
-  color: #ffffff;
+  color: #f0f8e8;
   font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background-color: #ff6b6b;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background-color: #5a7c42;
+  border: 1px solid #4a6b35;
+  text-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
 }
 
 .status-cancelled {
-  color: #ffffff;
+  color: #fdf0f0;
   font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background-color: #f44336;
-}
-
-.status-completed {
-  color: #ffffff;
-  font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background-color: #3f51b5;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background-color: #8b5a5a;
+  border: 1px solid #6b4545;
+  text-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
 }
 
 .loading-spinner {
@@ -152,20 +227,19 @@
   color: #ffffff;
 }
 
-.status-pending {
-  background-color: #ff9800;
-}
+// Removed duplicate status classes - using the ones above
 
-.status-confirmed {
-  background-color: #ff6b6b;
-}
-
-.status-completed {
-  background-color: #2196f3;
-}
-
+/* Status badges with simplified hover effects */
+.status-pending,
+.status-confirmed,
 .status-cancelled {
-  background-color: #f44336;
+  transition: opacity 0.2s ease;
+}
+
+.status-pending:hover,
+.status-confirmed:hover,
+.status-cancelled:hover {
+  opacity: 0.9;
 }
 
 /* Ensure Angular Material components have proper text color */
@@ -204,6 +278,35 @@
   color: #ffffff !important;
 }
 
-::ng-deep .mat-mdc-chip-option {
-  color: #ffffff !important;
+/* Removed chip styling - now using custom buttons */
+
+/* Responsive design for filter buttons */
+@media (max-width: 768px) {
+  .status-filter-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .status-filter-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .status-filter-btn {
+    min-width: 100px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .status-filter-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .status-filter-btn {
+    width: 100% !important;
+    min-width: unset !important;
+  }
 }

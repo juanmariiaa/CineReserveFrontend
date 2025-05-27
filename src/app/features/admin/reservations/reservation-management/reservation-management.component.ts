@@ -19,7 +19,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
 
 @Component({
@@ -41,7 +40,6 @@ import { MatBadgeModule } from '@angular/material/badge';
     MatDialogModule,
     FormsModule,
     MatTooltipModule,
-    MatChipsModule,
     MatBadgeModule,
   ],
   templateUrl: './reservation-management.component.html',
@@ -64,6 +62,7 @@ export class ReservationManagementComponent implements OnInit, AfterViewInit {
   ];
   dataSource = new MatTableDataSource<Reservation>([]);
   ReservationStatus = ReservationStatus;
+  private initialized = false;
 
   statusOptions = [
     {
@@ -84,12 +83,6 @@ export class ReservationManagementComponent implements OnInit, AfterViewInit {
       selected: true,
       color: 'warn',
     },
-    {
-      value: ReservationStatus.COMPLETED,
-      label: 'Completed',
-      selected: true,
-      color: 'accent',
-    },
   ];
 
   constructor(
@@ -104,8 +97,11 @@ export class ReservationManagementComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     // Set up sorting and pagination after the view is initialized
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    if (!this.initialized) {
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+      this.initialized = true;
+    }
   }
 
   loadReservations(): void {
@@ -113,7 +109,16 @@ export class ReservationManagementComponent implements OnInit, AfterViewInit {
     this.reservationService.getAllReservations().subscribe({
       next: (data) => {
         this.reservations = data;
-        this.dataSource = new MatTableDataSource(this.reservations);
+        this.dataSource.data = data;
+
+        // Re-assign pagination and sorting only if they exist
+        if (this.paginator) {
+          this.dataSource.paginator = this.paginator;
+        }
+        if (this.sort) {
+          this.dataSource.sort = this.sort;
+        }
+
         this.filterByStatus();
         this.loading = false;
       },
@@ -136,8 +141,10 @@ export class ReservationManagementComponent implements OnInit, AfterViewInit {
   }
 
   toggleStatusFilter(option: any): void {
-    option.selected = !option.selected;
-    this.filterByStatus();
+    if (option && typeof option.selected === 'boolean') {
+      option.selected = !option.selected;
+      this.filterByStatus();
+    }
   }
 
   filterByStatus(): void {
@@ -146,11 +153,16 @@ export class ReservationManagementComponent implements OnInit, AfterViewInit {
       .map((option) => option.value);
 
     if (selectedStatuses.length === 0) {
-      this.dataSource.data = this.reservations;
+      this.dataSource.data = [...this.reservations];
     } else {
       this.dataSource.data = this.reservations.filter((reservation) =>
         selectedStatuses.includes(reservation.status)
       );
+    }
+
+    // Reset paginator to first page after filtering
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
     }
   }
 
@@ -162,8 +174,6 @@ export class ReservationManagementComponent implements OnInit, AfterViewInit {
         return 'Confirmed';
       case ReservationStatus.CANCELLED:
         return 'Cancelled';
-      case ReservationStatus.COMPLETED:
-        return 'Completed';
       default:
         return 'Unknown';
     }
@@ -177,11 +187,27 @@ export class ReservationManagementComponent implements OnInit, AfterViewInit {
         return 'status-confirmed';
       case ReservationStatus.CANCELLED:
         return 'status-cancelled';
-      case ReservationStatus.COMPLETED:
-        return 'status-completed';
       default:
         return '';
     }
+  }
+
+  getFilterButtonClass(option: any): string {
+    const baseClass = option.selected ? 'selected' : 'unselected';
+    switch (option.value) {
+      case ReservationStatus.PENDING:
+        return `${baseClass} filter-pending`;
+      case ReservationStatus.CONFIRMED:
+        return `${baseClass} filter-confirmed`;
+      case ReservationStatus.CANCELLED:
+        return `${baseClass} filter-cancelled`;
+      default:
+        return baseClass;
+    }
+  }
+
+  getFilterIcon(status: ReservationStatus): string {
+    return ''; // Eliminado los iconos
   }
 
   confirmCancel(reservation: Reservation): void {

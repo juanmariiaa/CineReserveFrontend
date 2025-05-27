@@ -32,16 +32,16 @@
 
         <div class="status-filter-container">
           <span class="filter-label">Filter by status:</span>
-          <mat-chip-listbox aria-label="Status selection" multiple>
-            <mat-chip-option
+          <div class="status-filter-buttons">
+            <button
               *ngFor="let option of statusOptions"
-              [selected]="option.selected"
-              [color]="option.color"
-              (selectionChange)="toggleStatusFilter(option)"
+              mat-button
+              [class]="'status-filter-btn ' + getFilterButtonClass(option)"
+              (click)="toggleStatusFilter(option)"
             >
               {{ option.label }}
-            </mat-chip-option>
-          </mat-chip-listbox>
+            </button>
+          </div>
         </div>
 
         <div class="table-container">
