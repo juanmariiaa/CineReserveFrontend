@@ -126,7 +126,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
     // Subscribe to auth changes
     this.currentUserSubscription = this.authService.currentUser$.subscribe(
       (user) => {
-        this.updateAuthStatus();
+      this.updateAuthStatus();
       }
     );
 
@@ -138,7 +138,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
 
         // Start periodic seat refresh (every 15 seconds) to ensure we have latest seat availability
         this.startSeatRefresh();
-
+        
         // Pre-select 4 seats for the example (shown in the image)
         // This is just for the example display
         if (this.screeningId === 4) {
@@ -352,7 +352,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
             language: data.language,
             format: data.format,
           };
-
+          
           // Create a simple room object with only the needed fields for the reservation view
           // Using type assertion to avoid type errors with the full Room interface
           this.screening.room = {
@@ -360,7 +360,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
             number: data.roomNumber,
             capacity: data.capacity,
           } as any;
-
+          
           // Load seats after screening data is loaded
           this.loadSeats();
         },
@@ -387,19 +387,19 @@ export class ReservationComponent implements OnInit, OnDestroy {
     this.reservationService
       .getScreeningSeats(this.screeningId, timestamp)
       .subscribe({
-        next: (seats) => {
-          this.seats = seats.map((seat) => ({
-            ...seat,
-            available: seat.status !== 'RESERVED',
-          }));
+      next: (seats) => {
+        this.seats = seats.map((seat) => ({
+          ...seat,
+          available: seat.status !== 'RESERVED',
+        }));
 
-          // Extract unique row labels and sort them
+        // Extract unique row labels and sort them
           this.seatRows = [
             ...new Set(this.seats.map((seat) => seat.row)),
           ].sort();
 
-          // If we had pre-selected seats, find their corresponding actual seats from the loaded data
-          if (this.selectedSeats.length > 0) {
+        // If we had pre-selected seats, find their corresponding actual seats from the loaded data
+        if (this.selectedSeats.length > 0) {
             const preSelectedPositions = this.selectedSeats.map((seat) => ({
               row: seat.row,
               number: seat.number,
@@ -410,18 +410,18 @@ export class ReservationComponent implements OnInit, OnDestroy {
                 preSelectedPositions.some(
                   (pos) => pos.row === seat.row && pos.number === seat.number
                 )
-            );
-          }
-
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('Error loading seats:', error);
-          this.snackBar.open('Could not load seat information.', 'Close', {
-            duration: 5000,
-          });
-          this.loading = false;
-        },
+          );
+        }
+        
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading seats:', error);
+        this.snackBar.open('Could not load seat information.', 'Close', {
+          duration: 5000,
+        });
+        this.loading = false;
+      },
       });
   }
 
@@ -590,8 +590,8 @@ export class ReservationComponent implements OnInit, OnDestroy {
               }
 
               this.snackBar.open(errorMessage, 'Close', {
-                duration: 5000,
-              });
+          duration: 5000,
+        });
             },
           });
       },
