@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, catchError, tap, throwError } from 'rxjs';
 import { GoogleTokenRequest, JwtResponse, LoginRequest, SignupRequest } from '../models/auth.model';
 import { environment } from '../../../environments/environment';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,10 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
     this.loadUser();
   }
 
@@ -28,10 +32,9 @@ export class AuthService {
     return this.http.post<JwtResponse>(`${environment.apiUrl}/auth/signin`, credentials)
       .pipe(
         tap(response => {
-          localStorage.setItem(this.TOKEN_KEY, response.token);
-          localStorage.setItem(this.USER_KEY, JSON.stringify(response));
-          this.currentUserSubject.next(response);
-        })
+          this.storeUserData(response);
+        }),
+        catchError(this.handleError)
       );
   }
   
@@ -40,21 +43,40 @@ export class AuthService {
     return this.http.post<JwtResponse>(`${environment.apiUrl}/auth/google`, tokenRequest)
       .pipe(
         tap(response => {
-          localStorage.setItem(this.TOKEN_KEY, response.token);
-          localStorage.setItem(this.USER_KEY, JSON.stringify(response));
-          this.currentUserSubject.next(response);
-        })
+          this.storeUserData(response);
+        }),
+        catchError(this.handleError)
       );
+  }
+
+  private storeUserData(response: JwtResponse): void {
+    localStorage.setItem(this.TOKEN_KEY, response.token);
+    localStorage.setItem(this.USER_KEY, JSON.stringify(response));
+    this.currentUserSubject.next(response);
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    console.error('Auth service error:', error);
+    
+    if (error.status === 0) {
+      // A client-side or network error occurred
+      return throwError(() => new Error('Network error. Please check your connection.'));
+    }
+    
+    // Return an observable with a user-facing error message
+    return throwError(() => error);
   }
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
+    this.router.navigate(['/']);
   }
 
   register(user: SignupRequest): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/auth/signup`, user);
+    return this.http.post(`${environment.apiUrl}/auth/signup`, user)
+      .pipe(catchError(this.handleError));
   }
 
   getToken(): string | null {

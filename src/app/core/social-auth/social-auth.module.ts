@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SocialLoginModule, SocialAuthServiceConfig, GoogleLoginProvider, GoogleInitOptions } from '@abacritt/angularx-social-login';
+import { SocialLoginModule, SocialAuthServiceConfig, GoogleLoginProvider } from '@abacritt/angularx-social-login';
 import { environment } from '../../../environments/environment';
 
 @NgModule({
@@ -20,21 +20,17 @@ import { environment } from '../../../environments/environment';
         providers: [
           {
             id: GoogleLoginProvider.PROVIDER_ID,
-            provider: new GoogleLoginProvider(environment.googleClientId, {
-              oneTapEnabled: false,
-              prompt: 'select_account',
-              scopes: 'email profile',
-              use_fedcm_for_prompt: false,
-              ux_mode: 'popup',
-              revoke_on_logout: true,
-              plugin_name: 'CineReserve'
-            } as GoogleInitOptions)
+            provider: new GoogleLoginProvider(
+              environment.googleClientId,
+              {
+                prompt: 'select_account',
+                oneTapEnabled: false // Disable One Tap to avoid potential issues
+              }
+            )
           }
         ],
         onError: (err) => {
-          if (err && err.error !== 'popup_closed_by_user') {
-            console.warn('Google OAuth warning:', err.error || err);
-          }
+          console.error('Google OAuth error:', err);
         }
       } as SocialAuthServiceConfig
     }

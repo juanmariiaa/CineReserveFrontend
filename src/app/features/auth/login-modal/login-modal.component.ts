@@ -25,7 +25,7 @@ import {
   SocialUser,
   GoogleLoginProvider,
 } from '@abacritt/angularx-social-login';
-import { Subscription } from 'rxjs';
+import { Subscription, finalize } from 'rxjs';
 
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { AuthService } from '../../../core/services/auth.service';
@@ -140,66 +140,101 @@ export class LoginModalComponent implements OnDestroy {
   }
 
   handleGoogleSignIn(idToken: string): void {
-    this.authService.loginWithGoogle(idToken).subscribe({
-      next: () => {
-        this.isProcessingGoogleAuth = false;
-        this.close.emit();
-        this.loginSuccess.emit();
+    this.authService.loginWithGoogle(idToken)
+      .pipe(
+        finalize(() => {
+          this.isProcessingGoogleAuth = false;
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.close.emit();
+          this.loginSuccess.emit();
 
-        // Stay on current page after login
-        this.snackBar.open('Google sign-in successful!', 'Close', {
-          duration: 3000,
-        });
-      },
-      error: (error) => {
-        this.isProcessingGoogleAuth = false;
-        let errorMsg = 'Google authentication failed';
+          // Navigate based on user role
+          if (this.authService.isAdmin()) {
+            this.router.navigate(['/admin/dashboard']);
+          } else {
+            this.router.navigate(['/']);
+          }
 
-        // Handle specific Google OAuth errors
-        if (error.status === 401) {
-          errorMsg = 'Google authentication failed. Please try again.';
-        } else if (error.status === 0) {
-          errorMsg =
-            'Could not connect to server. Please check your connection.';
-        } else if (error.status === 409) {
-          // User might be registering for the first time
-          errorMsg =
-            'Account created successfully! Please try signing in again.';
-        } else if (
-          error.error &&
-          typeof error.error === 'string' &&
-          error.error.length < 100
-        ) {
-          // Only show short error messages
-          errorMsg = error.error;
-        } else if (
-          error.error &&
-          error.error.message &&
-          error.error.message.length < 100
-        ) {
-          errorMsg = error.error.message;
-        } else if (error.status >= 500) {
-          errorMsg = 'Server error. Please try again later.';
-        }
+          this.snackBar.open('Google sign-in successful!', 'Close', {
+            duration: 3000,
+          });
+        },
+        error: (error) => {
+          console.error('Google auth error:', error);
+          let errorMsg = 'Google authentication failed';
 
-        // For first-time Google users, show a more friendly message
-        if (
-          error.status === 400 ||
-          (error.error &&
-            (error.error.includes('User not found') ||
-              error.error.includes('first time') ||
-              error.error.includes('registration')))
-        ) {
-          errorMsg =
-            'Welcome! Your account has been created. Please try signing in again.';
-        }
+          // Handle specific Google OAuth errors
+          if (error.status === 401) {
+            errorMsg = 'Google authentication failed. Please try again.';
+          } else if (error.status === 0) {
+            errorMsg =
+              'Could not connect to server. Please check your connection.';
+          } else if (error.status === 409) {
+            // User might be registering for the first time
+            errorMsg =
+              'Account created successfully! Please try signing in again.';
+          } else if (
+            error.error && 
+            typeof error.error === 'string'
+          ) {
+            // Only show string error messages
+            errorMsg = error.error;
+          } else if (
+            error.error && 
+            error.error.message && 
+            typeof error.error.message === 'string'
+          ) {
+            errorMsg = error.error.message;
+          } else if (error.status >= 500) {
+            errorMsg = 'Server error. Please try again later.';
+          }
 
-        this.snackBar.open(errorMsg, 'Close', {
-          duration: 5000,
-          panelClass: ['error-snackbar'],
-        });
-      },
-    });
+          // For first-time Google users, show a more friendly message
+          const isNewUserError = this.isNewUserError(error);
+          if (isNewUserError) {
+            // Try to sign in again automatically after a short delay
+            setTimeout(() => {
+              this.socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID);
+            }, 1500);
+            
+            errorMsg =
+              'Welcome! Your account has been created. Signing you in now...';
+          }
+
+          this.snackBar.open(errorMsg, 'Close', {
+            duration: 5000,
+            panelClass: ['error-snackbar'],
+          });
+        },
+      });
+  }
+
+  // Safe method to check if error indicates a new user
+  private isNewUserError(error: any): boolean {
+    if (!error || error.status !== 400) {
+      return false;
+    }
+    
+    // Check if error.error is a string and contains relevant text
+    if (typeof error.error === 'string') {
+      const errorText = error.error.toLowerCase();
+      return errorText.includes('user not found') || 
+             errorText.includes('first time') || 
+             errorText.includes('registration');
+    }
+    
+    // Check if error.error.message is a string and contains relevant text
+    if (error.error && typeof error.error.message === 'string') {
+      const messageText = error.error.message.toLowerCase();
+      return messageText.includes('user not found') || 
+             messageText.includes('first time') || 
+             messageText.includes('registration');
+    }
+    
+    return false;
   }
 
   // Add a method to handle modal close and reset state
