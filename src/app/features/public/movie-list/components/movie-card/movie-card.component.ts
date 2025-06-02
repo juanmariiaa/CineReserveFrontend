@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { MovieWithNextScreening } from '../../../../../core/models/movie.model';
 
@@ -18,6 +19,7 @@ import { MovieWithNextScreening } from '../../../../../core/models/movie.model';
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
+    MatTooltipModule,
   ],
   templateUrl: './movie-card.component.html',
   styleUrls: ['./movie-card.component.scss'],
