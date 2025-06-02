@@ -20,13 +20,11 @@
         <ng-container *ngIf="!loading && screening">
           <!-- Movie Header Banner -->
           <div class="movie-header" *ngIf="screening.movie">
+            <div class="movie-backdrop-container" *ngIf="screening.movie?.backdropUrl">
+              <img class="backdrop-image" [src]="screening.movie.backdropUrl" [alt]="screening.movie.title + ' backdrop'">
+              <div class="backdrop-overlay"></div>
+            </div>
             <div class="movie-header-content">
-              <div class="movie-poster-large" *ngIf="screening.movie?.posterUrl">
-                <img
-                  [src]="screening.movie.posterUrl"
-                  [alt]="screening.movie.title + ' poster'"
-                />
-              </div>
               <div class="movie-header-details">
                 <h1 class="movie-title-large">{{ screening.movie?.title }}</h1>
                 <div class="movie-meta">

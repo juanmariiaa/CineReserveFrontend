@@ -559,34 +559,42 @@ margin-right: 8px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 200px;
 }
 
-.movie-header-content {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  gap: 30px;
-}
-
-.movie-poster-large {
-  width: 180px;
-  height: 270px;
-  border-radius: 8px;
+.movie-backdrop-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
   overflow: hidden;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-  flex-shrink: 0;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  transition: transform 0.3s ease;
 }
 
-.movie-poster-large:hover {
-  transform: scale(1.03);
-}
-
-.movie-poster-large img {
+.backdrop-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+}
+
+.backdrop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(60, 59, 52, 0.95) 100%);
+  z-index: 2;
+}
+
+.movie-header-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
 }
 
 .movie-header-details {
@@ -598,7 +606,7 @@ margin-right: 8px;
   font-weight: 700;
   margin: 0 0 20px 0;
   color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   line-height: 1.2;
 }
 
@@ -614,6 +622,7 @@ margin-right: 8px;
   align-items: center;
   gap: 8px;
   color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .meta-item mat-icon {
@@ -621,6 +630,7 @@ margin-right: 8px;
   font-size: 20px;
   height: 20px;
   width: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .movie-tags {
@@ -636,6 +646,7 @@ margin-right: 8px;
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Selected seats list */
@@ -694,15 +705,13 @@ margin-right: 8px;
 
 /* Responsive styles for movie header */
 @media (max-width: 768px) {
-  .movie-header-content {
-    flex-direction: column;
-    text-align: center;
+  .movie-header {
+    min-height: 250px;
   }
-
-  .movie-poster-large {
-    margin: 0 auto;
-    width: 150px;
-    height: 225px;
+  
+  .movie-header-content {
+    padding: 20px;
+    text-align: center;
   }
 
   .movie-title-large {
@@ -725,12 +734,6 @@ margin-right: 8px;
   .movie-info {
     flex-direction: column;
     gap: 15px;
-  }
-
-  .movie-poster {
-    width: 100%;
-    height: 200px;
-    margin: 0 auto;
   }
 
   .mobile-actions {
