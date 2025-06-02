@@ -1,276 +1,360 @@
 <div class="reservation-container">
-      <app-navbar></app-navbar>
+  <app-navbar></app-navbar>
 
-      <div class="content" [class.loading]="loading">
-        <div *ngIf="loading" class="loading-spinner">
-          <mat-spinner></mat-spinner>
-        </div>
-
-        <div *ngIf="!loading && !screening" class="error-message">
-          <mat-card>
-            <mat-card-content>
-              <p>Screening not found or has been removed.</p>
-              <button mat-raised-button color="accent" routerLink="/">
-                Go to Home
-              </button>
-            </mat-card-content>
-          </mat-card>
-        </div>
-
-        <ng-container *ngIf="!loading && screening">
-          <!-- Movie Header Banner -->
-          <div class="movie-header" *ngIf="screening.movie">
-            <div class="movie-backdrop-container" *ngIf="screening.movie?.backdropUrl">
-              <img class="backdrop-image" [src]="screening.movie.backdropUrl" [alt]="screening.movie.title + ' backdrop'">
-              <div class="backdrop-overlay"></div>
-            </div>
-            <div class="movie-header-content">
-              <div class="movie-header-details">
-                <h1 class="movie-title-large">{{ screening.movie?.title }}</h1>
-                <div class="movie-meta">
-                  <div class="meta-item">
-                    <mat-icon>event_seat</mat-icon>
-                    <span>Room {{ screening.room?.number }}</span>
-                  </div>
-                  <div class="meta-item">
-                    <mat-icon>access_time</mat-icon>
-                    <span>{{ formatDate(screening.startTime) }}</span>
-                  </div>
-                  <div class="meta-item">
-                    <mat-icon>euro</mat-icon>
-                    <span>10€ per seat</span>
-                  </div>
-                  <div class="meta-item">
-                    <mat-icon>movie</mat-icon>
-                    <span>{{ screening.format }}</span>
-                  </div>
-                  <div class="meta-item">
-                    <mat-icon>language</mat-icon>
-                    <span>{{ screening.language }}</span>
-                  </div>
-                </div>
-                <div class="movie-tags">
-                  <span class="movie-tag" *ngIf="screening.is3D">3D</span>
-                  <span class="movie-tag" *ngIf="screening.hasSubtitles">Subtitles</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="reservation-layout">
-            <!-- Main content area -->
-            <div class="reservation-summary">
-              <!-- Reservation Timeout Progress -->
-              <div
-                *ngIf="reservationTimeoutProgress > 0 && !reservationConfirmed"
-                class="timeout-container"
-              >
-                <div class="timeout-header">
-                  <mat-icon color="warn">timer</mat-icon>
-                  <span
-                    >Reservation will expire in
-                    {{ formatTimeRemaining() }}</span
-                  >
-                </div>
-                <mat-progress-bar
-                  [value]="reservationTimeoutProgress"
-                  color="warn"
-                  mode="determinate"
-                >
-                </mat-progress-bar>
-              </div>
-
-              <!-- Seat Selection Area with Zoom Controls -->
-              <mat-card class="seat-selection-card">
-                <mat-card-header>
-                  <mat-card-title>
-                    <span>Select Your Seats</span>
-                    <span
-                      *ngIf="selectedSeats.length > 0"
-                      class="selection-counter"
-                    >
-                      {{ selectedSeats.length }} selected
-                    </span>
-                  </mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                  <!-- Zoom Controls -->
-                  <div class="zoom-controls">
-                    <button
-                      mat-mini-fab
-                      color="primary"
-                      (click)="zoomOut()"
-                      [disabled]="zoomLevel <= minZoom"
-                    >
-                      <mat-icon>zoom_out</mat-icon>
-                    </button>
-                    <span class="zoom-level"
-                      >{{ (zoomLevel * 100).toFixed(0) }}%</span
-                    >
-                    <button
-                      mat-mini-fab
-                      color="primary"
-                      (click)="zoomIn()"
-                      [disabled]="zoomLevel >= maxZoom"
-                    >
-                      <mat-icon>zoom_in</mat-icon>
-                    </button>
-                    <button
-                      mat-mini-fab
-                      color="basic"
-                      (click)="resetZoom()"
-                      matTooltip="Reset Zoom"
-                    >
-                      <mat-icon>zoom_in_map</mat-icon>
-                    </button>
-                  </div>
-
-                  <div class="screen-area">
-                    <div class="screen">
-                      <div class="screen-label">SCREEN</div>
-                    </div>
-                  </div>
-
-                  <div *ngIf="seats.length === 0" class="no-seats-message">
-                    <mat-icon>error_outline</mat-icon>
-                    <p>No seats available for this screening.</p>
-                  </div>
-
-                  <!-- Fixed size seating chart with zoom and pan capability -->
-                  <div class="seats-container-wrapper">
-                    <div
-                      *ngIf="seats.length > 0"
-                      class="seats-container"
-                      [style.transform]="'scale(' + zoomLevel + ')'"
-                    >
-                      <div class="seat-row" *ngFor="let row of seatRows">
-                        <div class="row-label">{{ row }}</div>
-                        <div class="seats">
-                          <div
-                            *ngFor="let seat of getSeatsForRow(row)"
-                            class="seat"
-                            [class.unavailable]="!seat.available"
-                            [class.selected]="isSelected(seat)"
-                            (click)="toggleSeatSelection(seat)"
-                            [matTooltip]="
-                              'Row ' + seat.row + ', Seat ' + seat.number
-                            "
-                            matTooltipPosition="above"
-                          >
-                            {{ seat.number }}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="seat-legend">
-                    <div class="legend-item">
-                      <div class="seat-sample available"></div>
-                      <span>Available</span>
-                    </div>
-                    <div class="legend-item">
-                      <div class="seat-sample unavailable"></div>
-                      <span>Taken</span>
-                    </div>
-                    <div class="legend-item">
-                      <div class="seat-sample selected"></div>
-                      <span>Selected</span>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="reservation-sidebar">
-              <mat-card class="summary-card">
-                <mat-card-header>
-                  <mat-card-title>Reservation Summary</mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                  <div
-                    *ngIf="selectedSeats.length === 0"
-                    class="empty-selection"
-                  >
-                    <mat-icon>event_seat</mat-icon>
-                    <p>No seats selected</p>
-                    <p class="hint-text">
-                      Select seats from the seat map to continue
-                    </p>
-                  </div>
-
-                  <div
-                    *ngIf="selectedSeats.length > 0"
-                    class="selection-details"
-                  >
-                    <h3>Selected Seats</h3>
-
-                    <div class="selected-seats-list">
-                      <div *ngFor="let seat of selectedSeats" class="selected-seat-item">
-                        <div class="seat-info">
-                          <span class="seat-label">Row {{ seat.row }}, Seat {{ seat.number }}</span>
-                          <span class="seat-price">10€</span>
-                        </div>
-                        <button
-                          mat-icon-button
-                          color="warn"
-                          (click)="toggleSeatSelection(seat)"
-                          matTooltip="Remove seat"
-                        >
-                          <mat-icon>close</mat-icon>
-                        </button>
-                      </div>
-                    </div>
-
-                    <div class="price-summary">
-                      <div class="price-row">
-                        <span>Subtotal ({{ selectedSeats.length }} {{ selectedSeats.length === 1 ? 'seat' : 'seats' }})</span>
-                        <span>{{ getTotalPrice() }}€</span>
-                      </div>
-                      <div class="price-row total">
-                        <span>Total</span>
-                        <span>{{ getTotalPrice() }}€</span>
-                      </div>
-                    </div>
-                  </div>
-                </mat-card-content>
-                <mat-card-actions class="card-actions">
-                  <button
-                    mat-stroked-button
-                    class="clear-button"
-                    [disabled]="selectedSeats.length === 0"
-                    (click)="clearSelection()"
-                  >
-                    <mat-icon>clear</mat-icon> Clear
-                  </button>
-                  <button
-                    mat-raised-button
-                    color="primary"
-                    [disabled]="selectedSeats.length === 0 || reserving"
-                    (click)="confirmReservation()"
-                  >
-                    <span *ngIf="!reserving">Confirm Reservation</span>
-                    <mat-spinner *ngIf="reserving" diameter="24"></mat-spinner>
-                  </button>
-                </mat-card-actions>
-              </mat-card>
-
-              <div class="mobile-actions">
-                <button
-                  mat-fab
-                  extended
-                  color="accent"
-                  class="mobile-confirm-button"
-                  [disabled]="selectedSeats.length === 0 || reserving"
-                  (click)="confirmReservation()"
-                >
-                  <mat-icon>check_circle</mat-icon>
-                  Confirm {{ getTotalPrice() }}€ ({{ selectedSeats.length }})
-                </button>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-      </div>
+  <div class="content" [class.loading]="loading">
+    <div *ngIf="loading" class="loading-spinner">
+      <mat-spinner></mat-spinner>
     </div>
+
+    <div *ngIf="!loading && !screening" class="error-message">
+      <mat-card>
+        <mat-card-content>
+          <p>Screening not found or has been removed.</p>
+          <button mat-raised-button color="accent" routerLink="/">
+            Go to Home
+          </button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <ng-container *ngIf="!loading && screening">
+      <!-- Movie Backdrop Header with Information -->
+      <div class="hero-section" *ngIf="screening.movie">
+        <div class="backdrop-container">
+          <!-- Backdrop Image -->
+          <div
+            class="backdrop-image"
+            *ngIf="hasBackdrop()"
+            [style.background-image]="'url(' + getBackdropUrl() + ')'"
+          ></div>
+
+          <!-- Fallback background if no backdrop -->
+          <div class="backdrop-fallback" *ngIf="!hasBackdrop()"></div>
+
+          <div class="backdrop-overlay"></div>
+
+          <div class="hero-content">
+            <div class="movie-title-section">
+              <h1 class="movie-title">{{ screening.movie?.title }}</h1>
+              <div class="movie-rating" *ngIf="screening.movie?.rating">
+                <mat-icon class="star-icon">star</mat-icon>
+                <span>{{ screening.movie?.rating }}/10</span>
+              </div>
+            </div>
+
+            <div class="screening-details">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <mat-icon>place</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Sala</span>
+                    <span class="detail-value">{{
+                      screening.room?.number
+                    }}</span>
+                  </div>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>schedule</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Horario</span>
+                    <span class="detail-value">{{
+                      formatDate(screening.startTime)
+                    }}</span>
+                  </div>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>euro</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Precio</span>
+                    <span class="detail-value">10€/asiento</span>
+                  </div>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>movie</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Formato</span>
+                    <span class="detail-value">{{ screening.format }}</span>
+                  </div>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>language</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Idioma</span>
+                    <span class="detail-value">{{ screening.language }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="feature-badges">
+                <span class="feature-badge" *ngIf="screening.is3D">
+                  <mat-icon>3d_rotation</mat-icon>
+                  3D
+                </span>
+                <span class="feature-badge" *ngIf="screening.hasSubtitles">
+                  <mat-icon>subtitles</mat-icon>
+                  Subtítulos
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reservation Timer -->
+      <div
+        *ngIf="reservationTimeoutProgress > 0 && !reservationConfirmed"
+        class="reservation-timer"
+      >
+        <div class="timer-content">
+          <div class="timer-icon">
+            <mat-icon>timer</mat-icon>
+          </div>
+          <div class="timer-text">
+            <span class="timer-label">Tiempo restante</span>
+            <span class="timer-value">{{ formatTimeRemaining() }}</span>
+          </div>
+          <mat-progress-bar
+            class="timer-progress"
+            [value]="reservationTimeoutProgress"
+            color="warn"
+            mode="determinate"
+          ></mat-progress-bar>
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="main-content">
+        <!-- Seat Selection Section -->
+        <div class="seat-selection-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <mat-icon>event_seat</mat-icon>
+              Selecciona tus asientos
+            </h2>
+            <div class="seat-counter" *ngIf="selectedSeats.length > 0">
+              <span class="counter-number">{{ selectedSeats.length }}</span>
+              <span class="counter-text">seleccionados</span>
+            </div>
+          </div>
+
+          <!-- Zoom Controls -->
+          <div class="zoom-controls">
+            <button
+              mat-mini-fab
+              color="primary"
+              (click)="zoomOut()"
+              [disabled]="zoomLevel <= minZoom"
+              class="zoom-btn"
+            >
+              <mat-icon>zoom_out</mat-icon>
+            </button>
+            <span class="zoom-indicator"
+              >{{ (zoomLevel * 100).toFixed(0) }}%</span
+            >
+            <button
+              mat-mini-fab
+              color="primary"
+              (click)="zoomIn()"
+              [disabled]="zoomLevel >= maxZoom"
+              class="zoom-btn"
+            >
+              <mat-icon>zoom_in</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="resetZoom()"
+              matTooltip="Restablecer zoom"
+              class="reset-zoom-btn"
+            >
+              <mat-icon>center_focus_strong</mat-icon>
+            </button>
+          </div>
+
+          <!-- Screen Area -->
+          <div class="screen-container">
+            <div class="cinema-screen">
+              <div class="screen-glow"></div>
+              <div class="screen-surface">
+                <span class="screen-text">PANTALLA</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seats Grid -->
+          <div class="seats-viewport">
+            <div
+              *ngIf="seats.length > 0"
+              class="seats-grid"
+              [style.transform]="'scale(' + zoomLevel + ')'"
+            >
+              <div class="seat-row" *ngFor="let row of seatRows">
+                <div class="row-identifier">{{ row }}</div>
+                <div class="row-seats">
+                  <button
+                    *ngFor="let seat of getSeatsForRow(row)"
+                    class="seat-button"
+                    [class.seat-available]="seat.available"
+                    [class.seat-occupied]="!seat.available"
+                    [class.seat-selected]="isSelected(seat)"
+                    [disabled]="!seat.available"
+                    (click)="toggleSeatSelection(seat)"
+                    [matTooltip]="
+                      'Fila ' +
+                      seat.row +
+                      ', Asiento ' +
+                      seat.number +
+                      (seat.available ? '' : ' - Ocupado')
+                    "
+                    matTooltipPosition="above"
+                  >
+                    <span class="seat-number">{{ seat.number }}</span>
+                  </button>
+                </div>
+                <div class="row-identifier">{{ row }}</div>
+              </div>
+            </div>
+
+            <div *ngIf="seats.length === 0" class="no-seats-available">
+              <mat-icon>event_busy</mat-icon>
+              <h3>No hay asientos disponibles</h3>
+              <p>Esta sesión no tiene asientos disponibles para reservar.</p>
+            </div>
+          </div>
+
+          <!-- Seat Legend -->
+          <div class="seat-legend">
+            <div class="legend-item">
+              <div class="legend-seat available"></div>
+              <span>Disponible</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-seat occupied"></div>
+              <span>Ocupado</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-seat selected"></div>
+              <span>Seleccionado</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reservation Summary Sidebar -->
+        <div class="summary-sidebar">
+          <div class="summary-card">
+            <div class="summary-header">
+              <h3>
+                <mat-icon>receipt</mat-icon>
+                Resumen de reserva
+              </h3>
+            </div>
+
+            <div class="summary-content">
+              <div *ngIf="selectedSeats.length === 0" class="empty-selection">
+                <div class="empty-icon">
+                  <mat-icon>event_seat</mat-icon>
+                </div>
+                <h4>Ningún asiento seleccionado</h4>
+                <p>
+                  Selecciona asientos del mapa para continuar con tu reserva.
+                </p>
+              </div>
+
+              <div *ngIf="selectedSeats.length > 0" class="selection-summary">
+                <div class="selected-seats">
+                  <h4>Asientos seleccionados</h4>
+                  <div class="seats-list">
+                    <div *ngFor="let seat of selectedSeats" class="seat-item">
+                      <div class="seat-details">
+                        <span class="seat-position"
+                          >Fila {{ seat.row }}, Asiento {{ seat.number }}</span
+                        >
+                        <span class="seat-price">10€</span>
+                      </div>
+                      <button
+                        mat-icon-button
+                        color="warn"
+                        (click)="toggleSeatSelection(seat)"
+                        matTooltip="Eliminar asiento"
+                        class="remove-seat-btn"
+                      >
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="price-breakdown">
+                  <div class="price-line">
+                    <span
+                      >Subtotal ({{ selectedSeats.length }}
+                      {{
+                        selectedSeats.length === 1 ? "asiento" : "asientos"
+                      }})</span
+                    >
+                    <span>{{ getTotalPrice() }}€</span>
+                  </div>
+                  <div class="price-line total">
+                    <span>Total</span>
+                    <span>{{ getTotalPrice() }}€</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="summary-actions">
+              <button
+                mat-stroked-button
+                class="clear-btn"
+                [disabled]="selectedSeats.length === 0"
+                (click)="clearSelection()"
+              >
+                <mat-icon>clear_all</mat-icon>
+                Limpiar
+              </button>
+              <button
+                mat-raised-button
+                color="primary"
+                class="confirm-btn"
+                [disabled]="selectedSeats.length === 0 || reserving"
+                (click)="confirmReservation()"
+              >
+                <mat-spinner *ngIf="reserving" diameter="20"></mat-spinner>
+                <mat-icon *ngIf="!reserving">check_circle</mat-icon>
+                <span *ngIf="!reserving">Confirmar Reserva</span>
+                <span *ngIf="reserving">Procesando...</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Fixed Bottom Bar -->
+      <div class="mobile-bottom-bar" *ngIf="selectedSeats.length > 0">
+        <div class="mobile-summary">
+          <div class="mobile-total">
+            <span class="mobile-seats"
+              >{{ selectedSeats.length }} asiento{{
+                selectedSeats.length > 1 ? "s" : ""
+              }}</span
+            >
+            <span class="mobile-price">{{ getTotalPrice() }}€</span>
+          </div>
+          <button
+            mat-raised-button
+            color="primary"
+            class="mobile-confirm"
+            [disabled]="reserving"
+            (click)="confirmReservation()"
+          >
+            <mat-spinner *ngIf="reserving" diameter="18"></mat-spinner>
+            <span *ngIf="!reserving">Confirmar</span>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

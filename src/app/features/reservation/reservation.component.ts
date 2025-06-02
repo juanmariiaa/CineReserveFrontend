@@ -27,6 +27,7 @@ import {
 import { ScreeningService } from '../../core/services/screening.service';
 import { ReservationService } from '../../core/services/reservation.service';
 import { AuthService } from '../../core/services/auth.service';
+import { MovieService } from '../../core/services/movie.service';
 import {
   Screening,
   ScreeningBasicDTO,
@@ -111,6 +112,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
     private screeningService: ScreeningService,
     private reservationService: ReservationService,
     private authService: AuthService,
+    private movieService: MovieService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar
   ) {
@@ -126,7 +128,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
     // Subscribe to auth changes
     this.currentUserSubscription = this.authService.currentUser$.subscribe(
       (user) => {
-      this.updateAuthStatus();
+        this.updateAuthStatus();
       }
     );
 
@@ -138,7 +140,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
 
         // Start periodic seat refresh (every 15 seconds) to ensure we have latest seat availability
         this.startSeatRefresh();
-        
+
         // Pre-select 4 seats for the example (shown in the image)
         // This is just for the example display
         if (this.screeningId === 4) {
@@ -355,10 +357,10 @@ export class ReservationComponent implements OnInit, OnDestroy {
               id: data.movieId,
               title: data.movieTitle,
               posterUrl: data.moviePosterUrl,
-              tmdbId: 0 // Valor requerido pero no usado en este contexto
-            }
+              tmdbId: 0, // Valor requerido pero no usado en este contexto
+            },
           };
-          
+
           // Create a simple room object with only the needed fields for the reservation view
           // Using type assertion to avoid type errors with the full Room interface
           this.screening.room = {
@@ -366,9 +368,26 @@ export class ReservationComponent implements OnInit, OnDestroy {
             number: data.roomNumber,
             capacity: data.capacity,
           } as any;
-          
-          // Load seats after screening data is loaded
-          this.loadSeats();
+
+          // Load complete movie data including backdropUrl
+          this.movieService.getMovieById(data.movieId).subscribe({
+            next: (movieData) => {
+              if (this.screening && this.screening.movie) {
+                // Update the movie object with complete data including backdropUrl
+                this.screening.movie = {
+                  ...this.screening.movie,
+                  ...movieData,
+                };
+              }
+              // Load seats after both screening and movie data are loaded
+              this.loadSeats();
+            },
+            error: (error) => {
+              console.error('Error loading movie details:', error);
+              // Still load seats even if movie details fail
+              this.loadSeats();
+            },
+          });
         },
         error: (error) => {
           console.error('Error loading screening:', error);
@@ -393,19 +412,19 @@ export class ReservationComponent implements OnInit, OnDestroy {
     this.reservationService
       .getScreeningSeats(this.screeningId, timestamp)
       .subscribe({
-      next: (seats) => {
-        this.seats = seats.map((seat) => ({
-          ...seat,
-          available: seat.status !== 'RESERVED',
-        }));
+        next: (seats) => {
+          this.seats = seats.map((seat) => ({
+            ...seat,
+            available: seat.status !== 'RESERVED',
+          }));
 
-        // Extract unique row labels and sort them
+          // Extract unique row labels and sort them
           this.seatRows = [
             ...new Set(this.seats.map((seat) => seat.row)),
           ].sort();
 
-        // If we had pre-selected seats, find their corresponding actual seats from the loaded data
-        if (this.selectedSeats.length > 0) {
+          // If we had pre-selected seats, find their corresponding actual seats from the loaded data
+          if (this.selectedSeats.length > 0) {
             const preSelectedPositions = this.selectedSeats.map((seat) => ({
               row: seat.row,
               number: seat.number,
@@ -416,18 +435,18 @@ export class ReservationComponent implements OnInit, OnDestroy {
                 preSelectedPositions.some(
                   (pos) => pos.row === seat.row && pos.number === seat.number
                 )
-          );
-        }
-        
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading seats:', error);
-        this.snackBar.open('Could not load seat information.', 'Close', {
-          duration: 5000,
-        });
-        this.loading = false;
-      },
+            );
+          }
+
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading seats:', error);
+          this.snackBar.open('Could not load seat information.', 'Close', {
+            duration: 5000,
+          });
+          this.loading = false;
+        },
       });
   }
 
@@ -487,12 +506,15 @@ export class ReservationComponent implements OnInit, OnDestroy {
     const index = this.selectedSeats.findIndex((s) => s.id === seat.id);
     if (index > -1) {
       // Remove seat
-      this.selectedSeats = [...this.selectedSeats.slice(0, index), ...this.selectedSeats.slice(index + 1)];
+      this.selectedSeats = [
+        ...this.selectedSeats.slice(0, index),
+        ...this.selectedSeats.slice(index + 1),
+      ];
     } else {
       // Add seat
       this.selectedSeats = [...this.selectedSeats, seat];
     }
-    
+
     // Force change detection by creating a new array reference
     this.selectedSeats = [...this.selectedSeats];
   }
@@ -510,7 +532,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
     // Precio fijo de 10€ por asiento
     const pricePerSeat = 10;
     const numberOfSeats = this.selectedSeats.length;
-    
+
     return numberOfSeats * pricePerSeat;
   }
 
@@ -605,8 +627,8 @@ export class ReservationComponent implements OnInit, OnDestroy {
               }
 
               this.snackBar.open(errorMessage, 'Close', {
-          duration: 5000,
-        });
+                duration: 5000,
+              });
             },
           });
       },
@@ -624,5 +646,20 @@ export class ReservationComponent implements OnInit, OnDestroy {
         this.reserving = false;
       },
     });
+  }
+
+  // Debug function to check backdrop URL
+  getBackdropUrl(): string {
+    const url = this.screening?.movie?.backdropUrl;
+    console.log('Backdrop URL:', url); // Debug log
+    console.log('Full movie object:', this.screening?.movie); // Debug log
+    return url || '';
+  }
+
+  // Debug function to check if backdrop exists
+  hasBackdrop(): boolean {
+    const hasBackdrop = !!this.screening?.movie?.backdropUrl;
+    console.log('Has backdrop:', hasBackdrop); // Debug log
+    return hasBackdrop;
   }
 }
