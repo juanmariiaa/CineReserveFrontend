@@ -1,4 +1,5 @@
 <mat-card class="movie-card">
+  <!-- Poster -->
   <div class="movie-poster" [routerLink]="['/movies', movie.id]">
     <img
       *ngIf="movie.posterUrl"
@@ -15,7 +16,7 @@
       <span class="next-label">Next Show</span>
     </div>
 
-    <!-- Hover Quick Preview -->
+    <!-- Hover Quick Preview (solo visible en desktop) -->
     <div class="movie-preview-overlay">
       <div class="preview-content">
         <h3 class="preview-title">{{ movie.title }}</h3>
@@ -53,20 +54,22 @@
     </div>
   </div>
 
+  <!-- Contenido -->
   <div class="movie-content">
+    <!-- Header con título -->
     <mat-card-header>
-      <mat-card-title [routerLink]="['/movies', movie.id]">{{
-        movie.title
-      }}</mat-card-title>
-      <mat-card-subtitle
-        *ngIf="movie.nextScreening"
-        class="next-screening-subtitle"
-      >
+      <div class="title-container">
+        <mat-card-title [routerLink]="['/movies', movie.id]" [matTooltip]="movie.title">
+          {{ movie.title }}
+        </mat-card-title>
+      </div>
+      <div *ngIf="movie.nextScreening" class="next-screening-subtitle">
         <mat-icon>event_available</mat-icon>
-        Next: {{ formatDate(movie.nextScreening.date) }}
-      </mat-card-subtitle>
+        <span>Next: {{ formatDate(movie.nextScreening.date) }}</span>
+      </div>
     </mat-card-header>
 
+    <!-- Metadatos -->
     <mat-card-content>
       <div class="movie-meta-container">
         <div class="movie-meta" *ngIf="movie.durationMinutes">
@@ -83,6 +86,7 @@
         </div>
       </div>
 
+      <!-- Géneros (ocultos en móvil) -->
       <div
         class="movie-genres-container"
         *ngIf="movie.genres && movie.genres.length > 0"
@@ -95,6 +99,7 @@
       </div>
     </mat-card-content>
 
+    <!-- Botones -->
     <mat-card-actions>
       <button
         mat-stroked-button

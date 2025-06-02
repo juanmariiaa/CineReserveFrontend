@@ -97,14 +97,18 @@
 
 .movies-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, 280px);
   gap: 20px;
   width: 100%;
+  justify-content: center;
 }
 
 .movie-card-container {
   display: flex;
   width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 /* Movie card styles moved to movie-card component */
@@ -338,7 +342,7 @@ button.reserve-btn mat-icon {
 /* Responsive Adjustments */
 @media (max-width: 992px) {
   .movies-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, 260px);
   }
 }
 
@@ -353,22 +357,39 @@ button.reserve-btn mat-icon {
   }
 
   .movies-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, 230px);
     gap: 15px;
   }
 }
 
 @media (max-width: 576px) {
   .movie-list-container {
-    width: 100%;
-    padding: 10px 5px;
-    box-sizing: border-box;
+    width: 100% !important;
+    padding: 10px 5px !important;
+    box-sizing: border-box !important;
   }
 
   .movies-grid {
-    grid-template-columns: 1fr;
-    gap: 15px;
-    width: 100%;
-    padding: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+    width: 100% !important;
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+  }
+  
+  .movie-card-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    height: 180px !important; /* Altura fija igual a las tarjetas */
   }
 }
+
+@media (max-width: 400px) {
+  .movie-card-container {
+    height: 160px !important; /* Altura fija igual a las tarjetas para pantallas muy pequeñas */
+  }
+}
+

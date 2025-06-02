@@ -2,14 +2,14 @@
 .movie-card {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 280px;
   background-color: #35342e;
   color: white;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s, box-shadow 0.3s;
-  max-width: 100%;
+  margin: 0 auto;
 }
 
 .movie-card:hover {
@@ -149,6 +149,17 @@
 
 mat-card-header {
   padding: 16px 16px 8px;
+  height: 65px;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.title-container {
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 4px;
 }
 
 mat-card-title {
@@ -160,6 +171,12 @@ mat-card-title {
   color: white;
   cursor: pointer;
   transition: color 0.2s;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: 25px;
+  line-height: 25px;
+  box-sizing: border-box;
 }
 
 mat-card-title:hover {
@@ -240,137 +257,231 @@ button.reserve-btn mat-icon {
 
 /* Responsive Adjustments */
 @media (max-width: 992px) {
+  .movie-card {
+    width: 260px;
+  }
+  
   .movie-poster {
     height: 320px;
   }
 }
 
 @media (max-width: 768px) {
+  .movie-card {
+    width: 230px;
+  }
+  
   .movie-poster {
     height: 280px;
   }
 
   mat-card-title {
     font-size: 16px;
+    height: 22px;
+    line-height: 22px;
   }
 }
 
 @media (max-width: 576px) {
   .movie-card {
+    /* Dimensiones fijas y absolutas */
+    display: flex;
     flex-direction: row;
-    height: 180px;
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
+    height: 180px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    /* Forzar el mismo tamaño */
+    position: relative !important;
   }
 
   .movie-poster {
-    height: 180px;
-    width: 110px;
-    flex-shrink: 0;
+    /* Dimensiones fijas y absolutas */
+    height: 180px !important;
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
+    flex: 0 0 110px !important;
+    position: relative !important;
+    overflow: hidden !important;
   }
 
   .movie-content {
-    width: calc(100% - 110px);
-    overflow: hidden;
-    padding-right: 5px;
+    /* Dimensiones relativas pero fijas */
+    flex: 1 !important;
+    width: calc(100% - 110px) !important;
+    min-width: calc(100% - 110px) !important;
+    max-width: calc(100% - 110px) !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    position: relative !important;
   }
 
   .movie-genres-container {
-    display: none;
+    display: none !important;
   }
 
   .next-screening-badge {
-    top: 5px;
-    right: 5px;
-    padding: 3px 6px;
+    top: 5px !important;
+    right: 5px !important;
+    padding: 3px 6px !important;
   }
 
   .next-time {
-    font-size: 12px;
+    font-size: 12px !important;
   }
 
   .next-label {
-    font-size: 9px;
+    font-size: 9px !important;
   }
 
   mat-card-header {
-    padding: 12px 10px 6px;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 60px !important; /* Altura fija */
+    min-height: 60px !important;
+    max-height: 60px !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+
+  .title-container {
+    width: 100% !important;
+    height: 36px !important; /* Altura fija para el título */
+    min-height: 36px !important;
+    max-height: 36px !important;
+    overflow: hidden !important;
+    margin-bottom: 4px !important;
+  }
+
+  mat-card-title {
+    width: 100% !important;
+    white-space: normal !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+    height: 36px !important; /* Altura fija */
+    max-height: 36px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+  }
+
+  .next-screening-subtitle {
+    height: 20px !important;
+    margin-top: 0 !important;
+    font-size: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+  }
+
+  .next-screening-subtitle mat-icon {
+    font-size: 14px !important;
+    height: 14px !important;
+    width: 14px !important;
   }
 
   mat-card-content {
-    padding: 0 10px;
-  }
-
-  mat-card-actions {
-    padding: 6px 10px 10px;
+    padding: 4px 8px !important;
+    flex: 0 0 40px !important; /* Altura fija */
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
   }
 
   .movie-meta-container {
-    gap: 10px;
-    margin-bottom: 8px;
+    gap: 8px !important;
+    margin-bottom: 0 !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
   }
 
-  /* Fix for card actions on mobile */
+  .movie-meta {
+    font-size: 12px !important;
+  }
+
+  .movie-meta mat-icon {
+    font-size: 16px !important;
+    height: 16px !important;
+    width: 16px !important;
+  }
+
+  mat-card-actions {
+    padding: 4px 8px 8px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+    height: 50px !important; /* Altura fija */
+    min-height: 50px !important;
+    max-height: 50px !important;
+    overflow: hidden !important;
+  }
+
   mat-card-actions button {
-    padding: 0 6px;
-    min-width: 64px;
-    font-size: 13px;
-    line-height: 32px;
+    padding: 0 4px !important;
+    min-width: 64px !important;
+    font-size: 12px !important;
+    line-height: 30px !important;
+    height: 30px !important;
   }
 
   mat-card-actions button mat-icon {
-    margin-right: 4px;
-    font-size: 16px;
-    height: 16px;
-    width: 16px;
+    margin-right: 4px !important;
+    font-size: 14px !important;
+    height: 14px !important;
+    width: 14px !important;
   }
 }
 
 /* Fix for very small screens */
 @media (max-width: 400px) {
   .movie-card {
-    height: 160px;
+    height: 160px !important;
   }
 
   .movie-poster {
-    height: 160px;
-    width: 100px;
+    height: 160px !important;
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+    flex: 0 0 100px !important;
   }
 
   .movie-content {
-    width: calc(100% - 100px);
+    flex: 1 !important;
+    width: calc(100% - 100px) !important;
+    min-width: calc(100% - 100px) !important;
+    max-width: calc(100% - 100px) !important;
   }
 
   mat-card-title {
-    font-size: 14px;
-  }
-
-  .next-screening-subtitle {
-    font-size: 12px;
+    font-size: 14px !important;
   }
 
   mat-card-actions button {
-    padding: 0 4px;
-    font-size: 12px;
-    min-width: 60px;
-    line-height: 30px;
+    padding: 0 2px !important;
+    font-size: 11px !important;
+    min-width: 55px !important;
+    line-height: 28px !important;
+    height: 28px !important;
   }
 
   mat-card-actions button mat-icon {
-    margin-right: 2px;
-    font-size: 14px;
-    height: 14px;
-    width: 14px;
-  }
-
-  .movie-meta {
-    font-size: 12px;
-  }
-
-  .movie-meta mat-icon {
-    font-size: 16px;
-    height: 16px;
-    width: 16px;
+    margin-right: 2px !important;
+    font-size: 13px !important;
+    height: 13px !important;
+    width: 13px !important;
   }
 }
