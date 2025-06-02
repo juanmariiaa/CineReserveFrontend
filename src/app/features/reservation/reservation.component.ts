@@ -351,6 +351,12 @@ export class ReservationComponent implements OnInit, OnDestroy {
             hasSubtitles: data.hasSubtitles,
             language: data.language,
             format: data.format,
+            movie: {
+              id: data.movieId,
+              title: data.movieTitle,
+              posterUrl: data.moviePosterUrl,
+              tmdbId: 0 // Valor requerido pero no usado en este contexto
+            }
           };
           
           // Create a simple room object with only the needed fields for the reservation view
@@ -480,10 +486,15 @@ export class ReservationComponent implements OnInit, OnDestroy {
 
     const index = this.selectedSeats.findIndex((s) => s.id === seat.id);
     if (index > -1) {
-      this.selectedSeats.splice(index, 1);
+      // Remove seat
+      this.selectedSeats = [...this.selectedSeats.slice(0, index), ...this.selectedSeats.slice(index + 1)];
     } else {
-      this.selectedSeats.push(seat);
+      // Add seat
+      this.selectedSeats = [...this.selectedSeats, seat];
     }
+    
+    // Force change detection by creating a new array reference
+    this.selectedSeats = [...this.selectedSeats];
   }
 
   isSelected(seat: any): boolean {
@@ -491,12 +502,16 @@ export class ReservationComponent implements OnInit, OnDestroy {
   }
 
   clearSelection(): void {
+    // Create a new empty array to force change detection
     this.selectedSeats = [];
   }
 
   getTotalPrice(): number {
-    if (!this.screening) return 0;
-    return this.selectedSeats.length * this.screening.ticketPrice;
+    // Precio fijo de 10€ por asiento
+    const pricePerSeat = 10;
+    const numberOfSeats = this.selectedSeats.length;
+    
+    return numberOfSeats * pricePerSeat;
   }
 
   formatDate(dateString: string): string {
