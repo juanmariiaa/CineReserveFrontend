@@ -221,10 +221,9 @@
                     mat-raised-button
                     color="accent"
                     *ngIf="!isLoggedIn"
-                    routerLink="/login"
-                    [queryParams]="{ returnUrl: '/reserve/' + screening.id }"
+                    (click)="promptLogin('/reserve/' + screening.id)"
                   >
-                    <mat-icon>login</mat-icon> Login to Reserve
+                    <mat-icon>event_seat</mat-icon> Reserve Seats
                   </button>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, catchError, tap, throwError } from 'rxjs';
 import { GoogleTokenRequest, JwtResponse, LoginRequest, SignupRequest } from '../models/auth.model';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root'
@@ -13,10 +14,18 @@ export class AuthService {
   private readonly USER_KEY = 'auth-user';
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  
+  // Observable para manejar la apertura del modal de login
+  private loginModalSubject = new BehaviorSubject<boolean>(false);
+  public loginModal$ = this.loginModalSubject.asObservable();
+  
+  // Almacenar la URL a la que redirigir después del login
+  private redirectUrl: string | null = null;
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {
     this.loadUser();
   }
@@ -33,6 +42,8 @@ export class AuthService {
       .pipe(
         tap(response => {
           this.storeUserData(response);
+          // Redirigir si hay una URL guardada
+          this.redirectAfterLogin();
         }),
         catchError(this.handleError)
       );
@@ -44,6 +55,8 @@ export class AuthService {
       .pipe(
         tap(response => {
           this.storeUserData(response);
+          // Redirigir si hay una URL guardada
+          this.redirectAfterLogin();
         }),
         catchError(this.handleError)
       );
@@ -123,5 +136,43 @@ export class AuthService {
   isAdmin(): boolean {
     const user = this.currentUserSubject.value;
     return user?.roles?.includes('ROLE_ADMIN');
+  }
+
+  // Métodos para manejar el modal de login
+  openLoginModal(redirectUrl: string | null = null): void {
+    // Guardar URL de redirección si se proporciona
+    if (redirectUrl) {
+      this.redirectUrl = redirectUrl;
+    }
+    
+    // Mostrar mensaje al usuario
+    this.snackBar.open('You need to log in to reserve tickets', 'Close', {
+      duration: 5000,
+      panelClass: ['info-snackbar']
+    });
+    
+    // Abrir el modal
+    this.loginModalSubject.next(true);
+  }
+
+  closeLoginModal(): void {
+    this.loginModalSubject.next(false);
+  }
+
+  // Redirigir después del login exitoso
+  redirectAfterLogin(): void {
+    if (this.redirectUrl) {
+      this.router.navigateByUrl(this.redirectUrl);
+      this.redirectUrl = null;
+    }
+  }
+
+  // Guardar URL para redirección
+  setRedirectUrl(url: string): void {
+    this.redirectUrl = url;
+  }
+
+  getRedirectUrl(): string | null {
+    return this.redirectUrl;
   }
 }

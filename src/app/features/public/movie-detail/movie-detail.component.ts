@@ -91,6 +91,12 @@ export class PublicMovieDetailComponent implements OnInit {
     });
   }
 
+  // Método para manejar intentos de reserva cuando el usuario no está autenticado
+  promptLogin(redirectUrl: string): void {
+    // Usar el servicio para abrir el modal de login y guardar la URL de redirección
+    this.authService.openLoginModal(redirectUrl);
+  }
+
   loadMovieAndScreenings(movieId: number): void {
     this.loading = true;
 

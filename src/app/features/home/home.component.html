@@ -252,13 +252,14 @@
                   [routerLink]="
                     isLoggedIn
                       ? ['/reserve', screening.screeningId]
-                      : ['/login']
+                      : null
                   "
                   [queryParams]="
                     !isLoggedIn
                       ? { returnUrl: '/reserve/' + screening.screeningId }
                       : null
                   "
+                  (click)="!isLoggedIn ? promptLogin('/reserve/' + screening.screeningId, $event) : null"
                   class="screening-time-link"
                 >
                   <div class="time-info">

@@ -62,6 +62,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isRegisterModalOpen = false;
 
   private authStatusSub?: Subscription;
+  private loginModalSub?: Subscription;
 
   @HostListener('window:resize', ['$event'])
   onResize() {
@@ -79,11 +80,27 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.updateAuthStatus();
+    
+    // Suscribirse al estado del modal de login
+    this.loginModalSub = this.authService.loginModal$.subscribe(isOpen => {
+      if (isOpen) {
+        this.openLoginModal();
+      }
+    });
+    
+    // Suscribirse a los cambios de estado de autenticación
+    this.authStatusSub = this.authService.currentUser$.subscribe(() => {
+      this.updateAuthStatus();
+    });
   }
 
   ngOnDestroy(): void {
     if (this.authStatusSub) {
       this.authStatusSub.unsubscribe();
+    }
+    
+    if (this.loginModalSub) {
+      this.loginModalSub.unsubscribe();
     }
   }
 
@@ -116,6 +133,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   closeLoginModal(): void {
     this.isLoginModalOpen = false;
+    this.authService.closeLoginModal();
   }
 
   openRegisterModal(): void {
@@ -142,6 +160,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   onAuthSuccess(): void {
     this.updateAuthStatus();
+    this.closeLoginModal();
+    this.closeRegisterModal();
+    
+    // Redirigir si hay una URL guardada
+    if (this.authService.getRedirectUrl()) {
+      this.authService.redirectAfterLogin();
+    }
   }
 
   onRegisterSuccess(): void {

@@ -771,4 +771,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   getCurrentDate(): Date {
     return new Date();
   }
+
+  // Método para manejar intentos de reserva cuando el usuario no está autenticado
+  promptLogin(redirectUrl: string, event?: Event): void {
+    // Detener la propagación del evento si es necesario
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    // Usar el servicio para abrir el modal de login y guardar la URL de redirección
+    this.authService.openLoginModal(redirectUrl);
+  }
 }
