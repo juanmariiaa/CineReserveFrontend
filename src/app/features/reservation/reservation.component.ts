@@ -357,7 +357,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
               id: data.movieId,
               title: data.movieTitle,
               posterUrl: data.moviePosterUrl,
-              tmdbId: 0, // Valor requerido pero no usado en este contexto
+              tmdbId: 0, // Required value but not used in this context
             },
           };
 
@@ -529,7 +529,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
   }
 
   getTotalPrice(): number {
-    // Precio fijo de 10€ por asiento
+    // Fixed price of 10€ per seat
     const pricePerSeat = 10;
     const numberOfSeats = this.selectedSeats.length;
 

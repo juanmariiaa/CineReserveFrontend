@@ -47,7 +47,7 @@
                 <div class="detail-item">
                   <mat-icon>place</mat-icon>
                   <div class="detail-content">
-                    <span class="detail-label">Sala</span>
+                    <span class="detail-label">Room</span>
                     <span class="detail-value">{{
                       screening.room?.number
                     }}</span>
@@ -57,7 +57,7 @@
                 <div class="detail-item">
                   <mat-icon>schedule</mat-icon>
                   <div class="detail-content">
-                    <span class="detail-label">Horario</span>
+                    <span class="detail-label">Schedule</span>
                     <span class="detail-value">{{
                       formatDate(screening.startTime)
                     }}</span>
@@ -67,15 +67,15 @@
                 <div class="detail-item">
                   <mat-icon>euro</mat-icon>
                   <div class="detail-content">
-                    <span class="detail-label">Precio</span>
-                    <span class="detail-value">10€/asiento</span>
+                    <span class="detail-label">Price</span>
+                    <span class="detail-value">10€/seat</span>
                   </div>
                 </div>
 
                 <div class="detail-item">
                   <mat-icon>movie</mat-icon>
                   <div class="detail-content">
-                    <span class="detail-label">Formato</span>
+                    <span class="detail-label">Format</span>
                     <span class="detail-value">{{ screening.format }}</span>
                   </div>
                 </div>
@@ -83,7 +83,7 @@
                 <div class="detail-item">
                   <mat-icon>language</mat-icon>
                   <div class="detail-content">
-                    <span class="detail-label">Idioma</span>
+                    <span class="detail-label">Language</span>
                     <span class="detail-value">{{ screening.language }}</span>
                   </div>
                 </div>
@@ -96,7 +96,7 @@
                 </span>
                 <span class="feature-badge" *ngIf="screening.hasSubtitles">
                   <mat-icon>subtitles</mat-icon>
-                  Subtítulos
+                  Subtitles
                 </span>
               </div>
             </div>
@@ -114,7 +114,7 @@
             <mat-icon>timer</mat-icon>
           </div>
           <div class="timer-text">
-            <span class="timer-label">Tiempo restante</span>
+            <span class="timer-label">Time remaining</span>
             <span class="timer-value">{{ formatTimeRemaining() }}</span>
           </div>
           <mat-progress-bar
@@ -133,11 +133,11 @@
           <div class="section-header">
             <h2 class="section-title">
               <mat-icon>event_seat</mat-icon>
-              Selecciona tus asientos
+              Select your seats
             </h2>
             <div class="seat-counter" *ngIf="selectedSeats.length > 0">
               <span class="counter-number">{{ selectedSeats.length }}</span>
-              <span class="counter-text">seleccionados</span>
+              <span class="counter-text">selected</span>
             </div>
           </div>
 
@@ -167,7 +167,7 @@
             <button
               mat-icon-button
               (click)="resetZoom()"
-              matTooltip="Restablecer zoom"
+              matTooltip="Reset zoom"
               class="reset-zoom-btn"
             >
               <mat-icon>center_focus_strong</mat-icon>
@@ -179,7 +179,7 @@
             <div class="cinema-screen">
               <div class="screen-glow"></div>
               <div class="screen-surface">
-                <span class="screen-text">PANTALLA</span>
+                <span class="screen-text">SCREEN</span>
               </div>
             </div>
           </div>
@@ -203,11 +203,11 @@
                     [disabled]="!seat.available"
                     (click)="toggleSeatSelection(seat)"
                     [matTooltip]="
-                      'Fila ' +
+                      'Row ' +
                       seat.row +
-                      ', Asiento ' +
+                      ', Seat ' +
                       seat.number +
-                      (seat.available ? '' : ' - Ocupado')
+                      (seat.available ? '' : ' - Occupied')
                     "
                     matTooltipPosition="above"
                   >
@@ -220,8 +220,8 @@
 
             <div *ngIf="seats.length === 0" class="no-seats-available">
               <mat-icon>event_busy</mat-icon>
-              <h3>No hay asientos disponibles</h3>
-              <p>Esta sesión no tiene asientos disponibles para reservar.</p>
+              <h3>No seats available</h3>
+              <p>This screening has no seats available for reservation.</p>
             </div>
           </div>
 
@@ -229,15 +229,15 @@
           <div class="seat-legend">
             <div class="legend-item">
               <div class="legend-seat available"></div>
-              <span>Disponible</span>
+              <span>Available</span>
             </div>
             <div class="legend-item">
               <div class="legend-seat occupied"></div>
-              <span>Ocupado</span>
+              <span>Occupied</span>
             </div>
             <div class="legend-item">
               <div class="legend-seat selected"></div>
-              <span>Seleccionado</span>
+              <span>Selected</span>
             </div>
           </div>
         </div>
@@ -248,7 +248,7 @@
             <div class="summary-header">
               <h3>
                 <mat-icon>receipt</mat-icon>
-                Resumen de reserva
+                Reservation Summary
               </h3>
             </div>
 
@@ -257,20 +257,20 @@
                 <div class="empty-icon">
                   <mat-icon>event_seat</mat-icon>
                 </div>
-                <h4>Ningún asiento seleccionado</h4>
+                <h4>No seats selected</h4>
                 <p>
-                  Selecciona asientos del mapa para continuar con tu reserva.
+                  Select seats from the map to continue with your reservation.
                 </p>
               </div>
 
               <div *ngIf="selectedSeats.length > 0" class="selection-summary">
                 <div class="selected-seats">
-                  <h4>Asientos seleccionados</h4>
+                  <h4>Selected seats</h4>
                   <div class="seats-list">
                     <div *ngFor="let seat of selectedSeats" class="seat-item">
                       <div class="seat-details">
                         <span class="seat-position"
-                          >Fila {{ seat.row }}, Asiento {{ seat.number }}</span
+                          >Row {{ seat.row }}, Seat {{ seat.number }}</span
                         >
                         <span class="seat-price">10€</span>
                       </div>
@@ -278,7 +278,7 @@
                         mat-icon-button
                         color="warn"
                         (click)="toggleSeatSelection(seat)"
-                        matTooltip="Eliminar asiento"
+                        matTooltip="Remove seat"
                         class="remove-seat-btn"
                       >
                         <mat-icon>close</mat-icon>
@@ -292,7 +292,7 @@
                     <span
                       >Subtotal ({{ selectedSeats.length }}
                       {{
-                        selectedSeats.length === 1 ? "asiento" : "asientos"
+                        selectedSeats.length === 1 ? "seat" : "seats"
                       }})</span
                     >
                     <span>{{ getTotalPrice() }}€</span>
@@ -313,7 +313,7 @@
                 (click)="clearSelection()"
               >
                 <mat-icon>clear_all</mat-icon>
-                Limpiar
+                Clear
               </button>
               <button
                 mat-raised-button
@@ -324,8 +324,8 @@
               >
                 <mat-spinner *ngIf="reserving" diameter="20"></mat-spinner>
                 <mat-icon *ngIf="!reserving">check_circle</mat-icon>
-                <span *ngIf="!reserving">Confirmar Reserva</span>
-                <span *ngIf="reserving">Procesando...</span>
+                <span *ngIf="!reserving">Confirm Reservation</span>
+                <span *ngIf="reserving">Processing...</span>
               </button>
             </div>
           </div>
@@ -337,7 +337,7 @@
         <div class="mobile-summary">
           <div class="mobile-total">
             <span class="mobile-seats"
-              >{{ selectedSeats.length }} asiento{{
+              >{{ selectedSeats.length }} seat{{
                 selectedSeats.length > 1 ? "s" : ""
               }}</span
             >
@@ -351,7 +351,7 @@
             (click)="confirmReservation()"
           >
             <mat-spinner *ngIf="reserving" diameter="18"></mat-spinner>
-            <span *ngIf="!reserving">Confirmar</span>
+            <span *ngIf="!reserving">Confirm</span>
           </button>
         </div>
       </div>
